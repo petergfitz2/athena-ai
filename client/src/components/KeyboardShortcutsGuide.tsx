@@ -61,8 +61,20 @@ export default function KeyboardShortcutsGuide() {
   // Keyboard event listener
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // Show shortcuts on "?"
+      // Check if the user is typing in an input field
+      const activeElement = document.activeElement;
+      const isInputField = activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.getAttribute('contenteditable') === 'true'
+      );
+      
+      // Show shortcuts on "?" (but not when typing in input fields)
       if (e.key === "?" && !e.metaKey && !e.ctrlKey) {
+        // Don't trigger if user is typing in an input field
+        if (isInputField) {
+          return; // Let the "?" character be typed normally
+        }
         e.preventDefault();
         setIsOpen(true);
         return;
