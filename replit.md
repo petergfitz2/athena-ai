@@ -6,6 +6,30 @@ Athena AI Investing is a luxury conversational investment platform that provides
 
 ## Recent Changes
 
+### October 23, 2025 - Critical UX Improvements & Bug Fixes
+- **Session Persistence Fixed**: Mobile users now stay logged in for 30 days
+  - Updated session configuration with proper cookie settings
+  - sameSite: 'lax' for better mobile compatibility
+  - No more unexpected logouts on mobile devices
+- **FloatingAthenaOrb Added**: AI assistant now accessible from ALL pages
+  - Persistent floating orb in bottom-right corner
+  - Available on Dashboard, Watchlist, Trades, Analytics, Portfolio pages
+  - Opens chat panel on click for instant AI assistance
+- **Enhanced Onboarding Experience**: Clear demo mode indicators throughout
+  - Prominent "DEMO MODE - Virtual Trading" banner
+  - Welcome section explaining $100,000 virtual cash
+  - "Demo Trade - No Real Money" badges in trade modals
+  - Quick action buttons for new users: "Make Your First Trade" and "View Tutorials"
+- **Market News Section**: Prominent news aggregation on Dashboard
+  - 6 latest market news items with sentiment badges (Bullish/Bearish/Neutral)
+  - Shows source, relevant tickers, and timestamps
+  - Clickable for full article view in modal
+- **Portfolio Mock Data Fixed**: Now showing realistic demo portfolio
+  - Total value: $125,850 (was showing $0.00)
+  - 8 realistic tech stock holdings (AAPL, MSFT, GOOGL, TSLA, NVDA, META, AMZN, JPM)
+  - Proper sector allocations and performance metrics
+  - Cash balance: $25,000 for demo trading
+
 ### October 23, 2025 - Payment Integration & Educational Content
 - **Stripe Payment Integration**: Added real payment processing for account funding
   - Integrated Stripe for credit/debit cards, bank transfers (ACH)
@@ -29,11 +53,6 @@ Athena AI Investing is a luxury conversational investment platform that provides
     - Email, phone, and live chat support info
     - Links to tutorials, FAQ, and security resources
     - Popular articles and getting started guides
-- **Navigation Updates**: Added Tutorials, FAQ, and Help Center to user menu and mobile menu
-- **Critical Bug Fix**: ExecuteTradeModal balance display
-  - Fixed $0.00 balance bug - now fetches from /api/portfolio/summary
-  - Balance validation working properly
-  - Trades execute successfully with correct fund validation
 
 ## User Preferences
 
