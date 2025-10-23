@@ -233,7 +233,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                           isActive ? "text-primary" : "text-muted-foreground"
                         }`} />
                         <div className="flex-1">
-                          <p className={`text-sm font-medium ${
+                          <p className={`text-sm font-semibold ${
                             isActive ? "text-primary" : "text-foreground"
                           }`}>
                             {mode.label}

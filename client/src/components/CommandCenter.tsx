@@ -416,7 +416,7 @@ export default function CommandCenter() {
               <div className="flex items-center gap-4">
                 <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 <div>
-                  <h1 className="text-2xl font-light text-foreground">
+                  <h1 className="text-2xl font-medium text-foreground">
                     {getGreeting()}
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
@@ -433,21 +433,21 @@ export default function CommandCenter() {
                 onClick={isRecording ? stopRecording : startRecording}
                 variant={isRecording ? "destructive" : "default"}
                 size="sm"
-                className="rounded-full"
+                className="rounded-full font-medium"
                 data-testid="button-voice-command"
               >
                 {isRecording ? <Square className="w-4 h-4 mr-2" /> : <Mic className="w-4 h-4 mr-2" />}
-                {isRecording ? "Recording..." : "Voice Command"}
+                <span className="font-semibold">{isRecording ? "Recording..." : "Voice Command"}</span>
               </Button>
               <Button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 variant="ghost"
                 size="sm"
-                className="rounded-full"
+                className="rounded-full font-medium"
                 data-testid="button-toggle-chat"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
-                Chat
+                <span className="font-semibold">Chat</span>
                 {sidebarOpen && <X className="w-4 h-4 ml-2" />}
               </Button>
             </div>
@@ -531,13 +531,13 @@ export default function CommandCenter() {
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
-                <span className="font-light">Portfolio Snapshot</span>
+                <span className="font-medium">Portfolio Snapshot</span>
                 <Shield className="w-5 h-5 text-primary" />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-3xl font-light text-foreground">
+                <p className="text-3xl font-medium text-foreground">
                   <AnimatedCounter 
                     value={portfolioSummary?.totalValue || 0} 
                     formatValue={formatCurrency}
@@ -584,7 +584,7 @@ export default function CommandCenter() {
           <Card className="bg-gradient-to-br from-primary/20 to-purple-600/20 border-white/10 rounded-[20px]">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
-                <span className="font-light">AI Insights</span>
+                <span className="font-medium">AI Insights</span>
                 <Brain className="w-5 h-5 text-primary" />
               </CardTitle>
             </CardHeader>
@@ -628,7 +628,7 @@ export default function CommandCenter() {
           {/* Quick Actions */}
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-4">
-              <CardTitle className="font-light">Quick Actions</CardTitle>
+              <CardTitle className="font-medium">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
@@ -663,7 +663,7 @@ export default function CommandCenter() {
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-1">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
-                <span className="font-light">Market Pulse</span>
+                <span className="font-medium">Market Pulse</span>
                 <Activity className="w-5 h-5 text-primary" />
               </CardTitle>
             </CardHeader>
@@ -763,7 +763,7 @@ export default function CommandCenter() {
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-2">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
-                <span className="font-light">Active Positions</span>
+                <span className="font-medium">Active Positions</span>
                 <Badge variant="outline" className="text-xs">
                   {holdings.length} Holdings
                 </Badge>

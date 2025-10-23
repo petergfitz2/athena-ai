@@ -47,7 +47,7 @@ export default function DemoModeBanner() {
           data-testid="button-restore-demo-banner"
         >
           <Zap className="w-4 h-4 mr-2 text-primary" />
-          Demo Mode
+          <span className="font-medium">Demo Mode</span>
         </Button>
       </div>
     );
@@ -59,12 +59,12 @@ export default function DemoModeBanner() {
       <div className="fixed top-20 right-6 z-30">
         <div className="flex items-center gap-2">
           <Badge 
-            className="rounded-full px-4 py-1.5 bg-gradient-to-r from-primary to-purple-600 border-0 cursor-pointer"
+            className="rounded-full px-4 py-1.5 bg-gradient-to-r from-primary to-purple-600 border-0 cursor-pointer font-medium text-white"
             onClick={() => setIsMinimized(false)}
             data-testid="badge-demo-minimized"
           >
             <Zap className="w-4 h-4 mr-2" />
-            Demo Mode
+            <span className="font-medium">Demo Mode</span>
             <ChevronDown className="w-3 h-3 ml-2" />
           </Badge>
         </div>
