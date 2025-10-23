@@ -62,11 +62,11 @@ export default function TradeSuggestion({
             onApprove?.();
             console.log('Trade approved:', symbol, action);
           }}
-          className="flex-1 rounded-[28px]"
+          className="flex-1 rounded-[28px] bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 hover:scale-105 animate-purple-pulse"
           size="lg"
         >
-          <Check className="h-4 w-4 mr-2" />
-          Approve
+          <Check className="h-5 w-5 mr-2" />
+          <span className="font-medium">Approve Trade</span>
         </Button>
         <Button
           data-testid="button-decline-trade"
@@ -74,12 +74,12 @@ export default function TradeSuggestion({
             onDecline?.();
             console.log('Trade declined:', symbol);
           }}
-          variant="outline"
-          className="flex-1 rounded-[28px] bg-white/5 border-white/10"
-          size="lg"
+          variant="ghost"
+          className="rounded-[28px] bg-white/5 border-white/10 hover:bg-white/10"
+          size="default"
         >
-          <X className="h-4 w-4 mr-2" />
-          Decline
+          <X className="h-4 w-4 mr-1" />
+          <span className="text-sm">Decline</span>
         </Button>
       </div>
     </GlassCard>
