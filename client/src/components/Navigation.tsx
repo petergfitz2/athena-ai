@@ -147,7 +147,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           : "bg-black border-white/10"
       }`}
     >
-      <div className="w-full pl-6 pr-6">
+      <div className="w-full pl-6 pr-6 sm:pr-8 lg:pr-12">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo and Navigation Links */}
           <div className="flex items-center gap-6 h-full">
