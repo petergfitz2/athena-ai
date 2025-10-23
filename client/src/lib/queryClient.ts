@@ -23,6 +23,16 @@ export async function apiRequest(
   return res;
 }
 
+// Helper to make API calls and return parsed JSON
+export async function apiJson<T = any>(
+  method: string,
+  url: string,
+  data?: unknown | undefined,
+): Promise<T> {
+  const res = await apiRequest(method, url, data);
+  return await res.json();
+}
+
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;

@@ -4,7 +4,7 @@ import MarketDataTile from "@/components/MarketDataTile";
 import TradeSuggestion from "@/components/TradeSuggestion";
 import GlassCard from "@/components/GlassCard";
 import { ProtectedRoute, useAuth } from "@/lib/auth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface Trade {
@@ -28,7 +28,7 @@ function DashboardPageContent() {
 
   const handleApprove = async (tradeId: string) => {
     try {
-      await apiRequest("PATCH", `/api/trades/${tradeId}/status`, { status: "approved" });
+      await apiJson("PATCH", `/api/trades/${tradeId}/status`, { status: "approved" });
       
       toast({
         title: "Trade Approved",
@@ -36,10 +36,10 @@ function DashboardPageContent() {
       });
       
       queryClient.invalidateQueries({ queryKey: ["/api/trades/pending"] });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to approve trade",
+        description: error.message || "Failed to approve trade",
         variant: "destructive",
       });
     }
@@ -47,7 +47,7 @@ function DashboardPageContent() {
 
   const handleDecline = async (tradeId: string) => {
     try {
-      await apiRequest("PATCH", `/api/trades/${tradeId}/status`, { status: "rejected" });
+      await apiJson("PATCH", `/api/trades/${tradeId}/status`, { status: "rejected" });
       
       toast({
         title: "Trade Declined",
@@ -55,10 +55,10 @@ function DashboardPageContent() {
       });
       
       queryClient.invalidateQueries({ queryKey: ["/api/trades/pending"] });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to decline trade",
+        description: error.message || "Failed to decline trade",
         variant: "destructive",
       });
     }
