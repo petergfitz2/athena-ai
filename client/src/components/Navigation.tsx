@@ -35,7 +35,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
 
   const handleLogout = async () => {
     try {
-      await apiJson("POST", "/api/logout", {});
+      await apiJson("POST", "/api/auth/logout", {});
       window.location.href = "/";
     } catch (error) {
       toast({
@@ -76,15 +76,13 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/dashboard">
-            <a className="flex items-center gap-3 hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              <span className="text-xl font-light tracking-tight text-foreground">
-                Athena
-              </span>
-            </a>
+          <Link href="/dashboard" className="flex items-center gap-3 hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">A</span>
+            </div>
+            <span className="text-xl font-light tracking-tight text-foreground">
+              Athena
+            </span>
           </Link>
 
           {/* Desktop Navigation Links */}
@@ -93,18 +91,18 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               const Icon = link.icon;
               const active = isActive(link.href);
               return (
-                <Link key={link.href} href={link.href}>
-                  <a
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-light transition-all ${
-                      active
-                        ? "bg-primary/20 text-primary"
-                        : "text-muted-foreground hover-elevate active-elevate-2"
-                    }`}
-                    data-testid={`link-${link.label.toLowerCase()}`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {link.label}
-                  </a>
+                <Link 
+                  key={link.href} 
+                  href={link.href}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-light transition-all ${
+                    active
+                      ? "bg-primary/20 text-primary"
+                      : "text-muted-foreground hover-elevate active-elevate-2"
+                  }`}
+                  data-testid={`link-${link.label.toLowerCase()}`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {link.label}
                 </Link>
               );
             })}
@@ -134,19 +132,19 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   const Icon = link.icon;
                   const active = isActive(link.href);
                   return (
-                    <Link key={link.href} href={link.href}>
-                      <a
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-[20px] text-sm font-light transition-all ${
-                          active
-                            ? "bg-primary/20 text-primary"
-                            : "text-muted-foreground hover-elevate active-elevate-2"
-                        }`}
-                        data-testid={`mobile-link-${link.label.toLowerCase()}`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        {link.label}
-                      </a>
+                    <Link 
+                      key={link.href} 
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-[20px] text-sm font-light transition-all ${
+                        active
+                          ? "bg-primary/20 text-primary"
+                          : "text-muted-foreground hover-elevate active-elevate-2"
+                      }`}
+                      data-testid={`mobile-link-${link.label.toLowerCase()}`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      {link.label}
                     </Link>
                   );
                 })}

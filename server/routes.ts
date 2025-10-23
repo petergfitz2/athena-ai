@@ -97,19 +97,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
-    const user = req.user as any;
-    res.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      fullName: user.fullName,
-    });
+  app.post("/api/auth/login", (req, res, next) => {
+    passport.authenticate("local", (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ error: "Authentication error" });
+      }
+      if (!user) {
+        return res.status(401).json({ error: info?.message || "Invalid credentials" });
+      }
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          return res.status(500).json({ error: "Login failed" });
+        }
+        res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.fullName,
+        });
+      });
+    })(req, res, next);
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    req.logout(() => {
-      res.json({ success: true });
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({ error: "Session destruction failed" });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ success: true });
+      });
     });
   });
 

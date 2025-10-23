@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { apiJson } from "@/lib/queryClient";
+import { apiJson, queryClient } from "@/lib/queryClient";
 import { DollarSign, User, Bell, Lock } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
@@ -62,9 +62,14 @@ function SettingsPageContent() {
       await apiJson("POST", "/api/account/deposit", {
         amount: fundAmount,
       });
+      
+      // Invalidate portfolio queries to refresh balance
+      queryClient.invalidateQueries({ queryKey: ['/api/portfolio/summary'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
+      
       toast({
-        title: "Deposit Initiated",
-        description: `$${fundAmount} will be added to your account`,
+        title: "Funds Added",
+        description: `$${fundAmount} has been added to your account`,
       });
       setFundAmount("");
     } catch (error: any) {
