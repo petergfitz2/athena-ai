@@ -1,51 +1,45 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AuthProvider, useAuth } from "@/lib/auth";
-import { AppSidebar } from "@/components/AppSidebar";
+import { ModeProvider, useMode } from "@/contexts/ModeContext";
 import AuthPage from "@/pages/AuthPage";
-import DashboardPage from "@/pages/DashboardPage";
-import PortfolioPage from "@/pages/PortfolioPage";
-import ChatPage from "@/pages/ChatPage";
+import AmandaMode from "@/pages/AmandaMode";
+import HybridMode from "@/pages/HybridMode";
+import TerminalMode from "@/pages/TerminalMode";
+import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
-function AppLayout({ children }: { children: React.ReactNode }) {
+function ModeSelectorPage() {
   const { user } = useAuth();
-  const [location] = useLocation();
-  
-  // Don't show sidebar on auth page
-  if (location === "/" || !user) {
-    return <>{children}</>;
+  const { currentMode } = useMode();
+  const [, setLocation] = useLocation();
+
+  if (!user) {
+    return <Redirect to="/" />;
   }
 
-  const style = {
-    "--sidebar-width": "16rem",
-    "--sidebar-width-icon": "3rem",
-  };
+  // Auto-redirect to saved mode
+  if (currentMode) {
+    setLocation(`/${currentMode}`);
+  }
 
   return (
-    <SidebarProvider style={style as React.CSSProperties}>
-      <div className="flex h-screen w-full">
-        <AppSidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <header className="flex items-center gap-2 p-4 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-            <SidebarTrigger data-testid="button-sidebar-toggle">
-              <Button variant="ghost" size="icon" className="hover-elevate">
-                <Menu className="w-5 h-5" />
-              </Button>
-            </SidebarTrigger>
-          </header>
-          <main className="flex-1 overflow-auto">
-            {children}
-          </main>
+    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <div className="max-w-4xl w-full">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground mb-4">
+            Welcome to Athena
+          </h1>
+          <p className="text-lg text-muted-foreground font-light">
+            Choose your interface mode
+          </p>
         </div>
+        <ModeSelector />
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
 
@@ -53,9 +47,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={AuthPage} />
-      <Route path="/dashboard" component={DashboardPage} />
-      <Route path="/portfolio" component={PortfolioPage} />
-      <Route path="/chat" component={ChatPage} />
+      <Route path="/select-mode" component={ModeSelectorPage} />
+      <Route path="/amanda" component={AmandaMode} />
+      <Route path="/hybrid" component={HybridMode} />
+      <Route path="/terminal" component={TerminalMode} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -65,14 +60,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <div className="dark">
-            <Toaster />
-            <AppLayout>
+        <ModeProvider>
+          <TooltipProvider>
+            <div className="dark">
+              <Toaster />
               <Router />
-            </AppLayout>
-          </div>
-        </TooltipProvider>
+            </div>
+          </TooltipProvider>
+        </ModeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
