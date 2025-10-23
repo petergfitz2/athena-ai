@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Plus, X, TrendingUp, TrendingDown, Eye, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ function WatchlistPageContent() {
   const [newSymbol, setNewSymbol] = useState("");
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [buyModalSymbol, setBuyModalSymbol] = useState<string | null>(null);
+  const [updatedSymbols, setUpdatedSymbols] = useState<Set<string>>(new Set());
+  const prevQuotesRef = useRef<Record<string, MarketQuote>>({});
 
   // Fetch watchlist
   const { data: watchlist = [], isLoading: watchlistLoading, error: watchlistError } = useQuery<WatchlistItem[]>({
@@ -41,6 +43,37 @@ function WatchlistPageContent() {
     enabled: symbols.length > 0,
     refetchInterval: 60000, // Refresh every minute
   });
+
+  // Detect price changes and trigger glow animation
+  useEffect(() => {
+    const newUpdatedSymbols = new Set<string>();
+    
+    Object.keys(quotes).forEach(symbol => {
+      const currentQuote = quotes[symbol];
+      const prevQuote = prevQuotesRef.current[symbol];
+      
+      // Check if price changed
+      if (prevQuote && currentQuote.price !== prevQuote.price) {
+        newUpdatedSymbols.add(symbol);
+        
+        // Remove the glow after animation completes
+        setTimeout(() => {
+          setUpdatedSymbols(prev => {
+            const next = new Set(prev);
+            next.delete(symbol);
+            return next;
+          });
+        }, 800); // Match animation duration
+      }
+    });
+    
+    if (newUpdatedSymbols.size > 0) {
+      setUpdatedSymbols(prev => new Set([...Array.from(prev), ...Array.from(newUpdatedSymbols)]));
+    }
+    
+    // Update prev quotes reference
+    prevQuotesRef.current = quotes;
+  }, [quotes]);
 
   // Add to watchlist
   const addMutation = useMutation({
@@ -206,7 +239,9 @@ function WatchlistPageContent() {
               return (
                 <div
                   key={item.id}
-                  className="glass rounded-[28px] p-8 hover-elevate transition-all"
+                  className={`glass rounded-[28px] p-8 hover-elevate transition-all ${
+                    updatedSymbols.has(item.symbol) ? 'animate-data-glow' : ''
+                  }`}
                   data-testid={`watchlist-item-${item.symbol}`}
                 >
                   {/* Header with symbol and remove button */}
