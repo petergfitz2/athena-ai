@@ -147,10 +147,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           : "bg-black border-white/10"
       }`}
     >
-      <div className="w-full pl-3 pr-6">
+      <div className="w-full pl-6 pr-6">
         <div className="flex items-center justify-between h-16">
-          {/* All Navigation Elements - Left Aligned */}
-          <div className="flex items-center gap-4 h-full">
+          {/* Left Side - Logo and Navigation Links */}
+          <div className="flex items-center gap-6 h-full">
             {/* Logo */}
             <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
               <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap leading-none">
@@ -187,10 +187,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               );
             })}
             </div>
+          </div>
 
-            {/* Divider */}
-            <div className="hidden md:block h-6 w-px bg-white/10 mx-2"></div>
-
+          {/* Right Side - Mode Switcher and User Menu */}
+          <div className="hidden md:flex items-center gap-3 h-full">
             {/* Mode Switcher Dropdown - consistent height */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
