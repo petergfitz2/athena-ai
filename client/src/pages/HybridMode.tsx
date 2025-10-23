@@ -1,22 +1,24 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useVoice } from "@/hooks/useVoice";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
-import DashboardPage from "@/pages/DashboardPage";
-import PortfolioPage from "@/pages/PortfolioPage";
+import { useQuery } from "@tanstack/react-query";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import Navigation from "@/components/Navigation";
-import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import ModeSuggestion from "@/components/ModeSuggestion";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, X, MessageCircle, LayoutDashboard, Square, List, Settings, BarChart3 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Mic, Send, X, MessageCircle, TrendingUp, TrendingDown, Activity, Briefcase, Plus, Eye, ArrowUpRight, Sparkles, Zap, ChevronRight, DollarSign, Brain, Shield, Clock } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import type { PortfolioSummary, Holding, NewsArticle } from "@shared/schema";
 
 type Message = {
   id: string;
@@ -27,11 +29,11 @@ type Message = {
 
 function HybridModeContent() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
   useKeyboardShortcuts();
   
-  const [chatExpanded, setChatExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
@@ -40,7 +42,6 @@ function HybridModeContent() {
   }]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [view, setView] = useState<"dashboard" | "portfolio">("dashboard");
   
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [lastMessageTime, setLastMessageTime] = useState<number | null>(null);
@@ -50,12 +51,8 @@ function HybridModeContent() {
   
   const { isRecording, startRecording, stopRecording } = useVoice({
     onTranscript: async (text) => {
-      // Set the input field with the transcript first
       setInput(text);
-      
-      // Automatically send the message after transcript is received
       setTimeout(async () => {
-        // Only proceed if we have text and not already loading
         if (!text.trim() || isLoading) return;
         
         const userMessage: Message = {
@@ -66,14 +63,14 @@ function HybridModeContent() {
         };
 
         setMessages(prev => [...prev, userMessage]);
-        setInput(""); // Clear the input after creating the message
+        setInput("");
         setIsLoading(true);
 
         const currentLastMessageTime = lastMessageTime;
 
         try {
           const data = await apiJson<{ response: string }>("POST", "/api/chat", {
-            message: text, // Use the transcript text directly
+            message: text,
             conversationId,
             lastMessageTime: currentLastMessageTime,
           });
@@ -93,7 +90,6 @@ function HybridModeContent() {
             description: error.message || "Failed to send voice message",
             variant: "destructive",
           });
-          // Remove the failed message from the list
           setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         } finally {
           setIsLoading(false);
@@ -101,7 +97,6 @@ function HybridModeContent() {
       }, 100);
     },
     onResponse: (text) => {
-      // This is for TTS response if backend sends audio back
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
@@ -118,6 +113,37 @@ function HybridModeContent() {
       });
     },
   });
+
+  // Fetch portfolio data
+  const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
+    queryKey: ['/api/portfolio/summary'],
+  });
+
+  const { data: holdings = [], isLoading: holdingsLoading } = useQuery<Holding[]>({
+    queryKey: ['/api/holdings'],
+  });
+
+  const { data: newsData = [] } = useQuery<NewsArticle[]>({
+    queryKey: ['/api/market/news'],
+  });
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  const formatPercent = (value: number) => {
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${value.toFixed(1)}%`;
+  };
+
+  // Mock today's change for demo
+  const todayChange = summary ? (summary.totalValue * 0.024) : 0;
+  const todayChangePercent = 2.4;
 
   useEffect(() => {
     setMode("hybrid");
@@ -184,177 +210,310 @@ function HybridModeContent() {
     }
   };
 
+  const isDataLoading = summaryLoading || holdingsLoading;
+  const hasHoldings = holdings && holdings.length > 0;
+
   return (
-    <div className="relative h-screen bg-black overflow-hidden flex flex-col">
-      {/* Unified Header */}
+    <div className="min-h-screen bg-black flex flex-col">
+      {/* Main Navigation Header */}
       <Navigation />
-      <NavigationBreadcrumbs />
+      
+      {/* Split Screen Layout */}
+      <div className="flex-1 flex h-[calc(100vh-64px)]">
+        {/* Left Side - Dashboard */}
+        <div className="flex-1 overflow-y-auto border-r border-white/10">
+          <div className="p-6 lg:p-8">
+            {/* Dashboard Header */}
+            <div className="mb-6">
+              <h2 className="text-2xl lg:text-3xl font-extralight mb-2">Investment Dashboard</h2>
+              <p className="text-muted-foreground text-sm">
+                Real-time portfolio insights and market analysis
+              </p>
+            </div>
 
-      {/* Main Container - Responsive */}
-      <div className={`flex-1 flex flex-col lg:flex-row transition-all duration-300 ${chatExpanded ? 'lg:mr-[450px]' : 'mr-0'}`}>
-        {/* Sub Header with View Selector - Mobile responsive */}
-        <div className="w-full border-b border-white/10 px-4 sm:px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground font-light hidden sm:block">
-              {view === "dashboard" ? "Investment Dashboard" : "Portfolio Overview"}
-            </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant={view === "dashboard" ? "default" : "ghost"}
-                onClick={() => setView("dashboard")}
-                className="rounded-full flex-1 sm:flex-initial"
-                size="sm"
-                data-testid="button-view-dashboard"
-              >
-                Dashboard
-              </Button>
-              <Button
-                variant={view === "portfolio" ? "default" : "ghost"}
-                onClick={() => setView("portfolio")}
-                className="rounded-full flex-1 sm:flex-initial"
-                size="sm"
-                data-testid="button-view-portfolio"
-              >
-                Portfolio
-              </Button>
-            </div>
+            {/* Portfolio Snapshot */}
+            <Card className="rounded-[28px] border-white/10 bg-white/5 backdrop-blur-xl mb-6">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-normal flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                    Portfolio Snapshot
+                  </CardTitle>
+                  <Badge variant="outline" className="rounded-full">
+                    <Activity className="w-3 h-3 mr-1" />
+                    Live
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {isDataLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-8 bg-white/10 rounded w-32"></div>
+                    <div className="h-6 bg-white/10 rounded w-24"></div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <div className="text-3xl lg:text-4xl font-extralight mb-1">
+                        {summary ? formatCurrency(summary.totalValue) : "$0"}
+                      </div>
+                      <div className={`flex items-center gap-2 text-sm ${todayChangePercent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {todayChangePercent >= 0 ? (
+                          <TrendingUp className="w-4 h-4" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4" />
+                        )}
+                        <span>{formatCurrency(Math.abs(todayChange))}</span>
+                        <span>({formatPercent(todayChangePercent)})</span>
+                        <span className="text-muted-foreground">today</span>
+                      </div>
+                    </div>
+                    
+                    {/* Portfolio Metrics */}
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Total Gain</p>
+                        <p className={`text-lg font-light ${summary && summary.totalGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {summary ? formatPercent(summary.totalGainPercent) : '0%'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Holdings</p>
+                        <p className="text-lg font-light">{holdings.length}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* AI Insights */}
+            <Card className="rounded-[28px] border-white/10 bg-white/5 backdrop-blur-xl mb-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-normal flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-primary" />
+                  AI Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5"></div>
+                    <div className="flex-1">
+                      <p className="text-sm">Your portfolio shows strong momentum with tech holdings outperforming by 12%</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500 mt-1.5"></div>
+                    <div className="flex-1">
+                      <p className="text-sm">Consider rebalancing - tech allocation at 65% exceeds target of 50%</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5"></div>
+                    <div className="flex-1">
+                      <p className="text-sm">Market sentiment bullish - AI and clean energy sectors showing strength</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="rounded-[28px] border-white/10 bg-white/5 backdrop-blur-xl mb-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-normal flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-primary" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    className="rounded-full justify-start" 
+                    variant="outline"
+                    onClick={() => setLocation('/trades')}
+                    data-testid="button-buy-stocks"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Buy Stocks
+                  </Button>
+                  <Button 
+                    className="rounded-full justify-start" 
+                    variant="outline"
+                    onClick={() => setLocation('/portfolio')}
+                    data-testid="button-view-portfolio"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Portfolio
+                  </Button>
+                  <Button 
+                    className="rounded-full justify-start" 
+                    variant="outline"
+                    onClick={() => setLocation('/watchlist')}
+                    data-testid="button-watchlist"
+                  >
+                    <Activity className="w-4 h-4 mr-2" />
+                    Watchlist
+                  </Button>
+                  <Button 
+                    className="rounded-full justify-start" 
+                    variant="outline"
+                    onClick={() => setLocation('/analytics')}
+                    data-testid="button-analytics"
+                  >
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Analytics
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Market Pulse */}
+            <Card className="rounded-[28px] border-white/10 bg-white/5 backdrop-blur-xl">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-normal flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-primary" />
+                  Market Pulse
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {newsData.slice(0, 3).map((article, idx) => (
+                    <div key={article.id || idx} className="pb-3 border-b border-white/10 last:border-0 last:pb-0">
+                      <p className="text-sm font-medium mb-1 line-clamp-2">{article.title}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span>{new Date(article.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        {article.sentimentLabel && (
+                          <Badge variant="outline" className="rounded-full text-xs">
+                            {article.sentimentLabel}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        {/* Content Area - Add key to force remount and prevent conflicts */}
-        <div className="flex-1 overflow-auto">
-          {view === "dashboard" ? (
-            <div key="dashboard-hybrid">
-              <DashboardPage />
-            </div>
-          ) : (
-            <div key="portfolio-hybrid">
-              <PortfolioPage />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Floating Athena Orb - Responsive positioning */}
-      {!chatExpanded && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-50">
-          <div 
-            onClick={() => setChatExpanded(true)}
-            className="cursor-pointer group transition-all duration-300 hover:scale-105"
-            data-testid="button-expand-athena"
-          >
-            <div className="sm:hidden">
-              <AthenaTraderAvatar size="mini" showStatus={false} showName={false} isListening={isRecording} />
-            </div>
-            <div className="hidden sm:block">
-              <AthenaTraderAvatar size="small" showStatus={false} showName={false} isListening={isRecording} />
-            </div>
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
-              <div className="px-3 py-1 bg-black/90 backdrop-blur-xl rounded-full border border-white/10">
-                <p className="text-xs text-white/90 whitespace-nowrap">Click to chat</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Expanded Chat Panel - Full screen on mobile, side panel on desktop */}
-      {chatExpanded && (
-        <div className="fixed inset-0 lg:inset-auto lg:right-0 lg:top-16 lg:h-[calc(100vh-64px)] w-full lg:w-[450px] glass border-l border-white/10 flex flex-col z-40">
+        {/* Right Side - Chat Panel (Always Visible on Desktop) */}
+        <div className="hidden lg:flex w-[450px] flex-col border-l border-white/10 bg-black/50 backdrop-blur-xl">
           {/* Chat Header */}
-          <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between glass">
-            <div className="flex items-center gap-4">
+          <div className="flex-shrink-0 p-4 border-b border-white/10 bg-white/5">
+            <div className="flex items-center gap-3">
               <AthenaTraderAvatar 
                 size="mini" 
-                showStatus={false}
+                showStatus={false} 
                 showName={false}
                 isListening={isRecording}
-                isSpeaking={false}
               />
-              <div>
-                <h3 className="text-xl font-extralight text-foreground tracking-wide">Athena</h3>
-                <p className="text-xs text-muted-foreground font-light">AI Investment Advisor</p>
+              <div className="flex-1">
+                <h3 className="font-medium">Athena AI</h3>
+                <p className="text-xs text-muted-foreground">Your investment advisor</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setChatExpanded(false)}
-              className="rounded-full hover-elevate"
-              data-testid="button-collapse-athena"
-              aria-label="Close chat"
-            >
-              <X className="w-5 h-5" />
-            </Button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4" data-testid="hybrid-chat-messages">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} {...message} />
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((msg) => (
+              <ChatMessage
+                key={msg.id}
+                role={msg.role}
+                content={msg.content}
+                timestamp={msg.timestamp}
+                showAvatar={msg.role === "assistant"}
+              />
             ))}
             {isLoading && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div className="flex gap-3">
+                <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
+                <div className="flex-1 glass rounded-2xl p-4">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-75"></div>
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-150"></div>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Input */}
-          <div className="flex-shrink-0 p-4 border-t border-white/10">
-            <div className="flex items-end gap-2">
-              <Button
-                size="icon"
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`rounded-full flex-shrink-0 ${isRecording ? 'bg-destructive text-destructive-foreground' : ''}`}
-                data-testid="button-voice-hybrid"
-                aria-label={isRecording ? "Stop recording" : "Start voice input"}
-              >
-                {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-              </Button>
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    if (input.trim() && !isLoading) {
+          {/* Mode Suggestion */}
+          {shouldShow && suggestion && (
+            <div className="px-4 pb-2">
+              <ModeSuggestion
+                suggestion={suggestion}
+                onAccept={() => {
+                  dismissSuggestion();
+                  setLocation(suggestion.targetMode === "athena" ? "/athena" : "/terminal");
+                }}
+                onDismiss={dismissSuggestion}
+              />
+            </div>
+          )}
+
+          {/* Chat Input */}
+          <div className="flex-shrink-0 p-4 border-t border-white/10 bg-white/5">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
                       handleSendMessage();
                     }
-                  }
-                }}
-                placeholder="Ask Athena anything..."
-                className="flex-1 min-h-[48px] max-h-32 resize-none rounded-[20px] bg-white/10 border-white/20 text-foreground placeholder:text-white/40 px-4"
-                disabled={isLoading}
-                data-testid="input-hybrid-message"
-              />
+                  }}
+                  placeholder="Ask Athena about your portfolio..."
+                  className="resize-none rounded-[20px] bg-black/50 border-white/10 pr-12"
+                  rows={2}
+                  disabled={isLoading}
+                  data-testid="textarea-chat-input"
+                />
+                <Button
+                  onClick={() => isRecording ? stopRecording() : startRecording()}
+                  size="icon"
+                  variant="ghost"
+                  className={`absolute right-2 bottom-2 rounded-full ${isRecording ? 'text-red-500' : ''}`}
+                  disabled={isLoading}
+                  data-testid="button-voice"
+                >
+                  {isRecording ? <X className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                </Button>
+              </div>
               <Button
-                size="icon"
                 onClick={handleSendMessage}
                 disabled={!input.trim() || isLoading}
-                className="rounded-full flex-shrink-0"
-                data-testid="button-send-hybrid"
-                aria-label="Send message"
+                className="rounded-full self-end"
+                size="icon"
+                data-testid="button-send"
               >
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Mode Suggestion */}
-      {shouldShow && suggestion?.recommendedMode && (
-        <ModeSuggestion
-          recommendedMode={suggestion.recommendedMode}
-          reason={suggestion.reason}
-          onDismiss={dismissSuggestion}
-        />
-      )}
+      {/* Mobile Chat Button */}
+      <div className="lg:hidden fixed bottom-6 right-6 z-50">
+        <Button
+          onClick={() => toast({
+            title: "Mobile Chat",
+            description: "Full mobile chat experience coming soon",
+          })}
+          size="icon"
+          className="rounded-full w-14 h-14 shadow-lg"
+          data-testid="button-mobile-chat"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </Button>
+      </div>
     </div>
   );
 }
