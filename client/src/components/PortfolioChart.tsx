@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 
@@ -38,7 +38,18 @@ export default function PortfolioChart({ data, currentValue, totalGainPercent }:
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#A855F7" />
+                <stop offset="100%" stopColor="#EC4899" />
+              </linearGradient>
+              <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#A855F7" stopOpacity={0.3} />
+                <stop offset="50%" stopColor="#A855F7" stopOpacity={0.1} />
+                <stop offset="100%" stopColor="#A855F7" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
             <XAxis 
               dataKey="date" 
@@ -62,21 +73,18 @@ export default function PortfolioChart({ data, currentValue, totalGainPercent }:
               labelStyle={{ color: '#888' }}
               formatter={(value: number) => [`$${value.toLocaleString()}`, 'Portfolio Value']}
             />
-            <Line
+            <Area
               type="monotone"
               dataKey="value"
               stroke="url(#colorGradient)"
-              strokeWidth={2}
+              strokeWidth={3}
+              fill="url(#fillGradient)"
               dot={false}
-              activeDot={{ r: 4, fill: '#A855F7' }}
+              activeDot={{ r: 6, fill: '#A855F7', stroke: '#fff', strokeWidth: 2 }}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
             />
-            <defs>
-              <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#A855F7" />
-                <stop offset="100%" stopColor="#EC4899" />
-              </linearGradient>
-            </defs>
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
