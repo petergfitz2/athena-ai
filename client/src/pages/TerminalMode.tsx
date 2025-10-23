@@ -8,10 +8,20 @@ import { useModeSuggestion } from "@/hooks/useConversationContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import NewsDetailModal from "@/components/NewsDetailModal";
+import ChatMessage from "@/components/ChatMessage";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, Activity, LayoutDashboard } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { TrendingUp, TrendingDown, Activity, LayoutDashboard, Send, Mic } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { NewsArticle } from "@shared/schema";
+
+type Message = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: string;
+};
 
 interface Holding {
   id: string;
@@ -23,6 +33,7 @@ interface Holding {
 function TerminalModeContent() {
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   useKeyboardShortcuts();
   
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -31,6 +42,16 @@ function TerminalModeContent() {
   
   const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
   const [newsModalOpen, setNewsModalOpen] = useState(false);
+  
+  const [messages, setMessages] = useState<Message[]>([{
+    id: "welcome",
+    role: "assistant",
+    content: "Good morning, Peter. Strong buy signal on EQIX—data center demand is exploding as AI companies need massive computing infrastructure. Revenue's up 24% year-over-year.",
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  }]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastMessageTime, setLastMessageTime] = useState<number | null>(null);
 
   useEffect(() => {
     setMode("terminal");
@@ -89,6 +110,50 @@ function TerminalModeContent() {
   const dailyChange = 2847.32;
   const dailyChangePercent = 2.3;
 
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: input,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    const currentLastMessageTime = lastMessageTime;
+
+    try {
+      const data = await apiJson<{ response: string }>("POST", "/api/chat", {
+        message: input,
+        conversationId,
+        lastMessageTime: currentLastMessageTime,
+      });
+
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: data.response,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+      setLastMessageTime(Date.now());
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message",
+        variant: "destructive",
+      });
+      setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="h-screen bg-black overflow-hidden flex flex-col">
       {/* Header - Compact */}
@@ -123,7 +188,7 @@ function TerminalModeContent() {
       </div>
 
       {/* Multi-Panel Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 overflow-auto">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 overflow-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
         {/* Markets Panel */}
         <div className="glass rounded-[20px] p-4 overflow-auto">
           <h2 className="text-lg font-light text-foreground mb-4 flex items-center gap-2">
@@ -320,11 +385,66 @@ function TerminalModeContent() {
         </div>
       </div>
 
-      {/* Footer - Voice Available */}
-      <div className="flex-shrink-0 border-t border-white/10 px-6 py-2">
-        <p className="text-xs text-muted-foreground text-center">
-          Amanda voice available • Press Cmd/Ctrl + K to activate
-        </p>
+      {/* Chat Section */}
+      <div className="flex-shrink-0 border-t border-white/10 bg-black/50">
+        {/* Messages Preview - Compact */}
+        <div className="px-6 py-2 max-h-20 overflow-y-auto space-y-1">
+          {messages.slice(-2).map((message) => (
+            <div key={message.id} className="flex items-start gap-2">
+              <p className="text-xs text-muted-foreground flex-shrink-0">{message.role === 'user' ? 'You' : 'Amanda'}:</p>
+              <p className="text-xs text-foreground line-clamp-1">{message.content}</p>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Input */}
+        <div className="px-6 py-3 border-t border-white/10">
+          <div className="flex items-center gap-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="rounded-full flex-shrink-0"
+              data-testid="button-voice-terminal"
+            >
+              <Mic className="w-4 h-4" />
+            </Button>
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder="Any good buying opportunities?"
+              className="flex-1 h-10 rounded-full bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground"
+              disabled={isLoading}
+              data-testid="input-terminal-message"
+            />
+            <Button
+              size="icon"
+              onClick={handleSendMessage}
+              disabled={!input.trim() || isLoading}
+              className="rounded-full flex-shrink-0"
+              data-testid="button-send-terminal"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            Press Enter to send • Shift+Enter for new line • Cmd/Ctrl + K for voice
+          </p>
+        </div>
       </div>
 
       {/* Mode Suggestion */}
