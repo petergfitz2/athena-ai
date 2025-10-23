@@ -7,7 +7,7 @@ import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
-import AmandaAvatar from "@/components/AmandaAvatar";
+import AthenaOrb from "@/components/AthenaOrb";
 import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
@@ -209,16 +209,25 @@ function HybridModeContent() {
         </div>
       </div>
 
-      {/* Floating Mini Amanda (Bottom-Right) */}
+      {/* Floating Athena Orb (Bottom-Right) */}
       {!chatExpanded && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button
+        <div className="fixed bottom-8 right-8 z-50">
+          <div 
             onClick={() => setChatExpanded(true)}
-            className="rounded-full w-20 h-20 p-0 bg-gradient-to-br from-primary to-accent shadow-2xl hover:scale-110 transition-transform"
-            data-testid="button-expand-amanda"
+            className="cursor-pointer group transition-all duration-300 hover:scale-105"
+            data-testid="button-expand-athena"
           >
-            <AmandaAvatar size="medium" />
-          </Button>
+            <AthenaOrb 
+              size="small" 
+              showStatus={false}
+              isListening={isRecording}
+            />
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="px-3 py-1 bg-black/90 backdrop-blur-xl rounded-full border border-white/10">
+                <p className="text-xs text-white/90 whitespace-nowrap">Click to chat</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -226,20 +235,25 @@ function HybridModeContent() {
       {chatExpanded && (
         <div className="fixed right-0 top-0 h-screen w-[500px] glass border-l border-white/10 flex flex-col z-40">
           {/* Chat Header */}
-          <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AmandaAvatar size="small" />
+          <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between glass">
+            <div className="flex items-center gap-4">
+              <AthenaOrb 
+                size="mini" 
+                showStatus={false}
+                isListening={isRecording}
+                isSpeaking={false}
+              />
               <div>
-                <h3 className="text-lg font-light text-foreground">Amanda</h3>
-                <p className="text-xs text-muted-foreground">Your AI Advisor</p>
+                <h3 className="text-xl font-extralight text-foreground tracking-wide">Athena</h3>
+                <p className="text-xs text-muted-foreground font-light">AI Investment Advisor</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setChatExpanded(false)}
-              className="rounded-full"
-              data-testid="button-collapse-amanda"
+              className="rounded-full hover-elevate"
+              data-testid="button-collapse-athena"
             >
               <X className="w-5 h-5" />
             </Button>

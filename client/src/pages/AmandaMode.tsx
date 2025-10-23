@@ -8,7 +8,7 @@ import { useVoice } from "@/hooks/useVoice";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
-import AmandaAvatar from "@/components/AmandaAvatar";
+import AthenaOrb from "@/components/AthenaOrb";
 import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
@@ -215,27 +215,30 @@ function AmandaModeContent() {
         <div className="w-[420px] flex-shrink-0 bg-gradient-to-br from-primary/10 via-black to-black border-r border-white/10 flex flex-col">
           {/* Amanda Avatar - Video Call Style */}
           <div className="flex-1 flex items-center justify-center p-8">
-            <div className="relative">
-              <AmandaAvatar 
-                size="large" 
+            <div className="relative flex flex-col items-center">
+              <AthenaOrb 
+                size="full" 
                 isListening={isRecording || voiceStatus === "listening"}
                 isSpeaking={voiceStatus === "speaking"}
+                isTyping={isLoading}
+                showStatus={false}
               />
-              {/* Status Indicator */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                {isRecording || voiceStatus === "listening" ? (
-                  <div className="px-4 py-1.5 rounded-full bg-primary/20 border border-primary/50 backdrop-blur-md">
-                    <p className="text-xs text-primary font-light">Listening...</p>
-                  </div>
-                ) : voiceStatus === "speaking" ? (
-                  <div className="px-4 py-1.5 rounded-full bg-primary/20 border border-primary/50 backdrop-blur-md">
-                    <p className="text-xs text-primary font-light">Speaking...</p>
-                  </div>
-                ) : (
-                  <div className="px-4 py-1.5 rounded-full bg-card/50 border border-white/10 backdrop-blur-md">
-                    <p className="text-xs text-muted-foreground font-light">Ready to help</p>
-                  </div>
-                )}
+              {/* Athena Text */}
+              <div className="mt-8 text-center">
+                <h1 className="text-6xl font-extralight text-foreground tracking-wider mb-2">Athena</h1>
+                <div className="px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md inline-block">
+                  {isRecording || voiceStatus === "listening" ? (
+                    <p className="text-sm text-primary font-light animate-pulse">Listening to you...</p>
+                  ) : voiceStatus === "speaking" ? (
+                    <p className="text-sm text-primary font-light animate-pulse">Speaking...</p>
+                  ) : isLoading ? (
+                    <p className="text-sm text-muted-foreground font-light">
+                      <span className="thinking-dots">Thinking</span>
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground font-light">Ready to help</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
