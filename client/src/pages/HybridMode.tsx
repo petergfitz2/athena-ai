@@ -34,7 +34,7 @@ function HybridModeContent() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
-    content: "Hi! I'm Athena, your AI investment advisor.\n\nHow can I help you with your portfolio today?",
+    content: "Hi! I'm Athena, your AI investment advisor. How can I help you with your portfolio today?",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState("");

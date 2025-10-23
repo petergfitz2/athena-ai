@@ -849,22 +849,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           { id: 'mock-3', userId: user.id, symbol: 'GOOGL', quantity: '15', averageCost: '125.75', createdAt: new Date(), updatedAt: new Date() },
           { id: 'mock-4', userId: user.id, symbol: 'TSLA', quantity: '30', averageCost: '210.25', createdAt: new Date(), updatedAt: new Date() },
           { id: 'mock-5', userId: user.id, symbol: 'NVDA', quantity: '20', averageCost: '450.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-6', userId: user.id, symbol: 'META', quantity: '35', averageCost: '300.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-7', userId: user.id, symbol: 'AMZN', quantity: '40', averageCost: '140.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-8', userId: user.id, symbol: 'JPM', quantity: '45', averageCost: '145.00', createdAt: new Date(), updatedAt: new Date() },
         ];
         
-        // Return mock summary data
+        // Return mock summary data with correct $125,850 total value
         return res.json({
-          totalValue: 125000,
+          totalValue: 125850,
           totalCost: 110000,
-          totalGain: 15000,
-          totalGainPercent: 13.64,
+          totalGain: 15850,
+          totalGainPercent: 14.41,
           cashBalance: 25000,
           holdingsCount: 8,
           topHoldings: [
-            { symbol: 'AAPL', value: 8916, percentOfPortfolio: 7.13 },
-            { symbol: 'MSFT', value: 9472.75, percentOfPortfolio: 7.58 },
-            { symbol: 'NVDA', value: 9906.4, percentOfPortfolio: 7.93 },
-            { symbol: 'TSLA', value: 7285.2, percentOfPortfolio: 5.83 },
-            { symbol: 'GOOGL', value: 2127, percentOfPortfolio: 1.70 },
+            { symbol: 'AAPL', value: 8916, percentOfPortfolio: 7.08 },
+            { symbol: 'MSFT', value: 9472.75, percentOfPortfolio: 7.52 },
+            { symbol: 'NVDA', value: 9906.4, percentOfPortfolio: 7.87 },
+            { symbol: 'META', value: 11375, percentOfPortfolio: 9.04 },
+            { symbol: 'TSLA', value: 7285.2, percentOfPortfolio: 5.79 },
           ],
         } as PortfolioSummary);
       }
