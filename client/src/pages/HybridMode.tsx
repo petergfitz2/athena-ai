@@ -425,7 +425,6 @@ function HybridModeContent() {
                 role={msg.role}
                 content={msg.content}
                 timestamp={msg.timestamp}
-                showAvatar={msg.role === "assistant"}
               />
             ))}
             {isLoading && (
@@ -443,14 +442,11 @@ function HybridModeContent() {
           </div>
 
           {/* Mode Suggestion */}
-          {shouldShow && suggestion && (
+          {shouldShow && suggestion && suggestion.recommendedMode && (
             <div className="px-4 pb-2">
               <ModeSuggestion
-                suggestion={suggestion}
-                onAccept={() => {
-                  dismissSuggestion();
-                  setLocation(suggestion.targetMode === "athena" ? "/athena" : "/terminal");
-                }}
+                recommendedMode={suggestion.recommendedMode}
+                reason={suggestion.reason}
                 onDismiss={dismissSuggestion}
               />
             </div>
