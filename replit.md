@@ -4,6 +4,22 @@
 
 Athena AI Investing is a luxury conversational investment platform that provides AI-powered investment advice and portfolio management. It aims to combine the accessibility of a conversational interface with sophisticated financial intelligence. The platform offers three adaptive interface modes—Amanda Mode (conversational AI avatar), Hybrid Mode (dashboard with mini-Amanda), and Terminal Mode (multi-panel institutional interface)—to cater to diverse user preferences and investment needs. Its core purpose is to make advanced investment capabilities available through an intuitive, conversational user experience, positioning itself as a revolutionary first-mover in AI-driven wealth management.
 
+## Recent Changes
+
+### October 23, 2025 - Design & UX Improvements
+- **ExecuteTradeModal Redesign**: Complete visual overhaul for better readability
+  - Replaced low-contrast dark backgrounds with lighter gradient (from-[#0a0a0a] to-[#141414])
+  - Increased all text to white/high-contrast (text-white, text-white/60)
+  - Enlarged input fields to h-12 with better borders (border-white/20)
+  - Uppercase labels with tracking for clear hierarchy
+  - Larger fonts: text-base for inputs, text-xl for values
+  - Order preview section: Purple-tinted gradient background with prominent border
+  - Generous spacing throughout (space-y-6, p-6)
+  - Improved button sizing (h-12) with clear visual distinction
+- **Settings Page Fix**: Separated shared button state into independent states (isAddingFunds, isUpdatingProfile, isChangingPassword)
+- **Watchlist Integration**: Added prefilledSymbol prop to ExecuteTradeModal for seamless symbol pre-fill
+- **Password Schema Fix**: Corrected backend to use `password` field consistently
+
 ## User Preferences
 
 - I prefer simple language.

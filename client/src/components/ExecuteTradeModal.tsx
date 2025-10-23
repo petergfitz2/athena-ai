@@ -163,57 +163,57 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass rounded-[28px] border-white/10 sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-extralight text-foreground">
+      <DialogContent className="rounded-[28px] border-white/5 sm:max-w-lg bg-gradient-to-br from-[#0a0a0a] to-[#141414]">
+        <DialogHeader className="space-y-3 pb-6">
+          <DialogTitle className="text-3xl font-extralight text-white tracking-tight">
             {action === "buy" ? "Buy Stock" : "Sell Stock"}
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground font-light">
+          <DialogDescription className="text-base text-white/60 font-light">
             Execute a {action} order on the market
           </DialogDescription>
         </DialogHeader>
 
         {/* Stock Search */}
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-light text-foreground mb-2 block">
-              Search Stock
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-white/90 tracking-wide">
+              STOCK SYMBOL
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Input
                 value={searchSymbol}
                 onChange={(e) => setSearchSymbol(e.target.value.toUpperCase())}
                 placeholder="Enter symbol (e.g., AAPL)"
-                className="rounded-full bg-card border-white/10 text-foreground placeholder:text-muted-foreground/50"
+                className="rounded-full bg-white/5 border-white/20 text-white placeholder:text-white/30 h-12 text-base focus:border-primary/50 focus:bg-white/8"
                 onKeyDown={(e) => e.key === "Enter" && handleSymbolSearch()}
                 data-testid="input-search-symbol"
               />
               <Button
                 type="button"
                 onClick={handleSymbolSearch}
-                className="rounded-full px-6"
+                className="rounded-full px-6 h-12 bg-primary hover:bg-primary/90"
                 data-testid="button-search-symbol"
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-5 h-5" />
               </Button>
             </div>
           </div>
 
           {/* Quote Display */}
           {quote && selectedSymbol && (
-            <div className="glass rounded-[28px] p-5 space-y-3">
+            <div className="rounded-[28px] p-6 space-y-4 bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-light text-foreground">{selectedSymbol}</h3>
-                  <p className="text-sm text-muted-foreground font-light">{quote.name || "Stock"}</p>
+                  <h3 className="text-3xl font-light text-white tracking-tight">{selectedSymbol}</h3>
+                  <p className="text-base text-white/50 font-light mt-1">{quote.name || "Stock"}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-light text-foreground">${quote.price.toFixed(2)}</p>
-                  <div className={`flex items-center gap-1 text-sm ${
+                  <p className="text-3xl font-light text-white tracking-tight">${quote.price.toFixed(2)}</p>
+                  <div className={`flex items-center gap-1.5 text-base mt-1 ${
                     quote.change >= 0 ? "text-success" : "text-destructive"
                   }`}>
-                    {quote.change >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                    <span className="font-light">
+                    {quote.change >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                    <span className="font-medium">
                       {quote.change >= 0 ? "+" : ""}{quote.changePercent.toFixed(2)}%
                     </span>
                   </div>
@@ -224,21 +224,21 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-2">
             {/* Quantity */}
             <FormField
               control={form.control}
               name="quantity"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-light">Number of Shares</FormLabel>
+                <FormItem className="space-y-3">
+                  <FormLabel className="text-sm font-medium text-white/90 tracking-wide">NUMBER OF SHARES</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type="number"
                       step="0.00000001"
                       placeholder="100"
-                      className="rounded-full bg-card border-white/10 text-foreground placeholder:text-muted-foreground/50"
+                      className="rounded-full bg-white/5 border-white/20 text-white placeholder:text-white/30 h-12 text-base focus:border-primary/50 focus:bg-white/8"
                       data-testid="input-quantity"
                     />
                   </FormControl>
@@ -252,19 +252,19 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
               control={form.control}
               name="orderType"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-light">Order Type</FormLabel>
+                <FormItem className="space-y-3">
+                  <FormLabel className="text-sm font-medium text-white/90 tracking-wide">ORDER TYPE</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="rounded-full bg-card border-white/10 text-foreground" data-testid="select-order-type">
+                      <SelectTrigger className="rounded-full bg-white/5 border-white/20 text-white h-12 text-base focus:border-primary/50" data-testid="select-order-type">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-card border-white/10">
-                      <SelectItem value="market">Market Order</SelectItem>
-                      <SelectItem value="limit">Limit Order</SelectItem>
-                      <SelectItem value="stop">Stop Order</SelectItem>
-                      <SelectItem value="stop_limit">Stop-Limit Order</SelectItem>
+                    <SelectContent className="bg-[#1a1a1a] border-white/20 rounded-[20px]">
+                      <SelectItem value="market" className="text-white">Market Order</SelectItem>
+                      <SelectItem value="limit" className="text-white">Limit Order</SelectItem>
+                      <SelectItem value="stop" className="text-white">Stop Order</SelectItem>
+                      <SelectItem value="stop_limit" className="text-white">Stop-Limit Order</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -278,15 +278,15 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
                 control={form.control}
                 name="limitPrice"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-foreground font-light">Limit Price</FormLabel>
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-sm font-medium text-white/90 tracking-wide">LIMIT PRICE</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="rounded-full bg-card border-white/10 text-foreground placeholder:text-muted-foreground/50"
+                        className="rounded-full bg-white/5 border-white/20 text-white placeholder:text-white/30 h-12 text-base focus:border-primary/50 focus:bg-white/8"
                         data-testid="input-limit-price"
                       />
                     </FormControl>
@@ -302,15 +302,15 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
                 control={form.control}
                 name="stopPrice"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-foreground font-light">Stop Price</FormLabel>
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-sm font-medium text-white/90 tracking-wide">STOP PRICE</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
                         step="0.01"
                         placeholder="0.00"
-                        className="rounded-full bg-card border-white/10 text-foreground placeholder:text-muted-foreground/50"
+                        className="rounded-full bg-white/5 border-white/20 text-white placeholder:text-white/30 h-12 text-base focus:border-primary/50 focus:bg-white/8"
                         data-testid="input-stop-price"
                       />
                     </FormControl>
@@ -325,19 +325,19 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
               control={form.control}
               name="timeInForce"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-foreground font-light">Time in Force</FormLabel>
+                <FormItem className="space-y-3">
+                  <FormLabel className="text-sm font-medium text-white/90 tracking-wide">TIME IN FORCE</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="rounded-full bg-card border-white/10 text-foreground" data-testid="select-time-in-force">
+                      <SelectTrigger className="rounded-full bg-white/5 border-white/20 text-white h-12 text-base focus:border-primary/50" data-testid="select-time-in-force">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-card border-white/10">
-                      <SelectItem value="day">Day (Good for Day)</SelectItem>
-                      <SelectItem value="gtc">GTC (Good Till Canceled)</SelectItem>
-                      <SelectItem value="ioc">IOC (Immediate or Cancel)</SelectItem>
-                      <SelectItem value="fok">FOK (Fill or Kill)</SelectItem>
+                    <SelectContent className="bg-[#1a1a1a] border-white/20 rounded-[20px]">
+                      <SelectItem value="day" className="text-white">Day (Good for Day)</SelectItem>
+                      <SelectItem value="gtc" className="text-white">GTC (Good Till Canceled)</SelectItem>
+                      <SelectItem value="ioc" className="text-white">IOC (Immediate or Cancel)</SelectItem>
+                      <SelectItem value="fok" className="text-white">FOK (Fill or Kill)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -347,22 +347,22 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
 
             {/* Order Preview */}
             {quote && quantity > 0 && (
-              <div className="glass rounded-[28px] p-5 space-y-3 bg-primary/5">
-                <h4 className="text-sm font-light text-muted-foreground uppercase tracking-wide">Order Preview</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground font-light">Estimated {action === "buy" ? "Cost" : "Proceeds"}</span>
-                    <span className="text-foreground font-light">${estimatedCost.toFixed(2)}</span>
+              <div className="rounded-[28px] p-6 space-y-4 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+                <h4 className="text-sm font-semibold text-white/70 uppercase tracking-wider">Order Preview</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-base text-white/60">Estimated {action === "buy" ? "Cost" : "Proceeds"}</span>
+                    <span className="text-xl font-medium text-white">${estimatedCost.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground font-light">Account Balance</span>
-                    <span className="text-foreground font-light">${accountBalance.toFixed(2)}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-base text-white/60">Account Balance</span>
+                    <span className="text-xl font-medium text-white">${accountBalance.toFixed(2)}</span>
                   </div>
                   {action === "buy" && (
-                    <div className="flex justify-between text-sm pt-2 border-t border-white/10">
-                      <span className="text-muted-foreground font-light">Balance After</span>
-                      <span className={`font-light ${
-                        accountBalance - estimatedCost >= 0 ? "text-foreground" : "text-destructive"
+                    <div className="flex justify-between items-center pt-3 border-t border-white/20">
+                      <span className="text-base text-white/60">Balance After</span>
+                      <span className={`text-xl font-semibold ${
+                        accountBalance - estimatedCost >= 0 ? "text-white" : "text-destructive"
                       }`}>
                         ${(accountBalance - estimatedCost).toFixed(2)}
                       </span>
@@ -373,13 +373,13 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
             )}
 
             {/* Actions */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-4 pt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
-                className="flex-1 rounded-full"
+                className="flex-1 rounded-full h-12 text-base border-white/20 text-white hover:bg-white/5"
                 data-testid="button-cancel-trade"
               >
                 Cancel
@@ -387,8 +387,10 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
               <Button
                 type="submit"
                 disabled={isSubmitting || !selectedSymbol || !quantity}
-                className={`flex-1 rounded-full ${
-                  action === "buy" ? "bg-success hover:bg-success/90" : "bg-destructive hover:bg-destructive/90"
+                className={`flex-1 rounded-full h-12 text-base font-medium ${
+                  action === "buy" 
+                    ? "bg-success hover:bg-success/90 text-white" 
+                    : "bg-destructive hover:bg-destructive/90 text-white"
                 }`}
                 data-testid="button-execute-trade"
               >
