@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { ProtectedRoute } from "@/lib/auth";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useVoice } from "@/hooks/useVoice";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useModeSuggestion } from "@/hooks/useConversationContext";
 import AmandaAvatar from "@/components/AmandaAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
+import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Mic, Send, Square } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,10 +31,29 @@ function AmandaModeContent() {
   }]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [lastMessageTime, setLastMessageTime] = useState<number>(Date.now());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useKeyboardShortcuts();
+
+  // Create conversation on mount
+  const createConversation = useMutation({
+    mutationFn: async () => {
+      return apiJson<{ id: string }>("POST", "/api/conversations", {});
+    },
+    onSuccess: (data) => {
+      setConversationId(data.id);
+    },
+  });
+
+  useEffect(() => {
+    createConversation.mutate();
+  }, []);
+
+  // Mode suggestion hook
+  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId, true);
 
   const { status: voiceStatus, transcript, isRecording, startRecording, stopRecording } = useVoice({
     onTranscript: (text) => {
@@ -84,9 +105,13 @@ function AmandaModeContent() {
     setInput("");
     setIsLoading(true);
 
+    const currentLastMessageTime = lastMessageTime;
+
     try {
-      const data = await apiJson<{ response: string }>("POST", "/api/chat", {
+      const data = await apiJson<{ response: string; analysis?: any }>("POST", "/api/chat", {
         message: input,
+        conversationId,
+        lastMessageTime: currentLastMessageTime,
       });
 
       const assistantMessage: Message = {
@@ -97,6 +122,7 @@ function AmandaModeContent() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      setLastMessageTime(Date.now());
     } catch (error: any) {
       toast({
         title: "Error",
@@ -222,6 +248,15 @@ function AmandaModeContent() {
           </p>
         </div>
       </div>
+
+      {/* Mode Suggestion */}
+      {shouldShow && suggestion?.recommendedMode && (
+        <ModeSuggestion
+          recommendedMode={suggestion.recommendedMode}
+          reason={suggestion.reason}
+          onDismiss={dismissSuggestion}
+        />
+      )}
     </div>
   );
 }
