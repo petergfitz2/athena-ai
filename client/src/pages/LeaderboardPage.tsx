@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Trophy, TrendingUp, Target, Medal, Crown, Award, ChevronUp, ChevronDown, Minus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import Navigation from "@/components/Navigation";
 
 interface Trader {
   id: string;
@@ -141,8 +142,10 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-black">
+        <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">
@@ -347,5 +350,6 @@ export default function LeaderboardPage() {
         </Card>
       </div>
     </div>
+    </>
   );
 }
