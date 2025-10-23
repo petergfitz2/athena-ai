@@ -69,24 +69,24 @@ function DashboardPageContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-black p-8">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+      <div className="max-w-[1600px] mx-auto space-y-12 lg:space-y-16">
         {/* Header */}
         <div>
-          <h1 className="text-6xl font-extralight text-foreground tracking-tight mb-3">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mb-3 lg:mb-4">
             Dashboard
           </h1>
-          <p className="text-lg text-muted-foreground font-light">
+          <p className="text-lg lg:text-xl text-muted-foreground font-light">
             Your investment command center
           </p>
         </div>
 
         {/* Market Overview */}
         <section>
-          <h2 className="text-3xl font-light text-foreground mb-6">
+          <h2 className="text-4xl font-extralight text-foreground mb-8">
             Market Overview
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {marketData.map((data) => (
               <MarketDataTile key={data.symbol} {...data} />
             ))}
@@ -96,10 +96,10 @@ function DashboardPageContent() {
         {/* AI Trade Suggestions */}
         {pendingTrades.length > 0 && (
           <section>
-            <h2 className="text-3xl font-light text-foreground mb-6">
+            <h2 className="text-4xl font-extralight text-foreground mb-8">
               AI Trade Suggestions
             </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {pendingTrades.map((trade) => (
                 <TradeSuggestion
                   key={trade.id}

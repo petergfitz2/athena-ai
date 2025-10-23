@@ -52,49 +52,49 @@ function PortfolioPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-8">
-        <div className="text-foreground text-lg font-light">Loading portfolio...</div>
+      <div className="min-h-screen bg-black flex items-center justify-center px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+        <div className="text-foreground text-xl md:text-2xl font-extralight">Loading portfolio...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black p-8">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+      <div className="max-w-[1600px] mx-auto space-y-12 lg:space-y-16">
         {/* Header */}
         <div>
-          <h1 className="text-6xl font-extralight text-foreground tracking-tight mb-3">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mb-3 lg:mb-4">
             Portfolio
           </h1>
-          <p className="text-lg text-muted-foreground font-light">
+          <p className="text-lg lg:text-xl text-muted-foreground font-light">
             Track your investments in real-time
           </p>
         </div>
 
         {/* Summary Card */}
-        <div className="glass rounded-[28px] p-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="glass rounded-[28px] p-8 md:p-12 lg:p-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
             <div>
-              <p className="text-sm text-muted-foreground mb-3 font-light uppercase tracking-wide">
+              <p className="text-sm text-muted-foreground mb-4 font-light uppercase tracking-wider">
                 Total Value
               </p>
-              <p className="text-5xl font-extralight text-foreground" data-testid="text-total-value">
+              <p className="text-4xl md:text-5xl lg:text-6xl font-extralight text-foreground" data-testid="text-total-value">
                 ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-3 font-light uppercase tracking-wide">
+              <p className="text-sm text-muted-foreground mb-4 font-light uppercase tracking-wider">
                 Total Change
               </p>
-              <p className={`text-4xl font-light ${totalChange >= 0 ? 'text-primary' : 'text-destructive'}`}>
+              <p className={`text-3xl md:text-4xl lg:text-5xl font-extralight ${totalChange >= 0 ? 'text-primary' : 'text-destructive'}`}>
                 {totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-3 font-light uppercase tracking-wide">
+              <p className="text-sm text-muted-foreground mb-4 font-light uppercase tracking-wider">
                 Performance
               </p>
-              <p className={`text-4xl font-light ${totalChangePercent >= 0 ? 'text-primary' : 'text-destructive'}`}>
+              <p className={`text-3xl md:text-4xl lg:text-5xl font-extralight ${totalChangePercent >= 0 ? 'text-primary' : 'text-destructive'}`}>
                 {totalChangePercent >= 0 ? '+' : ''}{totalChangePercent.toFixed(2)}%
               </p>
             </div>
@@ -103,18 +103,18 @@ function PortfolioPageContent() {
 
         {/* Holdings */}
         {holdings.length === 0 ? (
-          <div className="glass rounded-[28px] p-16">
+          <div className="glass rounded-[28px] p-12 md:p-16 lg:p-20">
             <div className="text-center">
-              <p className="text-foreground text-2xl font-light mb-3">No holdings yet</p>
-              <p className="text-muted-foreground font-light">
+              <p className="text-foreground text-2xl md:text-3xl font-extralight mb-4">No holdings yet</p>
+              <p className="text-muted-foreground font-light text-base md:text-lg">
                 Start by talking to Athena about investment opportunities
               </p>
             </div>
           </div>
         ) : (
           <div>
-            <h2 className="text-3xl font-light text-foreground mb-6">Your Holdings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 className="text-4xl font-extralight text-foreground mb-8">Your Holdings</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {holdings.map((holding) => {
                 const currentPrice = getMockPrice(holding.symbol);
                 const quantity = parseFloat(holding.quantity);

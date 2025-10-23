@@ -162,24 +162,24 @@ function ChatPageContent() {
   }, [currentConversationId, conversationMessages]);
 
   return (
-    <div className="min-h-screen bg-black p-8">
-      <div className="max-w-5xl mx-auto h-[calc(100vh-4rem)] flex flex-col">
+    <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+      <div className="max-w-[1400px] mx-auto h-[calc(100vh-6rem)] lg:h-[calc(100vh-8rem)] flex flex-col">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-6xl font-extralight text-foreground tracking-tight mb-3">
+        <div className="mb-8 lg:mb-10">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mb-3 lg:mb-4">
             Chat
           </h1>
-          <p className="text-lg text-muted-foreground font-light">
+          <p className="text-lg lg:text-xl text-muted-foreground font-light">
             Talk to your AI investment advisor
           </p>
         </div>
 
         {/* Conversation History */}
         {conversations.length > 0 && (
-          <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
+          <div className="flex gap-3 lg:gap-4 mb-6 lg:mb-8 overflow-x-auto pb-2">
             <button
               onClick={handleNewConversation}
-              className="glass rounded-[28px] px-6 py-3 font-light text-sm whitespace-nowrap transition-all hover:bg-white/8"
+              className="glass rounded-[28px] px-6 lg:px-8 py-3 lg:py-4 font-light text-sm lg:text-base whitespace-nowrap transition-all hover:bg-white/8"
               data-testid="button-new-conversation"
             >
               + New Chat
@@ -188,7 +188,7 @@ function ChatPageContent() {
               <button
                 key={conv.id}
                 onClick={() => handleSelectConversation(conv.id)}
-                className={`glass rounded-[28px] px-6 py-3 font-light text-sm whitespace-nowrap transition-all
+                className={`glass rounded-[28px] px-6 lg:px-8 py-3 lg:py-4 font-light text-sm lg:text-base whitespace-nowrap transition-all
                   ${currentConversationId === conv.id ? 'bg-primary text-primary-foreground' : 'hover:bg-white/8'}`}
                 data-testid={`button-conversation-${conv.id}`}
               >
@@ -200,17 +200,17 @@ function ChatPageContent() {
         )}
 
         {/* Messages */}
-        <div className="flex-1 glass rounded-[28px] p-8 overflow-y-auto mb-6" data-testid="chat-messages">
-          <div className="space-y-6">
+        <div className="flex-1 glass rounded-[28px] p-6 md:p-10 lg:p-12 overflow-y-auto mb-6 lg:mb-8" data-testid="chat-messages">
+          <div className="space-y-6 lg:space-y-8">
             {messages.map((message) => (
               <ChatMessage key={message.id} {...message} />
             ))}
             {isLoading && messages.length > 0 && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div className="flex items-center gap-2 lg:gap-3 text-muted-foreground">
+                <div className="flex gap-1 lg:gap-1.5">
+                  <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             )}
