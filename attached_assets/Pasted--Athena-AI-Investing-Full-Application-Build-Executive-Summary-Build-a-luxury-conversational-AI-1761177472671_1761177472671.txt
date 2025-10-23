@@ -1,0 +1,352 @@
+# Athena AI Investing - Full Application Build
+## Executive Summary
+Build a luxury conversational AI investment platform that positions users as talking to their personal broker who has multi-billion dollar hedge fund intelligence. The platform handles everything from basic questions and trade execution to highly complex technical analysis—all through natural conversation, whether users are driving or doing deep analysis at their desk.
+## Core Value Proposition
+"Investing as easy as talking to a friend. Capabilities as vast as a multi-billion hedge fund."
+## Critical Positioning Principles
+- **Revolutionary First-Mover**: The first platform where you do EVERYTHING through conversation—questions, trades, advanced analysis
+- **Full Spectrum**: Handles basic questions ("Should I buy Apple?") AND complex analysis ("What's my portfolio's Sharpe ratio?")
+- **Complete Platform**: Ask questions, execute trades, get advanced analysis—all through simple conversation
+- **Ease + Power Balance**: Natural conversation with a trusted friend meets multi-billion hedge fund capabilities
+- **Casual Convenience**: "Get portfolio updates while driving" / "Execute trades while working out" / "Deep analysis from your desk"
+- **Competitor Distinction**: They're dumb tools that just display data. Athena is AI that actually UNDERSTANDS markets and DOES the analytical work
+- **Library Analogy**: Other platforms give you access to a library of books (data, filings, charts). Athena is like talking to someone who's already read all the books and can tell you the most relevant information—you don't need to read everything yourself. Intelligence vs access.
+## Messaging Rules
+✅ DO:
+- Lead with trust and ease: "As natural as speaking with a trusted friend"
+- Follow with power: "capabilities of a multi-billion hedge fund"
+- Show casual convenience: "while driving" / "while working out" / "from your couch"
+- Show both basic (simple questions/trades) AND advanced (technical analysis) use cases
+- Emphasize trade execution capability (not just advice)
+- Show sophistication through natural insights, not jargon
+❌ DON'T:
+- Never lead with jargon (13Fs, filings)—lead with convenience and ease
+- Never compare to Bloomberg terminals or Bloomberg-level anything
+- Never just focus on data access—focus on intelligence interpreting data
+## Design System
+### Colors (HSL Format)
+```css
+/* Background Colors */
+--background: 0 0% 0%;           /* Pure black #000000 */
+--card: 0 0% 3.9%;               /* Subtle elevation */
+--card-elevated: 0 0% 7%;        /* More elevated surfaces */
+/* Text Colors */
+--foreground: 0 0% 96.1%;        /* Near-white #f5f5f7 */
+--foreground-secondary: 0 0% 63%; /* Muted gray #a1a1a6 */
+--foreground-tertiary: 0 0% 45%;  /* Less important text */
+/* Accent Colors */
+--primary: 262 83% 58%;          /* Purple #8B5CF6 */
+--primary-dark: 262 83% 48%;     /* Darker purple for hover */
+--accent-blue: 217 91% 60%;      /* Blue #3B82F6 */
+/* Status Colors */
+--success: 142 71% 45%;          /* Green for positive */
+--destructive: 0 84% 60%;        /* Red for negative */
+--warning: 38 92% 50%;           /* Amber for warnings */
+Typography
+Font Family: Inter (system fallbacks: -apple-system, BlinkMacSystemFont, "Segoe UI")
+Headline Weights: 200-300 (ultra-light, creates luxury feel)
+Body Weights: 400-500 (regular to medium)
+Scale:
+Mobile: 0.75rem to 1.6rem
+Tablet: 1rem to 2.5rem
+Desktop: 1.1rem to 4.5rem
+Spacing System
+Small: 0.5rem (8px) - tight spacing
+Medium: 1rem (16px) - standard spacing
+Large: 1.5rem (24px) - generous spacing
+XL: 2rem (32px) - section spacing
+2XL: 3rem (48px) - major section spacing
+Border Radius
+Small elements: 8px (buttons, badges)
+Cards: 28px (rounded-[28px])
+Pills: 9999px (fully rounded)
+Effects
+Glass Morphism: backdrop-blur-md with rgba backgrounds
+Shadows: Soft, subtle - never harsh
+Gradients: Purple to blue (subtle, 0.01-0.08 opacity)
+Borders: 0.5px width, subtle (rgba(255,255,255,0.08))
+Component Patterns
+/* Card Pattern */
+.luxury-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+}
+/* Gradient Accent */
+.gradient-accent {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.05));
+  border: 0.5px solid rgba(139, 92, 246, 0.2);
+}
+/* Text Hierarchy */
+.text-primary { color: #f5f5f7; }      /* Main content */
+.text-secondary { color: #a1a1a6; }    /* Supporting info */
+.text-tertiary { opacity: 0.6; }       /* Least important */
+User Interface Modes
+1. Amanda Mode (Conversational UI)
+Full-screen chat interface
+Photorealistic AI avatar (top third of screen)
+Conversation bubbles below
+Voice input always available
+Minimal portfolio data overlay
+Use Case: Driving, working out, quick questions
+2. Hybrid Mode (Dashboard + Mini Amanda)
+Main area: Portfolio dashboard with charts
+Floating mini Amanda avatar (bottom-right corner)
+Chat expands on click
+Always-visible portfolio performance
+Market data panels
+Use Case: Desktop work, active trading
+3. Terminal Mode (Professional Interface)
+Dense information display
+Multi-panel layout (markets, portfolio, news, analysis)
+Amanda voice available but minimal visual presence
+Advanced charts and metrics
+Institutional-grade data visualization
+Use Case: Deep analysis, professional traders
+Adaptive Intelligence: The platform learns user behavior and progressively reveals deeper insights. Starts simple, grows sophisticated based on questions and trading patterns.
+
+Technical Architecture
+Frontend Stack
+Framework: React 18+ with TypeScript
+Routing: Wouter (lightweight)
+UI Components: shadcn/ui (Radix primitives + Tailwind)
+Styling: Tailwind CSS with custom design tokens
+State Management: TanStack Query for server state
+Real-time: WebSocket client for live data
+Forms: React Hook Form + Zod validation
+Backend Stack
+Runtime: Node.js with Express
+Language: TypeScript
+Database: PostgreSQL (Neon serverless)
+ORM: Drizzle ORM
+Real-time: WebSocket server (ws library)
+Authentication: Passport.js (username/password initially)
+Key Integrations
+OpenAI Realtime API: Voice conversation, GPT-5 for reasoning
+ElevenLabs: High-quality voice synthesis for Amanda
+Alpaca or DriveWealth: Trade execution and brokerage
+Market Data: Real-time stock prices, news feeds
+SEC EDGAR: 13F filings, Form 4 insider transactions
+Database Schema (Initial)
+// Users table
+users {
+  id: uuid (primary key)
+  email: string (unique)
+  passwordHash: string
+  fullName: string
+  createdAt: timestamp
+}
+// Portfolio holdings
+holdings {
+  id: uuid
+  userId: uuid (foreign key)
+  symbol: string
+  quantity: decimal
+  averageCost: decimal
+  updatedAt: timestamp
+}
+// Conversations
+conversations {
+  id: uuid
+  userId: uuid
+  startedAt: timestamp
+  endedAt: timestamp (nullable)
+}
+// Messages
+messages {
+  id: uuid
+  conversationId: uuid
+  role: enum('user', 'assistant')
+  content: text
+  audioUrl: string (nullable)
+  createdAt: timestamp
+}
+// Trade history
+trades {
+  id: uuid
+  userId: uuid
+  symbol: string
+  type: enum('buy', 'sell')
+  quantity: decimal
+  price: decimal
+  status: enum('pending', 'approved', 'executed', 'rejected')
+  executedAt: timestamp (nullable)
+  createdAt: timestamp
+}
+Security Requirements
+Bank-level encryption (TLS 1.3+)
+Zero-knowledge architecture for sensitive data
+Multi-factor authentication (voice + biometric planned)
+Trade approval workflow (explicit user consent)
+Audit logs for all trades and portfolio changes
+Rate limiting on API endpoints
+Performance Targets
+Voice response latency: < 800ms
+Portfolio load time: < 1s
+Real-time data updates: < 100ms lag
+Support 10,000+ concurrent users (at scale)
+MVP Feature Set (Phase 1)
+Authentication
+ Username/password signup/login
+ Session management
+ Email verification
+ Password reset flow
+Core Conversation
+ Text-based chat interface
+ Message history persistence
+ Voice input/output (OpenAI Realtime API)
+ Context-aware responses
+ Portfolio-aware insights
+Portfolio Management
+ View current holdings
+ Real-time portfolio value
+ Performance metrics (returns, Sharpe ratio)
+ Add/edit holdings manually
+ Portfolio optimization suggestions
+Market Data
+ Real-time stock quotes
+ Basic charts (price history)
+ Market news feed
+ Watchlist functionality
+Trade Execution
+ Trade suggestions from AI
+ Explicit approval workflow
+ Order status tracking
+ Trade history
+Intelligence Features (Phase 2)
+SEC Filing Analysis
+ 13F hedge fund positions tracking
+ Form 4 insider transaction alerts
+ AI synthesis: "14 hedge funds initiated positions in XYZ last quarter"
+ Portfolio-aware insights: "Buffett increased KO by 15%—interesting because you hold PEP"
+Management Commentary
+ Earnings call transcript analysis
+ Sentiment scoring
+ Key phrase extraction
+ Year-over-year language comparison
+Advanced Analytics
+ Correlation analysis
+ Risk metrics (beta, volatility, max drawdown)
+ Tax loss harvesting suggestions
+ Sector allocation optimization
+Development Priorities
+Week 1: Foundation
+Authentication system (signup, login, sessions)
+Basic chat interface (text only)
+Portfolio view (manual holdings entry)
+Database schema setup
+Week 2: Core Intelligence
+OpenAI integration (GPT-4 for text responses)
+Portfolio-aware context in conversations
+Basic market data display
+Simple trade suggestion flow
+Week 3: Real-time Features
+WebSocket integration
+Live portfolio value updates
+Real-time market data
+Voice input (OpenAI Realtime API)
+Week 4: Polish & Testing
+UI refinements (follow design system exactly)
+Error handling and loading states
+Performance optimization
+End-to-end testing
+Copy Bank (Pre-approved Messaging)
+Hero Messages
+"Talk to your broker. Who happens to have billion-dollar intelligence."
+"Investing as easy as talking to a friend. Capabilities as vast as a multi-billion hedge fund."
+"Ask anything. 'Should I buy Apple?' or 'What's my Sharpe ratio?' Same AI, same ease."
+Feature Descriptions
+"Get portfolio updates while driving. Execute trades while working out. Deep analysis from your desk."
+"Your broker's AI analyzes everything institutions use to make billion-dollar decisions. You just get clear answers."
+"Behind every answer is AI doing the work of an entire Wall Street team."
+Competitive Positioning
+"Robinhood shows you news. Schwab shows you charts. They're tools. Athena understands markets."
+"Not access to data. Intelligence that's already analyzed the data for you."
+"Other platforms give you a library. Athena is someone who's read all the books."
+Development Commands
+# Install dependencies
+npm install
+# Start development server
+npm run dev
+# Run database migrations
+npm run db:migrate
+# Generate database types
+npm run db:generate
+# Run tests
+npm test
+# Build for production
+npm run build
+Environment Variables Required
+# Database
+DATABASE_URL=postgresql://...
+# Authentication
+SESSION_SECRET=your-secret-here
+# OpenAI
+OPENAI_API_KEY=sk-...
+# Brokerage (Alpaca)
+ALPACA_API_KEY=...
+ALPACA_SECRET_KEY=...
+ALPACA_BASE_URL=https://paper-api.alpaca.markets
+# Optional
+ELEVENLABS_API_KEY=...
+Success Metrics
+User Engagement
+Daily active conversations
+Average session length
+Voice vs text usage ratio
+Return user rate
+Platform Performance
+Portfolio value accuracy
+Trade execution success rate
+AI response quality (user ratings)
+System uptime (target: 99.9%)
+Business Metrics
+Waitlist conversion rate
+User retention (30-day)
+Average portfolio size
+Referral rate
+Getting Started Prompt
+When you create the new Replit, paste this:
+
+"Build the Athena AI Investing application following the complete project brief above.
+
+Tech stack: React + TypeScript, Express, PostgreSQL (Drizzle ORM), WebSocket, OpenAI integration.
+
+Start with Phase 1 MVP:
+
+Authentication (username/password)
+Text-based conversational interface
+Portfolio view with manual holdings entry
+Basic market data display
+Follow the exact design system specified above. Pure black background, Inter font, ultra-light headlines, glass morphism effects, 28px border radius for cards.
+
+First, set up the project structure and authentication system."
+
+---
+## 📋 DOCUMENT 2: Quick Reference Card
+**Copy this for quick lookups during development:**
+```markdown
+# Athena Quick Reference
+## Brand Voice
+✅ "As natural as talking to a friend who has multi-billion hedge fund capabilities"
+✅ "While driving" / "while working out" / "from your desk"
+✅ Basic AND advanced: "Should I buy Apple?" + "What's my Sharpe ratio?"
+❌ Never: Bloomberg comparisons, leading with jargon
+## Color Palette
+- Background: #000000 (pure black)
+- Text: #f5f5f7 (near-white), #a1a1a6 (secondary)
+- Purple: #8B5CF6
+- Blue: #3B82F6
+## Component Style
+- Cards: 28px radius, backdrop-blur, rgba(255,255,255,0.02) background
+- Borders: 0.5px, rgba(255,255,255,0.08)
+- Buttons: Rounded-pill, padding 16-20px vertical
+- Headlines: Font-weight 200-300
+## Tech Stack
+Frontend: React + TypeScript + Tailwind + shadcn/ui
+Backend: Express + PostgreSQL + Drizzle ORM
+Real-time: WebSocket
+AI: OpenAI Realtime API
+Trading: Alpaca API
