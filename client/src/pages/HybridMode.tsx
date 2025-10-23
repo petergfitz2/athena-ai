@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
 import { useAuth } from "@/lib/auth";
@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Mic, Send, X, MessageCircle, TrendingUp, TrendingDown, Activity, Briefcase, Plus, Eye, ArrowUpRight, Sparkles, Zap, ChevronRight, DollarSign, Brain, Shield, Clock } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +33,7 @@ function HybridModeContent() {
   const { user } = useAuth();
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   useKeyboardShortcuts();
   
   const [messages, setMessages] = useState<Message[]>([{
@@ -144,6 +146,11 @@ function HybridModeContent() {
   // Mock today's change for demo
   const todayChange = summary ? (summary.totalValue * 0.024) : 0;
   const todayChangePercent = 2.4;
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     setMode("hybrid");
@@ -400,46 +407,53 @@ function HybridModeContent() {
         </div>
 
         {/* Right Side - Chat Panel (Always Visible on Desktop) */}
-        <div className="hidden lg:flex w-[450px] flex-col border-l border-white/10 bg-black/50 backdrop-blur-xl">
-          {/* Chat Header */}
+        <div className="hidden lg:flex w-[450px] flex-col bg-black/50 backdrop-blur-xl">
+          {/* Chat Header - More Prominent */}
           <div className="flex-shrink-0 p-4 border-b border-white/10 bg-white/5">
             <div className="flex items-center gap-3">
               <AthenaTraderAvatar 
-                size="mini" 
+                size="small" 
                 showStatus={false} 
                 showName={false}
                 isListening={isRecording}
               />
               <div className="flex-1">
-                <h3 className="font-medium">Athena AI</h3>
-                <p className="text-xs text-muted-foreground">Your investment advisor</p>
+                <h3 className="text-lg font-normal">Athena AI Chat</h3>
+                <p className="text-sm text-muted-foreground">Your personal investment advisor</p>
               </div>
+              <Badge variant="outline" className="rounded-full">
+                <Activity className="w-3 h-3 mr-1" />
+                Active
+              </Badge>
             </div>
           </div>
 
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                role={msg.role}
-                content={msg.content}
-                timestamp={msg.timestamp}
-              />
-            ))}
-            {isLoading && (
-              <div className="flex gap-3">
-                <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
-                <div className="flex-1 glass rounded-2xl p-4">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-75"></div>
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-150"></div>
+          {/* Chat Messages - Scrollable Area */}
+          <ScrollArea className="flex-1 p-4">
+            <div className="space-y-4">
+              {messages.map((msg) => (
+                <ChatMessage
+                  key={msg.id}
+                  role={msg.role}
+                  content={msg.content}
+                  timestamp={msg.timestamp}
+                />
+              ))}
+              {isLoading && (
+                <div className="flex gap-3">
+                  <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
+                  <div className="flex-1 glass rounded-2xl p-4">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-75"></div>
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-150"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
 
           {/* Mode Suggestion */}
           {shouldShow && suggestion && suggestion.recommendedMode && (
@@ -452,45 +466,52 @@ function HybridModeContent() {
             </div>
           )}
 
-          {/* Chat Input */}
-          <div className="flex-shrink-0 p-4 border-t border-white/10 bg-white/5">
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <Textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  placeholder="Ask Athena about your portfolio..."
-                  className="resize-none rounded-[20px] bg-black/50 border-white/10 pr-12"
-                  rows={2}
-                  disabled={isLoading}
-                  data-testid="textarea-chat-input"
-                />
-                <Button
-                  onClick={() => isRecording ? stopRecording() : startRecording()}
-                  size="icon"
-                  variant="ghost"
-                  className={`absolute right-2 bottom-2 rounded-full ${isRecording ? 'text-red-500' : ''}`}
-                  disabled={isLoading}
-                  data-testid="button-voice"
-                >
-                  {isRecording ? <X className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                </Button>
+          {/* Chat Input Section - Clear and Prominent */}
+          <div className="flex-shrink-0 border-t border-white/10 bg-white/5 p-4">
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground px-1">
+                Type your message or use voice
+              </p>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    placeholder="Ask Athena about your investments..."
+                    className="resize-none rounded-[28px] bg-black/50 border-white/10 px-4 py-3"
+                    rows={3}
+                    disabled={isLoading}
+                    data-testid="textarea-chat-input"
+                  />
+                  <div className="absolute bottom-3 right-3 flex gap-1">
+                    <Button
+                      onClick={() => isRecording ? stopRecording() : startRecording()}
+                      size="icon"
+                      variant="ghost"
+                      className={`rounded-full hover-elevate ${isRecording ? 'text-red-500 bg-red-500/10' : ''}`}
+                      disabled={isLoading}
+                      data-testid="button-voice"
+                    >
+                      {isRecording ? <X className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                    </Button>
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={!input.trim() || isLoading}
+                      className="rounded-full"
+                      size="icon"
+                      data-testid="button-send"
+                    >
+                      <Send className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
               </div>
-              <Button
-                onClick={handleSendMessage}
-                disabled={!input.trim() || isLoading}
-                className="rounded-full self-end"
-                size="icon"
-                data-testid="button-send"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         </div>
