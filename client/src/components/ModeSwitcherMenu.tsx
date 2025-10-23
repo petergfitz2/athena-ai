@@ -66,11 +66,11 @@ export default function ModeSwitcherMenu() {
           <ChevronDown className="w-4 h-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64 glass border-white/10">
+      <DropdownMenuContent align="start" className="w-64 bg-card border-white/10 backdrop-blur-md">
         <DropdownMenuLabel className="text-xs text-muted-foreground">
           Interface Mode
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-white/5" />
+        <DropdownMenuSeparator className="bg-white/10" />
         {MODES.map((mode) => {
           const Icon = mode.icon;
           const isActive = currentMode === mode.id;
@@ -101,7 +101,7 @@ export default function ModeSwitcherMenu() {
             </DropdownMenuItem>
           );
         })}
-        <DropdownMenuSeparator className="bg-white/5" />
+        <DropdownMenuSeparator className="bg-white/10" />
         <DropdownMenuItem
           onClick={handleLogout}
           className="cursor-pointer text-destructive focus:text-destructive"
