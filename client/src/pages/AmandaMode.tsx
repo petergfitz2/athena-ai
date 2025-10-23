@@ -30,7 +30,7 @@ function AmandaModeContent() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
-    content: "Hello! I'm Athena, your AI investment advisor. I can help you with portfolio questions, market insights, or trade suggestions. How can I assist you today?",
+    content: "Hello! I'm Athena, your AI investment advisor.\n\nI can help you with:\n• Portfolio analysis\n• Market insights\n• Trade suggestions\n\nHow can I assist you today?",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState("");

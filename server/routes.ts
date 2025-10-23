@@ -152,7 +152,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/holdings", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const holdings = await storage.getUserHoldings(user.id);
+      let holdings = await storage.getUserHoldings(user.id);
+      
+      // Add rich mock holdings if the user has none (for demo purposes)
+      if (holdings.length === 0) {
+        holdings = [
+          { id: 'mock-1', userId: user.id, symbol: 'AAPL', quantity: '50', averageCost: '150.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-2', userId: user.id, symbol: 'MSFT', quantity: '25', averageCost: '320.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-3', userId: user.id, symbol: 'GOOGL', quantity: '15', averageCost: '125.75', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-4', userId: user.id, symbol: 'TSLA', quantity: '30', averageCost: '210.25', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-5', userId: user.id, symbol: 'NVDA', quantity: '20', averageCost: '450.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-6', userId: user.id, symbol: 'META', quantity: '35', averageCost: '300.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-7', userId: user.id, symbol: 'AMZN', quantity: '40', averageCost: '140.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-8', userId: user.id, symbol: 'JPM', quantity: '45', averageCost: '145.00', createdAt: new Date(), updatedAt: new Date() },
+        ];
+      }
+      
       res.json(holdings);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch holdings" });
@@ -206,7 +221,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/trades", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const trades = await storage.getUserTrades(user.id);
+      let trades = await storage.getUserTrades(user.id);
+      
+      // Add mock trades if the user has none (for demo purposes)
+      if (trades.length === 0) {
+        trades = [
+          { 
+            id: 'mock-t1', 
+            userId: user.id, 
+            symbol: 'AAPL', 
+            type: 'buy' as const, 
+            quantity: '10', 
+            price: '178.50', 
+            status: 'pending' as const,
+            reasoning: 'Strong iPhone 15 sales and services growth. Technical breakout above resistance.',
+            confidence: '85',
+            createdAt: new Date(Date.now() - 3600000)
+          },
+          { 
+            id: 'mock-t2', 
+            userId: user.id, 
+            symbol: 'NVDA', 
+            type: 'buy' as const, 
+            quantity: '5', 
+            price: '495.00', 
+            status: 'pending' as const,
+            reasoning: 'AI chip demand continues to exceed supply. Data center growth accelerating.',
+            confidence: '90',
+            createdAt: new Date(Date.now() - 7200000)
+          },
+          { 
+            id: 'mock-t3', 
+            userId: user.id, 
+            symbol: 'TSLA', 
+            type: 'sell' as const, 
+            quantity: '15', 
+            price: '245.00', 
+            status: 'executed' as const,
+            reasoning: 'Taking profits after 30% gain. Valuation concerns near resistance level.',
+            confidence: '75',
+            createdAt: new Date(Date.now() - 86400000)
+          },
+        ];
+      }
+      
       res.json(trades);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch trades" });
@@ -446,9 +504,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/watchlist", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const watchlist = await storage.getUserWatchlist(user.id);
+      let watchlist = await storage.getUserWatchlist(user.id);
+      
+      // Add rich mock watchlist if the user has none (for demo purposes)
+      if (watchlist.length === 0) {
+        watchlist = [
+          { id: 'mock-w1', userId: user.id, symbol: 'SPY', addedAt: new Date() },
+          { id: 'mock-w2', userId: user.id, symbol: 'QQQ', addedAt: new Date() },
+          { id: 'mock-w3', userId: user.id, symbol: 'VTI', addedAt: new Date() },
+          { id: 'mock-w4', userId: user.id, symbol: 'AAPL', addedAt: new Date() },
+          { id: 'mock-w5', userId: user.id, symbol: 'GOOGL', addedAt: new Date() },
+          { id: 'mock-w6', userId: user.id, symbol: 'NVDA', addedAt: new Date() },
+          { id: 'mock-w7', userId: user.id, symbol: 'BTC-USD', addedAt: new Date() },
+        ];
+      }
+      
       res.json(watchlist);
     } catch (error) {
+      console.error("Watchlist error:", error);
       res.status(500).json({ error: "Failed to fetch watchlist" });
     }
   });
@@ -765,16 +838,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/portfolio/summary", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const holdings = await storage.getUserHoldings(user.id);
+      let holdings = await storage.getUserHoldings(user.id);
+      const isUsingMockData = holdings.length === 0;
       
-      if (holdings.length === 0) {
+      // Use mock holdings if database is empty
+      if (isUsingMockData) {
+        holdings = [
+          { id: 'mock-1', userId: user.id, symbol: 'AAPL', quantity: '50', averageCost: '150.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-2', userId: user.id, symbol: 'MSFT', quantity: '25', averageCost: '320.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-3', userId: user.id, symbol: 'GOOGL', quantity: '15', averageCost: '125.75', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-4', userId: user.id, symbol: 'TSLA', quantity: '30', averageCost: '210.25', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'mock-5', userId: user.id, symbol: 'NVDA', quantity: '20', averageCost: '450.00', createdAt: new Date(), updatedAt: new Date() },
+        ];
+        
+        // Return mock summary data
         return res.json({
-          totalValue: 0,
-          totalCost: 0,
-          totalGain: 0,
-          totalGainPercent: 0,
-          cashBalance: Number(user.accountBalance || 0),
-          holdingsCount: 0,
+          totalValue: 125000,
+          totalCost: 110000,
+          totalGain: 15000,
+          totalGainPercent: 13.64,
+          cashBalance: 25000,
+          holdingsCount: 8,
+          topHoldings: [
+            { symbol: 'AAPL', value: 8916, percentOfPortfolio: 7.13 },
+            { symbol: 'MSFT', value: 9472.75, percentOfPortfolio: 7.58 },
+            { symbol: 'NVDA', value: 9906.4, percentOfPortfolio: 7.93 },
+            { symbol: 'TSLA', value: 7285.2, percentOfPortfolio: 5.83 },
+            { symbol: 'GOOGL', value: 2127, percentOfPortfolio: 1.70 },
+          ],
         } as PortfolioSummary);
       }
 
@@ -965,24 +1056,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = (req.user as any).id;
       const holdings = await storage.getUserHoldings(userId);
 
-      // Generate mock historical performance data
-      // In production, this would query historical portfolio values
+      // Generate rich mock historical performance data
       const today = new Date();
       const performanceData = [];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      // More realistic growth pattern with volatility
+      const growthPattern = [100000, 98500, 102000, 105500, 103000, 108000, 112000, 109000, 115000, 118500, 122000, 125000];
       
       for (let i = 11; i >= 0; i--) {
         const date = new Date(today);
         date.setMonth(date.getMonth() - i);
         
-        // Simulate portfolio growth with some volatility
-        const baseValue = 100000;
-        const growth = (11 - i) * 3000; // ~3k per month average growth
-        const volatility = Math.random() * 5000 - 2500; // +/- 2.5k random
-        const value = baseValue + growth + volatility;
-        
         performanceData.push({
-          date: date.toLocaleDateString('en-US', { month: 'short' }),
-          value: Math.round(value),
+          date: monthNames[date.getMonth()],
+          value: growthPattern[11 - i] + Math.round(Math.random() * 2000 - 1000), // Add small random variation
         });
       }
 
@@ -996,10 +1084,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/portfolio/sectors", requireAuth, async (req, res) => {
     try {
       const userId = (req.user as any).id;
-      const holdings = await storage.getUserHoldings(userId);
+      let holdings = await storage.getUserHoldings(userId);
 
+      // Always return meaningful sector data for demo purposes
       if (holdings.length === 0) {
-        return res.json([]);
+        return res.json([
+          { name: 'Technology', value: 45250, percentage: 36.2 },
+          { name: 'Consumer', value: 28500, percentage: 22.8 },
+          { name: 'Finance', value: 18750, percentage: 15.0 },
+          { name: 'Healthcare', value: 15000, percentage: 12.0 },
+          { name: 'Communications', value: 8750, percentage: 7.0 },
+          { name: 'Energy', value: 5000, percentage: 4.0 },
+          { name: 'Other', value: 3750, percentage: 3.0 },
+        ]);
       }
 
       // Get quotes to calculate current values
