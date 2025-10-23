@@ -101,6 +101,7 @@ export default function CommandCenter() {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [expandedView, setExpandedView] = useState(localStorage.getItem('athena_expanded_view') === 'true');
+  const [searchInput, setSearchInput] = useState("");
   
   // Trade modal state
   const [tradeModalOpen, setTradeModalOpen] = useState(false);

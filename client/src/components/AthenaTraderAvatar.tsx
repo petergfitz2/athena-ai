@@ -24,29 +24,6 @@ export default function AthenaTraderAvatar({
   isTyping = false,
   className = "",
 }: AthenaTraderAvatarProps) {
-  const [breatheScale, setBreatheScale] = useState(1);
-  const [blinkAnimation, setBlinkAnimation] = useState(false);
-
-  // Subtle breathing animation
-  useEffect(() => {
-    if (isListening || isSpeaking) return;
-    
-    const interval = setInterval(() => {
-      setBreatheScale(s => s === 1 ? 1.02 : 1);
-    }, 3000);
-    
-    return () => clearInterval(interval);
-  }, [isListening, isSpeaking]);
-
-  // Occasional blink effect
-  useEffect(() => {
-    const blinkInterval = setInterval(() => {
-      setBlinkAnimation(true);
-      setTimeout(() => setBlinkAnimation(false), 150);
-    }, Math.random() * 4000 + 3000); // Random between 3-7 seconds
-
-    return () => clearInterval(blinkInterval);
-  }, []);
 
   const sizeClasses = {
     mini: "w-12 h-12",
@@ -113,9 +90,10 @@ export default function AthenaTraderAvatar({
       <div 
         className={cn(
           "relative transition-all duration-1000 ease-in-out",
-          sizeClasses[size]
+          sizeClasses[size],
+          isListening && "animate-listening-pulse",
+          !isListening && !isSpeaking && !isTyping && "animate-breathe"
         )}
-        style={{ transform: `scale(${breatheScale})` }}
       >
         {/* Listening pulse rings */}
         {isListening && (
@@ -136,22 +114,22 @@ export default function AthenaTraderAvatar({
         {/* Main Avatar Circle */}
         <div className={cn(
           "relative rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-purple-600/20 p-1",
-          sizeClasses[size]
+          sizeClasses[size],
+          isSpeaking && "animate-talking"
         )}>
           <div className="relative w-full h-full rounded-full overflow-hidden bg-black/50 backdrop-blur-xl border border-white/20">
             {/* Avatar Image */}
-            <div className="absolute inset-2 flex items-center justify-center">
+            <div className={cn(
+              "absolute inset-2 flex items-center justify-center",
+              !isListening && !isSpeaking && !isTyping && "animate-head-tilt"
+            )}>
               <img 
                 src={avatarImage}
                 alt="Athena - Professional AI Trader"
                 className={cn(
-                  "rounded-full object-cover",
-                  imageSizes[size],
-                  blinkAnimation && "brightness-95"
+                  "rounded-full object-cover animate-blink",
+                  imageSizes[size]
                 )}
-                style={{
-                  transition: "brightness 150ms ease-in-out",
-                }}
               />
               
               {/* Professional overlay effect */}

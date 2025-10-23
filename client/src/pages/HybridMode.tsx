@@ -142,10 +142,11 @@ function HybridModeContent() {
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    const messageText = input.trim();
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: input,
+      content: messageText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
@@ -157,7 +158,7 @@ function HybridModeContent() {
 
     try {
       const data = await apiJson<{ response: string }>("POST", "/api/chat", {
-        message: input,
+        message: messageText,
         conversationId,
         lastMessageTime: currentLastMessageTime,
       });
@@ -313,7 +314,9 @@ function HybridModeContent() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    handleSendMessage();
+                    if (input.trim() && !isLoading) {
+                      handleSendMessage();
+                    }
                   }
                 }}
                 placeholder="Ask Athena anything..."
