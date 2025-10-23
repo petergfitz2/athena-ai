@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import MarketDataTile from "@/components/MarketDataTile";
 import TradeSuggestion from "@/components/TradeSuggestion";
+import WatchlistCard from "@/components/WatchlistCard";
 import { ProtectedRoute } from "@/lib/auth";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -116,6 +117,11 @@ function DashboardPageContent() {
             </div>
           </section>
         )}
+
+        {/* Watchlist */}
+        <section>
+          <WatchlistCard />
+        </section>
       </div>
     </div>
   );

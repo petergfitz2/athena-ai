@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import PortfolioCard from "@/components/PortfolioCard";
 import { ProtectedRoute } from "@/lib/auth";
+import AddHoldingModal from "@/components/AddHoldingModal";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface Holding {
   id: string;
@@ -10,6 +14,8 @@ interface Holding {
 }
 
 function PortfolioPageContent() {
+  const [showAddModal, setShowAddModal] = useState(false);
+  
   const { data: holdings = [], isLoading } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
   });
@@ -62,13 +68,23 @@ function PortfolioPageContent() {
     <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
       <div className="max-w-[1600px] mx-auto space-y-12 lg:space-y-16">
         {/* Header */}
-        <div>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mb-3 lg:mb-4">
-            Portfolio
-          </h1>
-          <p className="text-lg lg:text-xl text-muted-foreground font-light">
-            Track your investments in real-time
-          </p>
+        <div className="flex items-start justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mb-3 lg:mb-4">
+              Portfolio
+            </h1>
+            <p className="text-lg lg:text-xl text-muted-foreground font-light">
+              Track your investments in real-time
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowAddModal(true)}
+            className="rounded-full bg-primary hover:bg-primary/90 px-6 py-3"
+            data-testid="button-add-holding-trigger"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add Holding
+          </Button>
         </div>
 
         {/* Summary Card */}
@@ -141,6 +157,8 @@ function PortfolioPageContent() {
           </div>
         )}
       </div>
+      
+      <AddHoldingModal open={showAddModal} onOpenChange={setShowAddModal} />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
+import QuickActionButtons from "@/components/QuickActionButtons";
 import { ProtectedRoute } from "@/lib/auth";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -146,7 +147,7 @@ function ChatPageContent() {
       content: "Hello! I'm Athena, your AI investment advisor. How can I help you today?",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }]);
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   const handleSelectConversation = (convId: string) => {
@@ -202,6 +203,9 @@ function ChatPageContent() {
         {/* Messages */}
         <div className="flex-1 glass rounded-[28px] p-6 md:p-10 lg:p-12 overflow-y-auto mb-6 lg:mb-8" data-testid="chat-messages">
           <div className="space-y-6 lg:space-y-8">
+            {messages.length <= 1 && !isLoading && (
+              <QuickActionButtons onAction={handleSendMessage} disabled={isLoading} />
+            )}
             {messages.map((message) => (
               <ChatMessage key={message.id} {...message} />
             ))}

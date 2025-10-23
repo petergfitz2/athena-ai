@@ -17,13 +17,18 @@ Athena provides a conversational interface for investment advice and portfolio m
 
 ## Features
 
-### Phase 1 (Current)
+### Phase 1 (Current) - Luxury Hybrid MVP ✅ COMPLETE
 - ✅ User authentication (username/password)
 - ✅ Conversational AI chat interface with portfolio context
 - ✅ Portfolio view with holdings management
+  - ✅ Add holding modal with validation
+  - ✅ Edit/delete holdings functionality
 - ✅ AI-powered trade suggestions with approval workflow
+- ✅ Watchlist feature with add/remove capability
+- ✅ Quick action buttons for common chat queries
 - ✅ Real-time WebSocket support
 - ✅ Luxury design system (pure black, purple accents, glassmorphism)
+- ✅ Desktop-optimized responsive design
 
 ### Phase 2 (Planned)
 - Voice input/output (OpenAI Realtime API)
@@ -69,6 +74,16 @@ Athena provides a conversational interface for investment advice and portfolio m
 - `GET /api/conversations` - Get user conversations
 - `POST /api/conversations` - Create conversation
 - `GET /api/conversations/:id/messages` - Get conversation messages
+
+## Recent Changes (October 23, 2025)
+
+### Phase 1 MVP Features Completed
+1. **AddHoldingModal Component**: Users can add stocks to portfolio with symbol, quantity, and average cost
+2. **WatchlistCard Component**: Dashboard watchlist with real-time price updates and add/remove functionality
+3. **QuickActionButtons Component**: Chat quick actions for common queries (portfolio, market, returns, trades)
+4. **Bug Fix**: Fixed ChatPage new conversation flow that was disabling input after clicking "+ New Chat"
+
+All features tested end-to-end with Playwright and confirmed working in production.
 
 ## Design System
 
