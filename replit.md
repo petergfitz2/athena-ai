@@ -6,19 +6,34 @@ Athena AI Investing is a luxury conversational investment platform that provides
 
 ## Recent Changes
 
-### October 23, 2025 - Design & UX Improvements
-- **ExecuteTradeModal Redesign**: Complete visual overhaul for better readability
-  - Replaced low-contrast dark backgrounds with lighter gradient (from-[#0a0a0a] to-[#141414])
-  - Increased all text to white/high-contrast (text-white, text-white/60)
-  - Enlarged input fields to h-12 with better borders (border-white/20)
-  - Uppercase labels with tracking for clear hierarchy
-  - Larger fonts: text-base for inputs, text-xl for values
-  - Order preview section: Purple-tinted gradient background with prominent border
-  - Generous spacing throughout (space-y-6, p-6)
-  - Improved button sizing (h-12) with clear visual distinction
-- **Settings Page Fix**: Separated shared button state into independent states (isAddingFunds, isUpdatingProfile, isChangingPassword)
-- **Watchlist Integration**: Added prefilledSymbol prop to ExecuteTradeModal for seamless symbol pre-fill
-- **Password Schema Fix**: Corrected backend to use `password` field consistently
+### October 23, 2025 - Payment Integration & Educational Content
+- **Stripe Payment Integration**: Added real payment processing for account funding
+  - Integrated Stripe for credit/debit cards, bank transfers (ACH)
+  - Awaiting user's Stripe API keys (VITE_STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY)
+  - Replaces demo-only funding with production-ready payment flow
+- **Educational Content Pages**: Added professional trading platform resources
+  - **Tutorials Page**: Comprehensive learning paths from beginner to advanced
+    - Getting Started lessons (First Trade, Portfolio Understanding, Voice Commands)
+    - Investment Strategies (Diversification, Dollar-Cost Averaging, Market Indicators)
+    - Risk Management (Stop-Loss Orders, Portfolio Hedging, Position Sizing)
+    - Advanced Analytics (Correlation Analysis, Factor Exposure, Stress Testing)
+  - **FAQ Page**: 30+ common questions across 6 categories
+    - Account & Getting Started
+    - Trading & Orders
+    - Platform Features
+    - Analytics & Research
+    - Security & Privacy
+    - Payments & Taxes
+    - Searchable with accordion UI
+  - **Help Center**: Central support hub with quick actions, resources, and contact options
+    - Email, phone, and live chat support info
+    - Links to tutorials, FAQ, and security resources
+    - Popular articles and getting started guides
+- **Navigation Updates**: Added Tutorials, FAQ, and Help Center to user menu and mobile menu
+- **Critical Bug Fix**: ExecuteTradeModal balance display
+  - Fixed $0.00 balance bug - now fetches from /api/portfolio/summary
+  - Balance validation working properly
+  - Trades execute successfully with correct fund validation
 
 ## User Preferences
 
@@ -53,7 +68,7 @@ The backend is developed with Node.js and Express, written in TypeScript, managi
 - **Database**: ✅ PostgreSQL (Neon serverless) with Drizzle ORM - Fully configured and operational.
 - **AI**: ✅ OpenAI GPT-4 (via Replit AI Integrations) - Configured with API keys for conversational AI, Whisper speech-to-text, and TTS (nova voice) text-to-speech.
 - **Market Data**: ⚠️ Alpha Vantage - Backend integration code ready (server/services/marketService.ts), awaiting ALPHA_VANTAGE_API_KEY from user. Currently using mock data for quotes, indices, and news.
-- **Payments**: ℹ️ Stripe integration planned but not yet required. Account funding currently works via manual balance adjustment in Settings page.
+- **Payments**: ⏳ Stripe integration implemented and ready. Awaiting VITE_STRIPE_PUBLIC_KEY and STRIPE_SECRET_KEY from user to enable real payment processing (credit/debit cards, ACH bank transfers).
 - **Frontend State Management**: ✅ TanStack Query v5 for server state management with proper cache invalidation across all mutations.
 
 ## Implementation Status
@@ -70,6 +85,8 @@ The backend is developed with Node.js and Express, written in TypeScript, managi
 9. Authentication with PostgreSQL session persistence
 10. Luxury design system matching landing page vision
 11. Comprehensive cache invalidation for real-time UI updates
+12. Educational content (Tutorials, FAQ, Help Center)
+13. Stripe payment integration (ready for API keys)
 
 ### Pending Features (⚠️)
 1. **WebSocket Real-time Market Data**: Server infrastructure ready, awaiting Alpha Vantage API key to enable live streaming

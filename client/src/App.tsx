@@ -14,6 +14,9 @@ import WatchlistPage from "@/pages/WatchlistPage";
 import SettingsPage from "@/pages/SettingsPage";
 import TradesPage from "@/pages/TradesPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
+import TutorialsPage from "@/pages/TutorialsPage";
+import FAQPage from "@/pages/FAQPage";
+import HelpPage from "@/pages/HelpPage";
 import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
 
@@ -60,6 +63,9 @@ function Router() {
       <Route path="/amanda" component={AmandaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />
+      <Route path="/tutorials" component={TutorialsPage} />
+      <Route path="/faq" component={FAQPage} />
+      <Route path="/help" component={HelpPage} />
       <Route component={NotFound} />
     </Switch>
   );

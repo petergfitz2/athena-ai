@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -159,6 +159,42 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   variant="ghost"
                   onClick={() => {
                     setMobileMenuOpen(false);
+                    setLocation("/tutorials");
+                  }}
+                  className="justify-start gap-3 rounded-[20px] hover-elevate active-elevate-2"
+                  data-testid="mobile-menu-tutorials"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  Tutorials
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setLocation("/faq");
+                  }}
+                  className="justify-start gap-3 rounded-[20px] hover-elevate active-elevate-2"
+                  data-testid="mobile-menu-faq"
+                >
+                  <FileQuestion className="w-5 h-5" />
+                  FAQ
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setLocation("/help");
+                  }}
+                  className="justify-start gap-3 rounded-[20px] hover-elevate active-elevate-2"
+                  data-testid="mobile-menu-help"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  Help Center
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
                     setLocation("/settings");
                   }}
                   className="justify-start gap-3 rounded-[20px] hover-elevate active-elevate-2"
@@ -210,6 +246,31 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   </p>
                 </div>
               </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem
+                onClick={() => setLocation("/tutorials")}
+                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                data-testid="menu-item-tutorials"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Tutorials
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setLocation("/faq")}
+                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                data-testid="menu-item-faq"
+              >
+                <FileQuestion className="w-4 h-4 mr-2" />
+                FAQ
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setLocation("/help")}
+                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                data-testid="menu-item-help"
+              >
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Help Center
+              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem
                 onClick={() => setLocation("/settings")}
