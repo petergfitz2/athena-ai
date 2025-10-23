@@ -484,17 +484,18 @@ function HybridModeContent() {
                       }
                     }}
                     placeholder="Ask Athena about your investments..."
-                    className="resize-none rounded-[28px] bg-black/50 border-white/10 px-4 py-3"
+                    className="resize-none rounded-[28px] bg-black/50 border-white/10 px-4 py-3 pr-24"
                     rows={3}
                     disabled={isLoading}
                     data-testid="textarea-chat-input"
+                    style={{ paddingRight: '100px' }}
                   />
-                  <div className="absolute bottom-3 right-3 flex gap-1">
+                  <div className="absolute bottom-3 right-3 flex gap-1 pointer-events-none">
                     <Button
                       onClick={() => isRecording ? stopRecording() : startRecording()}
                       size="icon"
                       variant="ghost"
-                      className={`rounded-full hover-elevate ${isRecording ? 'text-red-500 bg-red-500/10' : ''}`}
+                      className={`rounded-full hover-elevate pointer-events-auto ${isRecording ? 'text-red-500 bg-red-500/10' : ''}`}
                       disabled={isLoading}
                       data-testid="button-voice"
                     >
@@ -503,7 +504,7 @@ function HybridModeContent() {
                     <Button
                       onClick={handleSendMessage}
                       disabled={!input.trim() || isLoading}
-                      className="rounded-full"
+                      className="rounded-full pointer-events-auto"
                       size="icon"
                       data-testid="button-send"
                     >
