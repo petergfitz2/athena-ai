@@ -11,6 +11,8 @@ import HybridMode from "@/pages/HybridMode";
 import TerminalMode from "@/pages/TerminalMode";
 import DashboardPage from "@/pages/DashboardPage";
 import WatchlistPage from "@/pages/WatchlistPage";
+import SettingsPage from "@/pages/SettingsPage";
+import TradesPage from "@/pages/TradesPage";
 import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
 
@@ -51,6 +53,8 @@ function Router() {
       <Route path="/select-mode" component={ModeSelectorPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/watchlist" component={WatchlistPage} />
+      <Route path="/settings" component={SettingsPage} />
+      <Route path="/trades" component={TradesPage} />
       <Route path="/amanda" component={AmandaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />

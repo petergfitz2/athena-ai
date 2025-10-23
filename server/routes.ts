@@ -675,6 +675,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Account management routes
+  app.post("/api/account/deposit", requireAuth, async (req, res) => {
+    try {
+      const schema = z.object({
+        amount: z.string().or(z.number()),
+      });
+      const { amount } = schema.parse(req.body);
+      const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
+      
+      if (!Number.isFinite(amountNum) || amountNum <= 0) {
+        return res.status(400).json({ error: "Amount must be a positive number" });
+      }
+      
+      const userId = (req.user as any).id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const newBalance = Number(user.accountBalance || 0) + amountNum;
+      await storage.updateUserBalance(userId, newBalance.toString());
+      
+      res.json({ 
+        success: true,
+        balance: newBalance,
+        message: `Successfully deposited $${amountNum.toFixed(2)}`
+      });
+    } catch (error) {
+      console.error("Deposit error:", error);
+      res.status(500).json({ error: "Failed to process deposit" });
+    }
+  });
+
+  app.post("/api/account/withdraw", requireAuth, async (req, res) => {
+    try {
+      const schema = z.object({
+        amount: z.string().or(z.number()),
+      });
+      const { amount } = schema.parse(req.body);
+      const amountNum = typeof amount === 'string' ? parseFloat(amount) : amount;
+      
+      if (!Number.isFinite(amountNum) || amountNum <= 0) {
+        return res.status(400).json({ error: "Amount must be a positive number" });
+      }
+      
+      const userId = (req.user as any).id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const currentBalance = Number(user.accountBalance || 0);
+      if (currentBalance < amountNum) {
+        return res.status(400).json({ error: "Insufficient funds" });
+      }
+      
+      const newBalance = currentBalance - amountNum;
+      await storage.updateUserBalance(userId, newBalance.toString());
+      
+      res.json({ 
+        success: true,
+        balance: newBalance,
+        message: `Successfully withdrew $${amountNum.toFixed(2)}`
+      });
+    } catch (error) {
+      console.error("Withdraw error:", error);
+      res.status(500).json({ error: "Failed to process withdrawal" });
+    }
+  });
+
+  // User profile routes
+  app.patch("/api/user/profile", requireAuth, async (req, res) => {
+    try {
+      const schema = z.object({
+        fullName: z.string().optional(),
+        phone: z.string().optional(),
+      });
+      const updates = schema.parse(req.body);
+      
+      const userId = (req.user as any).id;
+      await storage.updateUserProfile(userId, updates);
+      
+      res.json({ 
+        success: true,
+        message: "Profile updated successfully"
+      });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  app.patch("/api/user/password", requireAuth, async (req, res) => {
+    try {
+      const schema = z.object({
+        currentPassword: z.string(),
+        newPassword: z.string().min(6),
+      });
+      const { currentPassword, newPassword } = schema.parse(req.body);
+      
+      const userId = (req.user as any).id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Verify current password
+      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValid) {
+        return res.status(400).json({ error: "Current password is incorrect" });
+      }
+      
+      // Hash and update new password
+      const newHash = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(userId, newHash);
+      
+      res.json({ 
+        success: true,
+        message: "Password changed successfully"
+      });
+    } catch (error) {
+      console.error("Password change error:", error);
+      res.status(500).json({ error: "Failed to change password" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

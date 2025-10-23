@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useVoice } from "@/hooks/useVoice";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
@@ -11,7 +12,7 @@ import NewsDetailModal from "@/components/NewsDetailModal";
 import ChatMessage from "@/components/ChatMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TrendingUp, TrendingDown, Activity, LayoutDashboard, Send, Mic } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, LayoutDashboard, Send, Mic, Square, List, Settings } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { NewsArticle } from "@shared/schema";
@@ -52,6 +53,28 @@ function TerminalModeContent() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [lastMessageTime, setLastMessageTime] = useState<number | null>(null);
+  
+  const { isRecording, startRecording, stopRecording } = useVoice({
+    onTranscript: (text) => {
+      setInput(text);
+    },
+    onResponse: (text) => {
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: text,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   useEffect(() => {
     setMode("terminal");
@@ -162,15 +185,35 @@ function TerminalModeContent() {
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-extralight text-foreground">Terminal</h1>
             <ModeSwitcherMenu />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/dashboard")}
-              className="rounded-full"
-              data-testid="button-dashboard"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/dashboard")}
+                className="rounded-full"
+                data-testid="button-dashboard"
+              >
+                <LayoutDashboard className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/trades")}
+                className="rounded-full"
+                data-testid="button-trades"
+              >
+                <List className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/settings")}
+                className="rounded-full"
+                data-testid="button-settings"
+              >
+                <Settings className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
           <div className="flex items-center gap-6">
             <div className="text-right">
@@ -412,10 +455,11 @@ function TerminalModeContent() {
             <Button
               size="icon"
               variant="ghost"
-              className="rounded-full flex-shrink-0"
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`rounded-full flex-shrink-0 ${isRecording ? 'bg-destructive text-destructive-foreground' : ''}`}
               data-testid="button-voice-terminal"
             >
-              <Mic className="w-4 h-4" />
+              {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
             <Input
               value={input}

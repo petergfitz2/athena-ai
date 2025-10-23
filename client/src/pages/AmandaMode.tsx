@@ -13,7 +13,7 @@ import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
-import { Mic, Send, Square, LayoutDashboard } from "lucide-react";
+import { Mic, Send, Square, LayoutDashboard, List, Settings } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 type Message = {
@@ -166,7 +166,7 @@ function AmandaModeContent() {
       {/* Top Header with Mode Switcher */}
       <div className="flex-shrink-0 px-6 py-3 flex items-center justify-between border-b border-white/10">
         <ModeSwitcherMenu />
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">
             Press Space or Cmd+K to talk
           </p>
@@ -178,6 +178,24 @@ function AmandaModeContent() {
             data-testid="button-dashboard"
           >
             <LayoutDashboard className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/trades")}
+            className="rounded-full"
+            data-testid="button-trades"
+          >
+            <List className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/settings")}
+            className="rounded-full"
+            data-testid="button-settings"
+          >
+            <Settings className="w-5 h-5" />
           </Button>
         </div>
       </div>

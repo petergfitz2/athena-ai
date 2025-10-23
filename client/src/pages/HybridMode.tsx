@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useVoice } from "@/hooks/useVoice";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import DashboardPage from "@/pages/DashboardPage";
@@ -12,7 +13,7 @@ import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, X, MessageCircle, LayoutDashboard } from "lucide-react";
+import { Mic, Send, X, MessageCircle, LayoutDashboard, Square, List, Settings } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -45,6 +46,28 @@ function HybridModeContent() {
   const [modeReady, setModeReady] = useState(false);
   
   const { suggestion, shouldShow, dismissSuggestion} = useModeSuggestion(conversationId, modeReady);
+  
+  const { isRecording, startRecording, stopRecording } = useVoice({
+    onTranscript: (text) => {
+      setInput(text);
+    },
+    onResponse: (text) => {
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: text,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   useEffect(() => {
     setMode("hybrid");
@@ -120,15 +143,35 @@ function HybridModeContent() {
             <div className="flex items-center gap-4">
               <h1 className="text-3xl font-extralight text-foreground">Athena</h1>
               <ModeSwitcherMenu />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/dashboard")}
-                className="rounded-full"
-                data-testid="button-dashboard"
-              >
-                <LayoutDashboard className="w-5 h-5" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLocation("/dashboard")}
+                  className="rounded-full"
+                  data-testid="button-dashboard"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLocation("/trades")}
+                  className="rounded-full"
+                  data-testid="button-trades"
+                >
+                  <List className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLocation("/settings")}
+                  className="rounded-full"
+                  data-testid="button-settings"
+                >
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button
@@ -214,10 +257,11 @@ function HybridModeContent() {
             <div className="flex items-end gap-2">
               <Button
                 size="icon"
-                className="rounded-full flex-shrink-0"
+                onClick={isRecording ? stopRecording : startRecording}
+                className={`rounded-full flex-shrink-0 ${isRecording ? 'bg-destructive text-destructive-foreground' : ''}`}
                 data-testid="button-voice-hybrid"
               >
-                <Mic className="w-5 h-5" />
+                {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </Button>
               <Textarea
                 value={input}
