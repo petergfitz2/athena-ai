@@ -920,7 +920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Calculate portfolio value distribution
       const values = holdings.map(holding => {
-        const quote = quotes.find(q => q.symbol === holding.symbol);
+        const quote = quotes.get(holding.symbol);
         return quote ? parseFloat(holding.quantity) * quote.price : 0;
       });
       const totalValue = values.reduce((sum, v) => sum + v, 0);
