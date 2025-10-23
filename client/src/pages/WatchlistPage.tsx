@@ -8,6 +8,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { MarketQuote } from "@shared/schema";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import { useLocation } from "wouter";
 import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
@@ -155,27 +157,33 @@ function WatchlistPageContent() {
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
+      <NavigationBreadcrumbs />
       <FloatingAthenaOrb />
       <div className="px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         <div className="max-w-[1600px] mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between gap-6 mb-12">
-          <div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground mb-2">
-              Watchlist
-            </h1>
-            <p className="text-muted-foreground font-light">
-              Monitor stocks you're interested in
-            </p>
+        <div className="mb-12">
+          <div className="mb-4">
+            <BackButton />
           </div>
-          <Button
-            onClick={() => setIsAddingStock(!isAddingStock)}
-            className="rounded-full gap-2"
-            data-testid="button-toggle-add-stock"
-          >
-            <Plus className="w-5 h-5" />
-            Add Stock
-          </Button>
+          <div className="flex items-center justify-between gap-6">
+            <div>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground mb-2">
+                Watchlist
+              </h1>
+              <p className="text-muted-foreground font-light">
+                Monitor stocks you're interested in
+              </p>
+            </div>
+            <Button
+              onClick={() => setIsAddingStock(!isAddingStock)}
+              className="rounded-full gap-2"
+              data-testid="button-toggle-add-stock"
+            >
+              <Plus className="w-5 h-5" />
+              Add Stock
+            </Button>
+          </div>
         </div>
 
         {/* Add Stock Form */}

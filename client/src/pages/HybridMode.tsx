@@ -9,7 +9,8 @@ import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
 import AthenaOrb from "@/components/AthenaOrb";
 import ChatMessage from "@/components/ChatMessage";
-import UnifiedHeader from "@/components/UnifiedHeader";
+import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -185,7 +186,8 @@ function HybridModeContent() {
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
       {/* Unified Header */}
-      <UnifiedHeader showModeSwitcher={true} transparentBg={false} />
+      <Navigation />
+      <NavigationBreadcrumbs />
 
       {/* Main Container - Responsive */}
       <div className={`flex-1 mt-16 flex flex-col lg:flex-row transition-all duration-300 ${chatExpanded ? 'lg:mr-[450px]' : 'mr-0'}`}>

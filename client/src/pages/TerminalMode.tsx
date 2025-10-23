@@ -6,7 +6,8 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useVoice } from "@/hooks/useVoice";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
-import UnifiedHeader from "@/components/UnifiedHeader";
+import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import NewsDetailModal from "@/components/NewsDetailModal";
 import ChatMessage from "@/components/ChatMessage";
@@ -229,7 +230,8 @@ function TerminalModeContent() {
   return (
     <div className="h-screen bg-black overflow-hidden flex flex-col">
       {/* Unified Header */}
-      <UnifiedHeader showModeSwitcher={true} transparentBg={false} />
+      <Navigation />
+      <NavigationBreadcrumbs />
 
       {/* Portfolio Stats Bar - Responsive */}
       <div className="flex-shrink-0 border-b border-white/10 px-4 sm:px-6 py-2 sm:py-3 mt-16">

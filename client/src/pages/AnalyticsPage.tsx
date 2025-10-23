@@ -6,6 +6,8 @@ import { TrendingUp, TrendingDown, AlertTriangle, Activity, BarChart3, Network, 
 import { ProtectedRoute } from "@/lib/auth";
 import RiskInsights from "@/components/RiskInsights";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 
 interface CorrelationData {
@@ -60,16 +62,22 @@ function AnalyticsPageContent() {
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
+      <NavigationBreadcrumbs />
       <FloatingAthenaOrb />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-extralight text-foreground">
-            Institutional Analytics
-          </h1>
-          <p className="text-muted-foreground font-light">
-            Advanced portfolio analysis and risk insights
-          </p>
+        <div>
+          <div className="mb-4">
+            <BackButton />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-extralight text-foreground">
+              Institutional Analytics
+            </h1>
+            <p className="text-muted-foreground font-light">
+              Advanced portfolio analysis and risk insights
+            </p>
+          </div>
         </div>
 
         {/* Correlation Analysis */}

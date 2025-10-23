@@ -9,6 +9,8 @@ import { apiJson, queryClient } from "@/lib/queryClient";
 import { Check, X, TrendingUp, TrendingDown, Clock, Sparkles } from "lucide-react";
 import type { Trade } from "@shared/schema";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 
 function TradesPageContent() {
@@ -126,10 +128,14 @@ function TradesPageContent() {
   return (
     <div className="min-h-screen bg-black text-foreground">
       <Navigation />
+      <NavigationBreadcrumbs />
       <FloatingAthenaOrb />
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight mb-2">

@@ -1,6 +1,8 @@
 import { Redirect } from "wouter";
 import { useAuth } from "@/lib/auth";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 import GlassCard from "@/components/GlassCard";
 import { MessageCircle, BookOpen, FileText, Shield, Headphones, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -62,10 +64,14 @@ function HelpContent() {
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
+      <NavigationBreadcrumbs />
       
       <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 py-12">
         {/* Header */}
         <div className="mb-12 text-center">
+          <div className="flex justify-start mb-4">
+            <BackButton />
+          </div>
           <h1 className="text-6xl font-extralight text-foreground mb-4">
             Help Center
           </h1>

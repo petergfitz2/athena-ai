@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Redirect } from "wouter";
 import { useAuth } from "@/lib/auth";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 import GlassCard from "@/components/GlassCard";
 import { BookOpen, TrendingUp, Shield, Zap, ChevronRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -112,10 +114,14 @@ function TutorialsContent() {
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
+      <NavigationBreadcrumbs />
       
       <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16 py-12">
         {/* Header */}
         <div className="mb-12">
+          <div className="mb-4">
+            <BackButton to="/help" label="Back to Help" />
+          </div>
           <h1 className="text-6xl font-extralight text-foreground mb-4">
             Learn to Invest
           </h1>

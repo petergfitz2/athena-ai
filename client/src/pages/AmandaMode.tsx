@@ -10,7 +10,8 @@ import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import AthenaOrb from "@/components/AthenaOrb";
 import ChatMessage from "@/components/ChatMessage";
-import UnifiedHeader from "@/components/UnifiedHeader";
+import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Mic, Send, Square, LayoutDashboard, List, Settings, BarChart3 } from "lucide-react";
@@ -209,7 +210,8 @@ function AmandaModeContent() {
   return (
     <div className="h-screen bg-black flex flex-col">
       {/* Unified Header */}
-      <UnifiedHeader showModeSwitcher={true} transparentBg={false} />
+      <Navigation />
+      <NavigationBreadcrumbs />
 
       {/* Main Chat Container with Split Layout - Responsive */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden mt-16">

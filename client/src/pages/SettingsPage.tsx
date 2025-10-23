@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { DollarSign, User, Bell, Lock } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 
 function SettingsPageContent() {
   const { user } = useAuth();
@@ -135,9 +137,13 @@ function SettingsPageContent() {
   return (
     <div className="min-h-screen bg-black text-foreground">
       <Navigation />
+      <NavigationBreadcrumbs />
       <div className="max-w-[1200px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight mb-4">
             Settings
           </h1>

@@ -18,11 +18,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModeSwitcherMenu from "./ModeSwitcherMenu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface NavigationProps {
   variant?: "default" | "transparent";
@@ -48,11 +53,51 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   };
 
   const navLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/watchlist", label: "Watchlist", icon: ListChecks },
-    { href: "/analytics", label: "Analytics", icon: TrendingUp },
-    { href: "/trades", label: "Trades", icon: History },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, shortcut: "⌘1" },
+    { href: "/watchlist", label: "Watchlist", icon: ListChecks, shortcut: "⌘2" },
+    { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘3" },
+    { href: "/trades", label: "Trades", icon: History, shortcut: "⌘4" },
+    { href: "/analytics", label: "Analytics", icon: TrendingUp, shortcut: "⌘5" },
   ];
+
+  // Add keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if Cmd (Mac) or Ctrl (Windows/Linux) is pressed
+      if (e.metaKey || e.ctrlKey) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            setLocation('/dashboard');
+            break;
+          case '2':
+            e.preventDefault();
+            setLocation('/watchlist');
+            break;
+          case '3':
+            e.preventDefault();
+            setLocation('/portfolio');
+            break;
+          case '4':
+            e.preventDefault();
+            setLocation('/trades');
+            break;
+          case '5':
+            e.preventDefault();
+            setLocation('/analytics');
+            break;
+        }
+      }
+      // Escape to go back
+      if (e.key === 'Escape' && location !== '/dashboard') {
+        e.preventDefault();
+        window.history.back();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [location, setLocation]);
 
   const isActive = (href: string) => location === href;
 
@@ -92,19 +137,29 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               const Icon = link.icon;
               const active = isActive(link.href);
               return (
-                <Link 
-                  key={link.href} 
-                  href={link.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-light transition-all ${
-                    active
-                      ? "bg-primary/20 text-primary"
-                      : "text-muted-foreground hover-elevate active-elevate-2"
-                  }`}
-                  data-testid={`link-${link.label.toLowerCase()}`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {link.label}
-                </Link>
+                <Tooltip key={link.href}>
+                  <TooltipTrigger asChild>
+                    <Link 
+                      href={link.href}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-light transition-all relative ${
+                        active
+                          ? "bg-primary/20 text-primary font-normal"
+                          : "text-muted-foreground hover-elevate active-elevate-2"
+                      }`}
+                      data-testid={`link-${link.label.toLowerCase()}`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {link.label}
+                      {active && (
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full" />
+                      )}
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent className="text-xs">
+                    <p>{link.label}</p>
+                    <p className="text-muted-foreground">{link.shortcut}</p>
+                  </TooltipContent>
+                </Tooltip>
               );
             })}
           </div>
@@ -133,7 +188,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   Access all pages and settings
                 </SheetDescription>
               </SheetHeader>
-              <div className="flex flex-col gap-4 mt-8">
+              <div className="flex flex-col gap-2 mt-8">
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const active = isActive(link.href);
@@ -144,13 +199,17 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center gap-3 px-4 py-4 rounded-[20px] text-base font-light transition-all min-h-[56px] ${
                         active
-                          ? "bg-primary/20 text-primary"
+                          ? "bg-primary/20 text-primary font-normal"
                           : "text-muted-foreground hover-elevate active-elevate-2"
                       }`}
                       data-testid={`mobile-link-${link.label.toLowerCase()}`}
                     >
                       <Icon className="w-5 h-5" />
-                      {link.label}
+                      <span className="flex-1">{link.label}</span>
+                      {active && (
+                        <div className="w-1 h-6 bg-primary rounded-full" />
+                      )}
+                      <span className="text-xs text-muted-foreground">{link.shortcut}</span>
                     </Link>
                   );
                 })}

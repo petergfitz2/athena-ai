@@ -1,6 +1,8 @@
 import { Redirect } from "wouter";
 import { useAuth } from "@/lib/auth";
 import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
 import GlassCard from "@/components/GlassCard";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
@@ -158,10 +160,14 @@ function FAQContent() {
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
+      <NavigationBreadcrumbs />
       
       <div className="max-w-[1200px] mx-auto px-6 sm:px-10 lg:px-16 py-12">
         {/* Header */}
         <div className="mb-12 text-center">
+          <div className="flex justify-start mb-4">
+            <BackButton to="/help" label="Back to Help" />
+          </div>
           <h1 className="text-6xl font-extralight text-foreground mb-4">
             Frequently Asked Questions
           </h1>
