@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth, ProtectedRoute } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon, Sparkles } from "lucide-react";
 import type { PortfolioSummary, Holding, MarketQuote } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -11,12 +11,42 @@ import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import PortfolioChart from "@/components/PortfolioChart";
 import SectorAllocationChart, { type SectorData } from "@/components/SectorAllocationChart";
 import Navigation from "@/components/Navigation";
+import { useLocation } from "wouter";
 
 function DashboardPageContent() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState(false);
+
+  const generateSuggestions = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/ai/trade-suggestions", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to generate suggestions");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "AI Suggestions Generated",
+        description: `Created ${data.length} new trade suggestions. Redirecting to Trades page...`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/trades"] });
+      setTimeout(() => setLocation("/trades"), 1500);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate AI suggestions",
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
@@ -166,7 +196,16 @@ function DashboardPageContent() {
                     Your current positions
                   </CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    onClick={() => generateSuggestions.mutate()}
+                    disabled={generateSuggestions.isPending}
+                    className="gap-2 rounded-full"
+                    data-testid="button-ai-suggestions"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {generateSuggestions.isPending ? "Generating..." : "AI Suggestions"}
+                  </Button>
                   <Button 
                     onClick={() => setShowBuyModal(true)}
                     className="gap-2 rounded-full bg-success hover:bg-success/90"

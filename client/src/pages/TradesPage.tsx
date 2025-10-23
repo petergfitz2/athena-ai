@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiJson, queryClient } from "@/lib/queryClient";
-import { Check, X, TrendingUp, TrendingDown, Clock } from "lucide-react";
+import { Check, X, TrendingUp, TrendingDown, Clock, Sparkles } from "lucide-react";
 import type { Trade } from "@shared/schema";
 import Navigation from "@/components/Navigation";
 
@@ -60,6 +60,33 @@ function TradesPageContent() {
     },
   });
 
+  const generateSuggestions = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/ai/trade-suggestions", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to generate suggestions");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "AI Suggestions Generated",
+        description: `Created ${data.length} new trade suggestions for your review`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/trades"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate AI suggestions",
+        variant: "destructive",
+      });
+    },
+  });
+
   const filteredTrades = allTrades.filter(trade => {
     if (filter === "all") return true;
     if (filter === "pending") return trade.status === "pending" || trade.status === "approved";
@@ -101,12 +128,26 @@ function TradesPageContent() {
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight mb-4">
-            Trades
-          </h1>
-          <p className="text-lg text-muted-foreground font-light">
-            Review and manage your trade suggestions
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight mb-2">
+                Trades
+              </h1>
+              <p className="text-lg text-muted-foreground font-light">
+                Review and manage your trade suggestions
+              </p>
+            </div>
+            <Button
+              onClick={() => generateSuggestions.mutate()}
+              disabled={generateSuggestions.isPending}
+              className="rounded-full mt-4"
+              size="lg"
+              data-testid="button-generate-suggestions"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {generateSuggestions.isPending ? "Generating..." : "Get AI Suggestions"}
+            </Button>
+          </div>
         </div>
 
         {/* Filter Tabs */}
