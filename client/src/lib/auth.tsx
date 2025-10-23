@@ -76,6 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await res.json();
     setUser(data);
+    // Mark as new user for guided tour
+    localStorage.setItem("athena-new-user", "true");
+    // Always go directly to dashboard, no mode selection
     setLocation("/dashboard");
   }
 

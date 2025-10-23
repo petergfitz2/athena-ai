@@ -1,56 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth, ProtectedRoute } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon, Sparkles, Wallet, BookOpen, MessageCircle, Newspaper, AlertCircle, HelpCircle } from "lucide-react";
+import { 
+  TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, 
+  Sparkles, Wallet, BookOpen, MessageCircle, Newspaper, 
+  HelpCircle, Target, DollarSign, Activity, Briefcase, 
+  ChevronRight, Eye, Zap, ArrowRight 
+} from "lucide-react";
 import type { PortfolioSummary, Holding, MarketQuote, NewsArticle } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
-import PortfolioChart from "@/components/PortfolioChart";
-import SectorAllocationChart, { type SectorData } from "@/components/SectorAllocationChart";
 import Navigation from "@/components/Navigation";
 import { useLocation } from "wouter";
 import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import NewsDetailModal from "@/components/NewsDetailModal";
+import GuidedTour from "@/components/GuidedTour";
+import { motion } from "framer-motion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-function DashboardPageContent() {
+function SimplifiedDashboardContent() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showBuyModal, setShowBuyModal] = useState(false);
-  const [showSellModal, setShowSellModal] = useState(false);
   const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsArticle | null>(null);
+  const [floatingOrbPulse, setFloatingOrbPulse] = useState(false);
 
-  const generateSuggestions = useMutation({
-    mutationFn: async () => {
-      const response = await fetch("/api/ai/trade-suggestions", {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to generate suggestions");
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "AI Suggestions Generated",
-        description: `Created ${data.length} new trade suggestions. Redirecting to Trades page...`,
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/trades"] });
-      setTimeout(() => setLocation("/trades"), 1500);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate AI suggestions",
-        variant: "destructive",
-      });
-    },
-  });
+  // Check if first-time user for orb pulsing
+  useEffect(() => {
+    const isFirstVisit = !localStorage.getItem("athena-orb-clicked");
+    if (isFirstVisit) {
+      setFloatingOrbPulse(true);
+    }
+  }, []);
 
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
@@ -64,605 +54,467 @@ function DashboardPageContent() {
     queryKey: ['/api/market/quotes'],
   });
 
-  const { data: performanceData = [] } = useQuery<Array<{ date: string; value: number }>>({
-    queryKey: ['/api/portfolio/performance'],
-  });
-
-  const { data: sectorData = [] } = useQuery<SectorData[]>({
-    queryKey: ['/api/portfolio/sectors'],
-  });
-
   const { data: newsData = [] } = useQuery<NewsArticle[]>({
     queryKey: ['/api/market/news'],
   });
 
   const isLoading = summaryLoading || holdingsLoading;
-
+  const hasHoldings = holdings && holdings.length > 0;
+  
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
   const formatPercent = (value: number) => {
     const sign = value >= 0 ? '+' : '';
-    return `${sign}${value.toFixed(2)}%`;
+    return `${sign}${value.toFixed(1)}%`;
+  };
+
+  // Get today's change (mock data for demo)
+  const todayChange = summary ? (summary.totalValue * 0.024) : 0; // Mock 2.4% change
+  const todayChangePercent = 2.4;
+
+  // Open Athena chat
+  const handleChatWithAthena = () => {
+    const orbButton = document.querySelector('[data-testid="button-floating-athena"]') as HTMLElement;
+    if (orbButton) {
+      orbButton.click();
+      localStorage.setItem("athena-orb-clicked", "true");
+      setFloatingOrbPulse(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-black text-foreground">
       <Navigation />
       <FloatingAthenaOrb />
-      <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
-        {/* Demo Mode Banner */}
-        <div className="mb-8 p-4 rounded-[20px] bg-gradient-to-r from-primary/10 to-purple-600/10 border border-primary/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Badge className="bg-primary text-white border-0 px-3 py-1">
-                DEMO MODE
-              </Badge>
-              <p className="text-sm font-light text-foreground">
-                Virtual Trading Environment - Practice without real money
-              </p>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="rounded-full"
-              onClick={() => setLocation("/help")}
+      <GuidedTour />
+      
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        
+        {/* Simplified Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-extralight mb-2">
+            Welcome back, {user?.fullName || user?.username}
+          </h1>
+          <p className="text-muted-foreground font-light">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+
+        {/* Start Here Section - Only show for new/empty portfolios */}
+        {!hasHoldings && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <Card className="bg-gradient-to-br from-primary/10 via-purple-600/5 to-transparent border-primary/20 rounded-[28px] p-8">
+              <CardHeader className="p-0 mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-2xl font-light">Start Your Journey</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  Choose how you'd like to begin with Athena
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button
+                    onClick={handleChatWithAthena}
+                    className="group p-6 rounded-[20px] bg-black/40 border border-white/10 hover-elevate active-elevate-2 text-left transition-all"
+                    data-testid="button-start-chat"
+                  >
+                    <MessageCircle className="w-8 h-8 text-primary mb-3" />
+                    <h3 className="text-lg font-medium mb-1 group-hover:text-primary transition-colors">
+                      Talk to Athena
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Get AI-powered investment suggestions
+                    </p>
+                  </button>
+                  
+                  <button
+                    onClick={() => setLocation("/watchlist")}
+                    className="group p-6 rounded-[20px] bg-black/40 border border-white/10 hover-elevate active-elevate-2 text-left transition-all"
+                    data-testid="button-start-browse"
+                  >
+                    <Eye className="w-8 h-8 text-primary mb-3" />
+                    <h3 className="text-lg font-medium mb-1 group-hover:text-primary transition-colors">
+                      Browse Stocks
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Explore and track your favorite companies
+                    </p>
+                  </button>
+                  
+                  <button
+                    onClick={() => setLocation("/tutorials")}
+                    className="group p-6 rounded-[20px] bg-black/40 border border-white/10 hover-elevate active-elevate-2 text-left transition-all"
+                    data-testid="button-start-learn"
+                  >
+                    <BookOpen className="w-8 h-8 text-primary mb-3" />
+                    <h3 className="text-lg font-medium mb-1 group-hover:text-primary transition-colors">
+                      Learn Trading
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Master investing with guided tutorials
+                    </p>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Essential KPIs - Simplified */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" data-tour="portfolio-value">
+          {/* Total Value */}
+          <Card className="bg-card border-white/10 rounded-[28px] hover-elevate">
+            <CardHeader className="pb-3">
+              <CardDescription className="text-xs text-muted-foreground font-light flex items-center gap-2">
+                <Wallet className="w-3 h-3" />
+                Portfolio Value
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="w-3 h-3 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Total value of all your investments plus cash</p>
+                  </TooltipContent>
+                </Tooltip>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-light">
+                {isLoading ? (
+                  <div className="h-9 bg-primary/10 rounded animate-pulse"></div>
+                ) : (
+                  formatCurrency(summary?.totalValue || 100000)
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Today's Change */}
+          <Card className="bg-card border-white/10 rounded-[28px] hover-elevate">
+            <CardHeader className="pb-3">
+              <CardDescription className="text-xs text-muted-foreground font-light flex items-center gap-2">
+                <Activity className="w-3 h-3" />
+                Today's Change
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="h-9 bg-primary/10 rounded animate-pulse"></div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-3xl font-light ${todayChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {formatCurrency(Math.abs(todayChange))}
+                  </span>
+                  <span className={`text-sm ${todayChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {formatPercent(todayChangePercent)}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Cash Balance */}
+          <Card className="bg-card border-white/10 rounded-[28px] hover-elevate">
+            <CardHeader className="pb-3">
+              <CardDescription className="text-xs text-muted-foreground font-light flex items-center gap-2">
+                <DollarSign className="w-3 h-3" />
+                Cash Available
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-light">
+                {isLoading ? (
+                  <div className="h-9 bg-primary/10 rounded animate-pulse"></div>
+                ) : (
+                  formatCurrency(summary?.cashBalance || 100000)
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions - Large and Prominent */}
+        <div className="mb-8" data-tour="quick-actions">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Button
+              onClick={handleChatWithAthena}
+              size="lg"
+              className="h-auto py-6 rounded-[20px] bg-primary hover:bg-primary/90 flex flex-col gap-2"
+              data-testid="button-quick-chat"
             >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Learn More
+              <MessageCircle className="w-6 h-6" />
+              <span className="text-base">Chat with Athena</span>
+            </Button>
+            
+            <Button
+              onClick={() => setShowBuyModal(true)}
+              size="lg"
+              variant="outline"
+              className="h-auto py-6 rounded-[20px] flex flex-col gap-2"
+              data-testid="button-quick-buy"
+              data-tour="buy-stocks"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              <span className="text-base">Buy Stocks</span>
+            </Button>
+            
+            <Button
+              onClick={() => setLocation("/portfolio")}
+              size="lg"
+              variant="outline"
+              className="h-auto py-6 rounded-[20px] flex flex-col gap-2"
+              data-testid="button-quick-portfolio"
+            >
+              <Briefcase className="w-6 h-6" />
+              <span className="text-base">View Portfolio</span>
             </Button>
           </div>
         </div>
 
-        {/* Welcome Section for New Users */}
-        {(!holdings || holdings.length === 0) && (
-          <Card className="mb-8 bg-gradient-to-br from-primary/5 to-transparent border-primary/20 rounded-[28px]">
-            <CardHeader>
-              <CardTitle className="text-3xl font-light">Welcome to Your Demo Portfolio, {user?.fullName || user?.username}!</CardTitle>
-              <CardDescription className="text-base mt-2">
-                This is a sandbox environment with virtual funds. Perfect for learning and practicing.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <MessageCircle className="w-5 h-5 text-primary mt-1" />
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column - Holdings (Top 3 only) */}
+          <div className="lg:col-span-2 space-y-6">
+            {hasHoldings ? (
+              <Card className="bg-card border-white/10 rounded-[28px]">
+                <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <p className="font-medium text-sm">Ask Athena AI</p>
-                    <p className="text-xs text-muted-foreground">Get personalized stock suggestions</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Wallet className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="font-medium text-sm">$100,000 Virtual Cash</p>
-                    <p className="text-xs text-muted-foreground">Practice trading risk-free</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Newspaper className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="font-medium text-sm">Real-Time News</p>
-                    <p className="text-xs text-muted-foreground">Stay updated with market trends</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Button onClick={() => setShowBuyModal(true)} className="rounded-full">
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Make Your First Trade
-                </Button>
-                <Button variant="outline" onClick={() => setLocation("/tutorials")} className="rounded-full">
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  View Tutorials
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight mb-4">
-            Portfolio Overview
-          </h1>
-          <p className="text-lg text-muted-foreground font-light">
-            Your investment performance and market insights
-          </p>
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[1, 2, 3, 4].map(i => (
-              <Card key={i} className="bg-card/50 border-white/10 rounded-[28px] p-8 animate-purple-pulse">
-                <div className="h-20 bg-primary/10 rounded"></div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
-              {/* Total Value */}
-              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-total-value">
-                <CardHeader className="pb-2">
-                  <CardDescription className="text-xs text-muted-foreground font-light">
-                    Total Value
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-light">
-                    {formatCurrency(summary?.totalValue || 0)}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Total Gain/Loss */}
-              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-total-gain">
-                <CardHeader className="pb-2">
-                  <CardDescription className="text-xs text-muted-foreground font-light">
-                    Total Gain/Loss
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-3xl font-light ${(summary?.totalGain || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {formatCurrency(summary?.totalGain || 0)}
-                  </div>
-                  <div className={`text-sm mt-1 ${(summary?.totalGainPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {formatPercent(summary?.totalGainPercent || 0)}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Cash Balance */}
-              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-cash-balance">
-                <CardHeader className="pb-2">
-                  <CardDescription className="text-xs text-muted-foreground font-light">
-                    Cash Balance
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-light">
-                    {formatCurrency(summary?.cashBalance || 0)}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Holdings Count */}
-              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-holdings-count">
-                <CardHeader className="pb-2">
-                  <CardDescription className="text-xs text-muted-foreground font-light">
-                    Holdings
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-light">
-                    {summary?.holdingsCount || 0}
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    positions
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Portfolio Insights Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              {/* Top Performer Card */}
-              {holdings && holdings.length > 0 && (
-                (() => {
-                  const topPerformer = holdings
-                    .map((holding) => {
-                      const quote = quotes?.[holding.symbol];
-                      const currentPrice = quote?.price || Number(holding.averageCost);
-                      const quantity = Number(holding.quantity);
-                      const avgCost = Number(holding.averageCost);
-                      const marketValue = quantity * currentPrice;
-                      const costBasis = quantity * avgCost;
-                      const gainLoss = marketValue - costBasis;
-                      const gainLossPercent = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
-                      return { symbol: holding.symbol, gainLossPercent, gainLoss };
-                    })
-                    .sort((a, b) => b.gainLossPercent - a.gainLossPercent)[0];
-                  
-                  return (
-                    <Card className="bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20 rounded-[28px] hover-elevate" data-testid="card-top-performer">
-                      <CardHeader className="pb-2">
-                        <CardDescription className="text-xs text-green-400 font-light flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4" />
-                          Top Performer
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-light text-foreground mb-1">{topPerformer?.symbol}</div>
-                        <div className="text-3xl font-extralight text-green-400">
-                          +{topPerformer?.gainLossPercent.toFixed(2)}%
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {formatCurrency(topPerformer?.gainLoss || 0)} gain
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })()
-              )}
-
-              {/* Sector Alert Card */}
-              {sectorData && sectorData.length > 0 && (
-                (() => {
-                  const topSector = sectorData[0];
-                  const totalSectorValue = sectorData.reduce((acc, s) => acc + s.value, 0);
-                  const concentration = (topSector.value / totalSectorValue) * 100;
-                  const isHighConcentration = concentration > 40;
-                  
-                  return (
-                    <Card 
-                      className={`${
-                        isHighConcentration 
-                          ? 'bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20' 
-                          : 'bg-gradient-to-br from-primary/10 to-transparent border-primary/20'
-                      } rounded-[28px] hover-elevate`}
-                      data-testid="card-sector-alert"
-                    >
-                      <CardHeader className="pb-2">
-                        <CardDescription className={`text-xs font-light flex items-center gap-2 ${
-                          isHighConcentration ? 'text-yellow-400' : 'text-primary'
-                        }`}>
-                          <TrendingUp className="w-4 h-4" />
-                          Sector Concentration
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-light text-foreground mb-1">{topSector?.name}</div>
-                        <div className={`text-3xl font-extralight ${
-                          isHighConcentration ? 'text-yellow-400' : 'text-primary'
-                        }`}>
-                          {concentration.toFixed(1)}%
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {isHighConcentration ? 'High concentration' : 'Well balanced'}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })()
-              )}
-
-              {/* Cash Utilization Card */}
-              {summary && (
-                (() => {
-                  const cashBalance = summary.cashBalance || 0;
-                  const totalValue = summary.totalValue || 0;
-                  const cashUtilization = totalValue > 0 ? ((totalValue - cashBalance) / totalValue) * 100 : 0;
-                  const isUnderUtilized = cashBalance > totalValue * 0.2;
-                  
-                  return (
-                    <Card 
-                      className={`${
-                        isUnderUtilized
-                          ? 'bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20'
-                          : 'bg-gradient-to-br from-primary/10 to-transparent border-primary/20'
-                      } rounded-[28px] hover-elevate`}
-                      data-testid="card-cash-utilization"
-                    >
-                      <CardHeader className="pb-2">
-                        <CardDescription className={`text-xs font-light flex items-center gap-2 ${
-                          isUnderUtilized ? 'text-blue-400' : 'text-primary'
-                        }`}>
-                          <Wallet className="w-4 h-4" />
-                          Cash Utilization
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-2xl font-light text-foreground mb-1">
-                          {cashUtilization.toFixed(1)}% Invested
-                        </div>
-                        <div className={`text-3xl font-extralight ${
-                          isUnderUtilized ? 'text-blue-400' : 'text-primary'
-                        }`}>
-                          {formatCurrency(cashBalance)}
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {isUnderUtilized ? 'Consider investing' : 'Cash available'}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })()
-              )}
-            </div>
-
-            {/* Portfolio Visualizations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-8 lg:mb-12">
-              {/* Performance Chart */}
-              <PortfolioChart 
-                data={performanceData}
-                currentValue={summary?.totalValue || 0}
-                totalGainPercent={summary?.totalGainPercent || 0}
-              />
-              
-              {/* Sector Allocation */}
-              <SectorAllocationChart 
-                data={sectorData}
-              />
-            </div>
-
-            {/* Holdings Table */}
-            <Card className="bg-card border-white/10 rounded-[28px] mb-12">
-              <CardHeader className="flex flex-row items-center justify-between gap-4">
-                <div>
-                  <CardTitle className="text-4xl font-extralight">Holdings</CardTitle>
-                  <CardDescription className="mt-2 text-muted-foreground font-light">
-                    Your current positions
-                  </CardDescription>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button 
-                    onClick={() => generateSuggestions.mutate()}
-                    disabled={generateSuggestions.isPending}
-                    className="gap-2 rounded-full"
-                    data-testid="button-ai-suggestions"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    {generateSuggestions.isPending ? "Generating..." : "AI Suggestions"}
-                  </Button>
-                  <Button 
-                    onClick={() => setShowBuyModal(true)}
-                    className="gap-2 rounded-full bg-success hover:bg-success/90"
-                    data-testid="button-buy-stock"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    Buy Stock
-                  </Button>
-                  <Button 
-                    onClick={() => setShowSellModal(true)}
-                    variant="outline"
-                    className="gap-2 rounded-full"
-                    data-testid="button-sell-stock"
-                  >
-                    <SellIcon className="w-4 h-4" />
-                    Sell Stock
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {!holdings || holdings.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground font-light mb-4">
-                      No holdings yet. Start building your portfolio.
-                    </p>
-                    <Button 
-                      onClick={() => setShowBuyModal(true)}
-                      variant="default" 
-                      className="gap-2 rounded-full bg-success hover:bg-success/90"
-                      data-testid="button-buy-first-stock"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Buy Your First Stock
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-white/10">
-                          <th className="text-left py-3 px-4 text-sm font-light text-muted-foreground">Symbol</th>
-                          <th className="text-right py-3 px-4 text-sm font-light text-muted-foreground">Quantity</th>
-                          <th className="text-right py-3 px-4 text-sm font-light text-muted-foreground">Avg Cost</th>
-                          <th className="text-right py-3 px-4 text-sm font-light text-muted-foreground">Current Price</th>
-                          <th className="text-right py-3 px-4 text-sm font-light text-muted-foreground">Market Value</th>
-                          <th className="text-right py-3 px-4 text-sm font-light text-muted-foreground">Gain/Loss</th>
-                          <th className="text-right py-3 px-4 text-sm font-light text-muted-foreground">Change</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {holdings.map((holding) => {
-                          const quote = quotes?.[holding.symbol];
-                          const currentPrice = quote?.price || Number(holding.averageCost);
-                          const quantity = Number(holding.quantity);
-                          const avgCost = Number(holding.averageCost);
-                          const marketValue = quantity * currentPrice;
-                          const costBasis = quantity * avgCost;
-                          const gainLoss = marketValue - costBasis;
-                          const gainLossPercent = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
-                          const changePercent = quote?.changePercent || 0;
-
-                          return (
-                            <tr 
-                              key={holding.id} 
-                              className="border-b border-white/5 hover-elevate"
-                              data-testid={`row-holding-${holding.symbol}`}
-                            >
-                              <td className="py-4 px-4">
-                                <div className="font-medium">{holding.symbol}</div>
-                              </td>
-                              <td className="text-right py-4 px-4 font-light">
-                                {quantity.toFixed(2)}
-                              </td>
-                              <td className="text-right py-4 px-4 font-light">
-                                {formatCurrency(avgCost)}
-                              </td>
-                              <td className="text-right py-4 px-4 font-light">
-                                {formatCurrency(currentPrice)}
-                              </td>
-                              <td className="text-right py-4 px-4 font-medium">
-                                {formatCurrency(marketValue)}
-                              </td>
-                              <td className={`text-right py-4 px-4 font-medium ${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                <div className="flex items-center justify-end gap-1">
-                                  {gainLoss >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                                  <span>{formatCurrency(Math.abs(gainLoss))}</span>
-                                </div>
-                                <div className="text-xs mt-0.5">
-                                  {formatPercent(gainLossPercent)}
-                                </div>
-                              </td>
-                              <td className={`text-right py-4 px-4 ${changePercent >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                {formatPercent(changePercent)}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Market News Section */}
-            <Card className="bg-card border-white/10 rounded-[28px] mb-12">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-4xl font-extralight flex items-center gap-3">
-                      <Newspaper className="w-8 h-8 text-primary" />
-                      Market News
-                    </CardTitle>
-                    <CardDescription className="mt-2 text-muted-foreground font-light">
-                      Latest updates and market intelligence
+                    <CardTitle className="text-2xl font-light">Your Holdings</CardTitle>
+                    <CardDescription className="text-sm mt-1">
+                      Top performing positions
                     </CardDescription>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setLocation("/portfolio")}
                     className="rounded-full"
-                    onClick={() => setLocation("/watchlist")}
                   >
-                    View All News
+                    View All
+                    <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {newsData && newsData.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {newsData.slice(0, 6).map((article) => {
-                      const getSentimentColor = (label?: string) => {
-                        if (!label) return "text-muted-foreground";
-                        const normalized = label.toLowerCase();
-                        if (normalized.includes("bullish") || normalized.includes("positive")) return "text-success";
-                        if (normalized.includes("bearish") || normalized.includes("negative")) return "text-destructive";
-                        return "text-warning";
-                      };
-
-                      return (
-                        <div
-                          key={article.id}
-                          className="p-4 rounded-[20px] bg-white/5 hover-elevate cursor-pointer transition-all"
-                          onClick={() => setSelectedNewsArticle(article)}
-                          data-testid={`news-article-${article.id}`}
-                        >
-                          <div className="flex items-start justify-between gap-3 mb-2">
-                            {article.sentimentLabel && (
-                              <Badge className={`${getSentimentColor(article.sentimentLabel)} bg-transparent border-current px-2 py-0.5 text-xs`}>
-                                {article.sentimentLabel}
-                              </Badge>
-                            )}
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(article.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                          <h4 className="font-medium text-sm mb-2 line-clamp-2">{article.title}</h4>
-                          {article.summary && (
-                            <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{article.summary}</p>
-                          )}
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs text-muted-foreground">{article.source}</p>
-                            {article.tickers && article.tickers.length > 0 && (
-                              <div className="flex gap-1">
-                                {article.tickers.slice(0, 3).map(ticker => (
-                                  <Badge key={ticker} variant="outline" className="text-xs px-2 py-0">
-                                    {ticker}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Newspaper className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground">No market news available</p>
-                    <p className="text-xs text-muted-foreground mt-1">Check back later for updates</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Top Holdings */}
-            {summary?.topHoldings && summary.topHoldings.length > 0 && (
-              <Card className="bg-card border-white/10 rounded-[28px]">
-                <CardHeader>
-                  <CardTitle className="text-4xl font-extralight">Top Holdings</CardTitle>
-                  <CardDescription className="mt-2 text-muted-foreground font-light">
-                    Your largest positions by value
-                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {summary.topHoldings.map((holding, index) => (
-                      <div 
-                        key={holding.symbol} 
-                        className="flex items-center justify-between p-4 rounded-[20px] bg-white/5"
-                        data-testid={`top-holding-${index}`}
+                <CardContent className="space-y-3">
+                  {holdings.slice(0, 3).map((holding) => {
+                    const quote = quotes?.[holding.symbol];
+                    const currentPrice = quote?.price || Number(holding.averageCost);
+                    const quantity = Number(holding.quantity);
+                    const avgCost = Number(holding.averageCost);
+                    const marketValue = quantity * currentPrice;
+                    const costBasis = quantity * avgCost;
+                    const gainLoss = marketValue - costBasis;
+                    const gainLossPercent = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
+
+                    return (
+                      <div
+                        key={holding.id}
+                        className="flex items-center justify-between p-4 rounded-[16px] bg-black/40 border border-white/5 hover-elevate"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
-                            {index + 1}
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-sm font-medium">{holding.symbol.slice(0, 2)}</span>
                           </div>
                           <div>
-                            <div className="font-medium">{holding.symbol}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {holding.percentOfPortfolio.toFixed(2)}% of portfolio
-                            </div>
+                            <p className="font-medium text-lg">{holding.symbol}</p>
+                            <p className="text-sm text-muted-foreground">{quantity} shares</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium">{formatCurrency(holding.value)}</div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="mt-1 gap-1"
-                            data-testid={`button-view-${holding.symbol}`}
-                          >
-                            View <ArrowUpRight className="w-3 h-3" />
-                          </Button>
+                          <p className="font-medium">{formatCurrency(marketValue)}</p>
+                          <p className={`text-sm ${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            {formatPercent(gainLossPercent)}
+                          </p>
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
+                </CardContent>
+              </Card>
+            ) : !isLoading && (
+              <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/10 rounded-[28px]">
+                <CardContent className="py-16 text-center">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                    <Briefcase className="w-10 h-10 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-light mb-3">Ready to start investing?</h3>
+                  <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
+                    Build your portfolio with AI guidance. Start with virtual money to practice.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button
+                      onClick={() => setShowBuyModal(true)}
+                      size="lg"
+                      className="rounded-full"
+                      data-testid="button-make-first-trade"
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Make First Trade
+                    </Button>
+                    <Button
+                      onClick={handleChatWithAthena}
+                      size="lg"
+                      variant="outline"
+                      className="rounded-full"
+                      data-testid="button-ask-athena"
+                    >
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Ask Athena for Ideas
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
             )}
-          </>
+          </div>
+
+          {/* Right Column - Market News (Top 3 only) */}
+          <div className="space-y-6" data-tour="market-news">
+            <Card className="bg-card border-white/10 rounded-[28px]">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-2xl font-light">Market News</CardTitle>
+                  <CardDescription className="text-sm mt-1">
+                    Latest updates
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLocation("/news")}
+                  className="rounded-full"
+                >
+                  View More
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {newsData.slice(0, 3).map((article) => (
+                  <button
+                    key={article.id}
+                    onClick={() => setSelectedNewsArticle(article)}
+                    className="w-full text-left p-4 rounded-[16px] bg-black/40 border border-white/5 hover-elevate active-elevate-2 transition-all"
+                  >
+                    <p className="font-medium text-sm mb-1 line-clamp-2">
+                      {article.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {article.source} • {article.publishedAt}
+                    </p>
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Learning Resources */}
+            <Card className="bg-gradient-to-br from-purple-600/10 to-transparent border-purple-600/20 rounded-[28px]">
+              <CardHeader>
+                <CardTitle className="text-xl font-light flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-purple-400" />
+                  Learn & Grow
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start rounded-[16px]"
+                  onClick={() => setLocation("/tutorials")}
+                >
+                  <Zap className="w-4 h-4 mr-3 text-purple-400" />
+                  Quick Start Guide
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start rounded-[16px]"
+                  onClick={() => setLocation("/tutorials")}
+                >
+                  <Target className="w-4 h-4 mr-3 text-purple-400" />
+                  Investment Strategies
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start rounded-[16px]"
+                  onClick={() => setLocation("/faq")}
+                >
+                  <HelpCircle className="w-4 h-4 mr-3 text-purple-400" />
+                  FAQs
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Progressive Disclosure - Show after some activity */}
+        {hasHoldings && holdings.length >= 3 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+            className="mt-8"
+          >
+            <Card className="bg-gradient-to-r from-primary/5 via-purple-600/5 to-transparent border-primary/10 rounded-[28px]">
+              <CardContent className="py-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Ready for more?</p>
+                      <p className="text-sm text-muted-foreground">
+                        Unlock advanced analytics and insights
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => setLocation("/analytics")}
+                    variant="outline"
+                    className="rounded-full"
+                  >
+                    View Analytics
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
       </div>
-      
-      {/* Trade Execution Modals */}
-      <ExecuteTradeModal open={showBuyModal} onOpenChange={setShowBuyModal} action="buy" />
-      <ExecuteTradeModal open={showSellModal} onOpenChange={setShowSellModal} action="sell" />
-      
-      {/* News Detail Modal */}
-      <NewsDetailModal 
-        article={selectedNewsArticle} 
-        open={!!selectedNewsArticle} 
-        onClose={() => setSelectedNewsArticle(null)} 
+
+      {/* Modals */}
+      <ExecuteTradeModal 
+        open={showBuyModal} 
+        onOpenChange={setShowBuyModal}
+        action="buy"
       />
+      
+      {selectedNewsArticle && (
+        <NewsDetailModal
+          article={selectedNewsArticle}
+          onClose={() => setSelectedNewsArticle(null)}
+        />
+      )}
     </div>
   );
 }
 
-export default function DashboardPage() {
+export default function SimplifiedDashboard() {
   return (
     <ProtectedRoute>
-      <DashboardPageContent />
+      <SimplifiedDashboardContent />
     </ProtectedRoute>
   );
 }
