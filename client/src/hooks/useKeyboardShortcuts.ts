@@ -13,8 +13,8 @@ export function useKeyboardShortcuts() {
         switch (e.key) {
           case "1":
             e.preventDefault();
-            setMode("amanda");
-            setLocation("/amanda");
+            setMode("athena");
+            setLocation("/athena");
             break;
           case "2":
             e.preventDefault();
