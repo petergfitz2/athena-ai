@@ -62,6 +62,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
     { href: "/watchlist", label: "Watchlist", icon: ListChecks, shortcut: "⌘W" },
     { href: "/trades", label: "Trades", icon: TrendingUp, shortcut: "⌘T" },
     { href: "/analytics", label: "Analytics", icon: Activity, shortcut: "⌘A" },
+    { href: "/leaderboard", label: "Leaderboard", icon: Trophy, shortcut: "⌘L" },
   ];
 
   const modes = [
@@ -152,7 +153,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           <div className="flex items-center gap-8">
             {/* Logo */}
             <Link href="/" className="flex items-center hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-xl font-light tracking-tight text-foreground">
+              <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap">
                 Athena AI Investing
               </span>
             </Link>
@@ -167,9 +168,9 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-light transition-all relative ${
+                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all relative ${
                         active
-                          ? "bg-primary/20 text-primary font-normal"
+                          ? "bg-primary/20 text-primary font-semibold"
                           : "text-muted-foreground hover-elevate active-elevate-2"
                       }`}
                       data-testid={`link-${link.label.toLowerCase()}`}
@@ -201,7 +202,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   {currentMode === "athena" && <MessageCircle className="w-4 h-4" />}
                   {currentMode === "hybrid" && <Layout className="w-4 h-4" />}
                   {currentMode === "terminal" && <Grid3x3 className="w-4 h-4" />}
-                  <span className="text-sm font-light">
+                  <span className="text-sm font-medium">
                     {modes.find(m => m.id === currentMode)?.label || "Select Mode"}
                   </span>
                   <ChevronDown className="w-4 h-4 opacity-50" />
@@ -211,7 +212,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 align="end"
                 className="w-64 bg-card border-white/10 rounded-[20px]"
               >
-                <DropdownMenuLabel className="font-light text-xs text-muted-foreground">
+                <DropdownMenuLabel className="font-medium text-xs text-muted-foreground">
                   Interface Mode
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
@@ -264,7 +265,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden lg:block text-sm font-light">
+                  <span className="hidden lg:block text-sm font-medium">
                     {user?.username}
                   </span>
                 </Button>
@@ -273,10 +274,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 align="end"
                 className="w-56 bg-card border-white/10 rounded-[20px]"
               >
-                <DropdownMenuLabel className="font-light">
+                <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{user?.username}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-semibold">{user?.username}</p>
+                    <p className="text-xs text-muted-foreground font-normal">
                       {user?.email}
                     </p>
                   </div>

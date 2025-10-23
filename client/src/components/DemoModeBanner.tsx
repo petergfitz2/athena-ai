@@ -93,7 +93,7 @@ export default function DemoModeBanner() {
           
           <div className="flex-1 space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-white">
+              <h3 className="text-sm font-semibold text-white">
                 Demo Trading Mode
               </h3>
               <div className="flex gap-1">
@@ -121,7 +121,7 @@ export default function DemoModeBanner() {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-white/80" />
-                <span className="text-lg font-light text-white">
+                <span className="text-lg font-normal text-white">
                   ${balance.toLocaleString()} Virtual Cash
                 </span>
               </div>

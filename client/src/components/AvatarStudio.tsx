@@ -60,7 +60,7 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black border-white/10">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-extralight">
+          <DialogTitle className="text-2xl font-semibold">
             Avatar Studio
           </DialogTitle>
         </DialogHeader>
@@ -148,23 +148,23 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                 </div>
 
                 <div>
-                  <Label>Trading Style</Label>
-                  <RadioGroup value={tradingStyle} onValueChange={setTradingStyle} className="mt-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="conservative" id="conservative" />
-                      <Label htmlFor="conservative">Conservative - Focus on stability</Label>
+                  <Label className="text-foreground font-medium">Trading Style</Label>
+                  <RadioGroup value={tradingStyle} onValueChange={setTradingStyle} className="mt-2 space-y-2">
+                    <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                      <RadioGroupItem value="conservative" id="conservative" className="border-white/40 text-primary" />
+                      <Label htmlFor="conservative" className="text-foreground font-normal cursor-pointer">Conservative - Focus on stability</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="balanced" id="balanced" />
-                      <Label htmlFor="balanced">Balanced - Mix of growth and safety</Label>
+                    <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                      <RadioGroupItem value="balanced" id="balanced" className="border-white/40 text-primary" />
+                      <Label htmlFor="balanced" className="text-foreground font-normal cursor-pointer">Balanced - Mix of growth and safety</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="aggressive" id="aggressive" />
-                      <Label htmlFor="aggressive">Aggressive - High risk, high reward</Label>
+                    <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                      <RadioGroupItem value="aggressive" id="aggressive" className="border-white/40 text-primary" />
+                      <Label htmlFor="aggressive" className="text-foreground font-normal cursor-pointer">Aggressive - High risk, high reward</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="analytical" id="analytical" />
-                      <Label htmlFor="analytical">Analytical - Data-driven decisions</Label>
+                    <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                      <RadioGroupItem value="analytical" id="analytical" className="border-white/40 text-primary" />
+                      <Label htmlFor="analytical" className="text-foreground font-normal cursor-pointer">Analytical - Data-driven decisions</Label>
                     </div>
                   </RadioGroup>
                 </div>

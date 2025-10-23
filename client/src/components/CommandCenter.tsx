@@ -16,6 +16,7 @@ import QuickStartGuide from "@/components/QuickStartGuide";
 import DemoModeBanner from "@/components/DemoModeBanner";
 import KeyboardShortcutsGuide from "@/components/KeyboardShortcutsGuide";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
+import NewsDetailModal from "@/components/NewsDetailModal";
 import AnimatedCounter, { formatCurrency, formatPercent } from "@/components/AnimatedCounter";
 import { LoadingMessage, MarketDataSkeleton, PortfolioSkeleton } from "@/components/LoadingSkeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,7 +77,12 @@ interface NewsArticle {
   summary?: string;
   publishedAt: string;
   sentiment?: string;
+  sentimentLabel?: string;
+  sentimentScore?: number;
   tickers?: string[];
+  source?: string;
+  url?: string;
+  imageUrl?: string;
 }
 
 export default function CommandCenter() {
@@ -103,6 +109,10 @@ export default function CommandCenter() {
   
   // Ticker search state
   const [tickerSearch, setTickerSearch] = useState("");
+  
+  // News modal state
+  const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsArticle | null>(null);
+  const [newsModalOpen, setNewsModalOpen] = useState(false);
 
   // Greeting based on time
   const getGreeting = () => {
@@ -163,9 +173,84 @@ export default function CommandCenter() {
     queryKey: ["/api/holdings"],
   });
 
-  const { data: news = [] } = useQuery<NewsArticle[]>({
+  const { data: newsFromAPI = [] } = useQuery<NewsArticle[]>({
     queryKey: ["/api/market/news"],
   });
+  
+  // Mock news data for Market Pulse - mix with API data
+  const mockNews: NewsArticle[] = [
+    {
+      id: "mock-1",
+      title: "Fed Maintains Interest Rates, Markets Rally on Dovish Tone",
+      summary: "The Federal Reserve kept interest rates unchanged at their latest meeting, signaling a potential pause in the hiking cycle. Markets responded positively to the dovish commentary, with major indices closing up over 2%.",
+      publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      sentimentLabel: "Bullish",
+      sentimentScore: 0.8,
+      tickers: ["SPY", "QQQ", "IWM"],
+      source: "Financial Times",
+      url: "https://example.com/fed-news",
+    },
+    {
+      id: "mock-2", 
+      title: "NVIDIA Announces Revolutionary AI Chip, Stock Surges 8%",
+      summary: "NVIDIA unveiled its next-generation AI processor at GTC, claiming 10x performance improvements. The announcement sent the stock soaring to new all-time highs, lifting the entire semiconductor sector.",
+      publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+      sentimentLabel: "Very Bullish",
+      sentimentScore: 0.95,
+      tickers: ["NVDA", "AMD", "INTC"],
+      source: "TechCrunch",
+      url: "https://example.com/nvidia-chip",
+    },
+    {
+      id: "mock-3",
+      title: "Apple Faces Regulatory Challenges in EU Over App Store Policies",
+      summary: "European regulators have opened a new investigation into Apple's App Store practices, potentially leading to significant fines. The news weighed on Apple shares, which fell 2.3% in after-hours trading.",
+      publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      sentimentLabel: "Bearish",
+      sentimentScore: 0.3,
+      tickers: ["AAPL", "GOOGL"],
+      source: "Reuters",
+      url: "https://example.com/apple-eu",
+    },
+    {
+      id: "mock-4",
+      title: "Tesla Delivers Record Q4 Vehicles, Beats Analyst Expectations",
+      summary: "Tesla reported delivering 485,000 vehicles in Q4, surpassing Wall Street estimates. The strong delivery numbers suggest robust demand despite economic headwinds and increased competition in the EV market.",
+      publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+      sentimentLabel: "Bullish",
+      sentimentScore: 0.75,
+      tickers: ["TSLA", "RIVN", "LCID"],
+      source: "Bloomberg",
+      url: "https://example.com/tesla-deliveries",
+    },
+    {
+      id: "mock-5",
+      title: "Oil Prices Spike on OPEC+ Production Cuts",
+      summary: "OPEC+ announced surprise production cuts of 1.2 million barrels per day, sending crude oil prices up 5%. Energy stocks rallied while airlines and transportation companies faced pressure from higher fuel costs.",
+      publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+      sentimentLabel: "Mixed",
+      sentimentScore: 0.5,
+      tickers: ["XOM", "CVX", "USO"],
+      source: "Wall Street Journal",
+      url: "https://example.com/opec-cuts",
+    },
+    {
+      id: "mock-6",
+      title: "Small Modular Reactor Stocks Surge on Clean Energy Push",
+      summary: "SMR technology companies like Oklo and NuScale saw significant gains as the Biden administration announced new funding for next-generation nuclear reactors. The sector is attracting increased institutional investment.",
+      publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+      sentimentLabel: "Very Bullish",
+      sentimentScore: 0.9,
+      tickers: ["OKLO", "SMR", "CCJ"],
+      source: "Clean Energy Wire",
+      url: "https://example.com/smr-surge",
+    }
+  ];
+  
+  // Combine mock news with API news, prioritizing recent items
+  const news = [...mockNews, ...newsFromAPI].sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  ).slice(0, 10);
 
   // Create conversation
   useEffect(() => {
@@ -247,8 +332,8 @@ export default function CommandCenter() {
     setTradeModalOpen(true);
   };
   
-  // Handle ticker search
-  const handleTickerSearch = (searchTerm: string) => {
+  // Handle ticker search - also send to AI
+  const handleTickerSearch = async (searchTerm: string) => {
     const term = searchTerm.trim().toUpperCase();
     if (term.length === 0) return;
     
@@ -268,24 +353,39 @@ export default function CommandCenter() {
     
     // Check if it's a company name
     const mappedTicker = companyMappings[term];
-    if (mappedTicker) {
-      handleOpenTradeModal("buy", mappedTicker);
-      setTickerSearch("");
-      return;
-    }
+    const finalTicker = mappedTicker || term;
     
-    // If it looks like a ticker symbol (1-5 uppercase letters), open trade modal
-    if (term.length >= 1 && term.length <= 5 && /^[A-Z]+$/.test(term)) {
-      handleOpenTradeModal("buy", term);
+    // If it looks like a valid ticker or company name
+    if (mappedTicker || (term.length >= 1 && term.length <= 5 && /^[A-Z]+$/.test(term))) {
+      // Open trade modal
+      handleOpenTradeModal("buy", finalTicker);
       setTickerSearch("");
+      
+      // Also send query to Athena AI for insights
+      if (!sidebarOpen) {
+        setSidebarOpen(true);
+      }
+      
+      // Send AI query about the stock
+      const aiQuery = `Tell me about ${finalTicker} stock. What's the current market sentiment and any recent news?`;
+      handleSendMessage(aiQuery);
+      
     } else if (term.length > 5) {
-      // Show a toast for invalid input
-      toast({
-        title: "Invalid ticker",
-        description: "Please enter a valid ticker symbol (1-5 letters) or company name",
-        variant: "destructive",
-      });
+      // Try searching as a company name through AI
+      if (!sidebarOpen) {
+        setSidebarOpen(true);
+      }
+      
+      const aiQuery = `What can you tell me about ${searchTerm}? Is this a publicly traded company?`;
+      handleSendMessage(aiQuery);
+      setTickerSearch("");
     }
+  };
+  
+  // Handle news article click
+  const handleNewsClick = (article: NewsArticle) => {
+    setSelectedNewsArticle(article);
+    setNewsModalOpen(true);
   };
 
   return (
@@ -364,6 +464,64 @@ export default function CommandCenter() {
         "max-w-[1600px] mx-auto p-6 transition-all duration-300",
         sidebarOpen ? "lg:mr-[450px]" : ""
       )}>
+        {/* Prominent Search Bar - FIRST THING USERS SEE */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search stocks or ask Athena anything..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchInput.trim()) {
+                  // Check if it looks like a ticker
+                  const trimmed = searchInput.trim().toUpperCase();
+                  if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
+                    handleTickerSearch(trimmed);
+                    setSearchInput("");
+                  } else {
+                    // Send to AI chat
+                    if (!sidebarOpen) setSidebarOpen(true);
+                    handleSendMessage(searchInput);
+                    setSearchInput("");
+                  }
+                }
+              }}
+              className="w-full pl-12 pr-4 h-14 text-lg rounded-full bg-white/5 border-white/20 text-foreground placeholder:text-white/40 focus:border-primary focus:bg-white/8 transition-all"
+              data-testid="input-main-search"
+              autoFocus
+            />
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  if (searchInput.trim()) {
+                    const trimmed = searchInput.trim().toUpperCase();
+                    if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
+                      handleTickerSearch(trimmed);
+                    } else {
+                      if (!sidebarOpen) setSidebarOpen(true);
+                      handleSendMessage(searchInput);
+                    }
+                    setSearchInput("");
+                  }
+                }}
+                data-testid="button-search-submit"
+              >
+                Press Enter
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Investment Dashboard - ACTUAL CONTENT */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-normal text-foreground mb-4">Investment Dashboard</h2>
+        </div>
+
         <div className={cn(
           "grid gap-6",
           expandedView ? "lg:grid-cols-3 md:grid-cols-2" : "lg:grid-cols-2"
@@ -500,8 +658,8 @@ export default function CommandCenter() {
             </CardContent>
           </Card>
 
-          {/* Market Pulse */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
+          {/* Market Pulse - Fully Interactive */}
+          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-1">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
                 <span className="font-light">Market Pulse</span>
@@ -509,40 +667,94 @@ export default function CommandCenter() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {news.slice(0, 3).map((article) => (
-                <div 
-                  key={article.id} 
-                  className="pb-3 border-b border-white/5 last:border-0 cursor-pointer hover-elevate rounded-lg p-2 -m-2 transition-all"
-                  onClick={() => {
-                    toast({
-                      title: article.title,
-                      description: `${article.summary || "Loading full article..."}`,
-                    });
-                  }}
-                  data-testid={`news-item-${article.id}`}
-                >
-                  <p className="text-sm font-medium text-foreground line-clamp-2">
-                    {article.title}
-                  </p>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(article.publishedAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                    {article.tickers && article.tickers.length > 0 && (
-                      <div className="flex gap-1">
-                        {article.tickers.slice(0, 2).map(ticker => (
-                          <Badge key={ticker} variant="outline" className="text-xs">
-                            {ticker}
+              {news.slice(0, 4).map((article) => {
+                const getSentimentBadgeVariant = (sentiment?: string) => {
+                  if (!sentiment) return "outline";
+                  const s = sentiment.toLowerCase();
+                  if (s.includes("bullish")) return "default";
+                  if (s.includes("bearish")) return "destructive";
+                  return "secondary";
+                };
+                
+                const getSentimentColor = (sentiment?: string) => {
+                  if (!sentiment) return "";
+                  const s = sentiment.toLowerCase();
+                  if (s.includes("very bullish")) return "text-green-500";
+                  if (s.includes("bullish")) return "text-success";
+                  if (s.includes("bearish")) return "text-destructive";
+                  if (s.includes("mixed")) return "text-warning";
+                  return "";
+                };
+                
+                return (
+                  <Card 
+                    key={article.id} 
+                    className="p-3 bg-white/5 hover:bg-white/10 border-white/10 cursor-pointer transition-all duration-200 hover:scale-[1.02] rounded-[16px]"
+                    onClick={() => handleNewsClick(article)}
+                    data-testid={`news-item-${article.id}`}
+                  >
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-foreground line-clamp-2 hover:text-primary transition-colors">
+                        {article.title}
+                      </p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {article.source && (
+                            <span className="text-xs text-muted-foreground">
+                              {article.source}
+                            </span>
+                          )}
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(article.publishedAt).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                        
+                        {article.sentimentLabel && (
+                          <Badge 
+                            variant={getSentimentBadgeVariant(article.sentimentLabel)}
+                            className={cn("text-xs", getSentimentColor(article.sentimentLabel))}
+                          >
+                            {article.sentimentLabel}
                           </Badge>
-                        ))}
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                      
+                      {article.tickers && article.tickers.length > 0 && (
+                        <div className="flex gap-1 flex-wrap">
+                          {article.tickers.slice(0, 3).map(ticker => (
+                            <Badge 
+                              key={ticker} 
+                              variant="outline" 
+                              className="text-xs cursor-pointer hover:bg-primary/20 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenTradeModal("buy", ticker);
+                              }}
+                            >
+                              {ticker}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+              
+              <Button 
+                variant="outline" 
+                className="w-full rounded-full mt-2"
+                size="sm"
+                onClick={() => setLocation("/news")}
+                data-testid="button-view-all-news"
+              >
+                View All Market News
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
             </CardContent>
           </Card>
 
@@ -625,7 +837,7 @@ export default function CommandCenter() {
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="rounded-full h-8 px-3"
+                          className="rounded-full h-8 px-3 font-semibold hover:bg-primary/20"
                           onClick={() => handleOpenTradeModal("buy", holding.symbol)}
                           data-testid={`button-buy-${holding.symbol}`}
                         >
@@ -634,7 +846,7 @@ export default function CommandCenter() {
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="rounded-full h-8 px-3"
+                          className="rounded-full h-8 px-3 font-semibold hover:bg-destructive/20"
                           onClick={() => handleOpenTradeModal("sell", holding.symbol)}
                           data-testid={`button-sell-${holding.symbol}`}
                         >
@@ -682,23 +894,27 @@ export default function CommandCenter() {
       )}>
         <div className="flex flex-col h-full">
           {/* Chat Header */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
-              <div>
-                <h3 className="text-lg font-light">Athena AI</h3>
-                <p className="text-xs text-muted-foreground">Your Investment Advisor</p>
+          <div className="p-4 border-b border-white/10">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="flex-shrink-0">
+                  <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg font-medium">Athena AI</h3>
+                  <p className="text-xs text-muted-foreground">Your Investment Advisor</p>
+                </div>
               </div>
+              <Button
+                onClick={() => setSidebarOpen(false)}
+                variant="ghost"
+                size="icon"
+                className="rounded-full flex-shrink-0"
+                data-testid="button-close-sidebar"
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-            <Button
-              onClick={() => setSidebarOpen(false)}
-              variant="ghost"
-              size="icon"
-              className="rounded-full"
-              data-testid="button-close-sidebar"
-            >
-              <X className="w-4 h-4" />
-            </Button>
           </div>
           
           {/* Messages */}
@@ -761,6 +977,16 @@ export default function CommandCenter() {
         onOpenChange={setTradeModalOpen}
         action={tradeAction}
         prefilledSymbol={prefilledSymbol}
+      />
+      
+      {/* News Detail Modal */}
+      <NewsDetailModal
+        article={selectedNewsArticle}
+        open={newsModalOpen}
+        onClose={() => {
+          setNewsModalOpen(false);
+          setSelectedNewsArticle(null);
+        }}
       />
     </div>
     </TooltipProvider>

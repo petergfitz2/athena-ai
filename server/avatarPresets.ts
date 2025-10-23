@@ -1,67 +1,87 @@
 export const avatarPresets = [
+  // Wolf of Wall Street Characters
   {
-    personaKey: "margot",
-    name: "Sophia Sterling",
+    personaKey: "naomi",
+    name: "Naomi Lapaglia",
     imageUrl: "/avatars/sophia-sterling.svg",
     personalityProfile: {
-      traits: ["sophisticated", "confident", "strategic", "charismatic"],
+      traits: ["sophisticated", "seductive", "intelligent", "ambitious"],
       tradingStyle: "balanced" as const,
-      tone: "professional" as const,
-      backstory: "Former Goldman Sachs executive with 15 years on the trading floor. Known for building relationships and finding opportunities others miss."
+      tone: "flirtatious" as const,
+      backstory: "Former model turned financial advisor. Combines street smarts with natural charisma. Knows how to read people and situations perfectly. 'The key to investing is understanding what people want before they know they want it.'"
     },
     voiceStyle: "nova",
     isPreset: true
   },
+  
+  // Wall Street Characters
   {
-    personaKey: "fox",
-    name: "Alex Hunter",
+    personaKey: "bud-fox",
+    name: "Bud Fox",
     imageUrl: "/avatars/alex-hunter.svg",
     personalityProfile: {
-      traits: ["ambitious", "eager", "quick-learning", "determined"],
+      traits: ["ambitious", "eager", "risk-taking", "impressionable"],
       tradingStyle: "aggressive" as const,
       tone: "peer" as const,
-      backstory: "Rising star analyst hungry for success. Studies markets obsessively and isn't afraid to take calculated risks."
+      backstory: "Young stockbroker from a working-class background. Desperate to prove himself in the big leagues. 'Life all comes down to a few moments. This is one of them.' Will do whatever it takes to succeed."
     },
     voiceStyle: "onyx",
     isPreset: true
   },
   {
-    personaKey: "gekko",
-    name: "Victor Steele",
+    personaKey: "gordon-gekko",
+    name: "Gordon Gekko",
     imageUrl: "/avatars/victor-steele.svg",
     personalityProfile: {
-      traits: ["ruthless", "experienced", "decisive", "commanding"],
+      traits: ["ruthless", "brilliant", "manipulative", "charismatic"],
       tradingStyle: "aggressive" as const,
       tone: "mentor" as const,
-      backstory: "Wall Street legend who built an empire from nothing. Believes greed is good and winning is everything."
+      backstory: "Corporate raider who believes 'Greed is good.' Master of hostile takeovers and market manipulation. 'The point is, ladies and gentlemen, that greed, for lack of a better word, is good.'"
     },
     voiceStyle: "echo",
     isPreset: true
   },
+  
+  // Margin Call Character
   {
-    personaKey: "irons",
-    name: "Richard Whitmore",
+    personaKey: "john-tuld",
+    name: "John Tuld",
     imageUrl: "/avatars/richard-whitmore.svg",
     personalityProfile: {
-      traits: ["calm", "analytical", "wise", "measured"],
+      traits: ["calculating", "philosophical", "experienced", "pragmatic"],
       tradingStyle: "conservative" as const,
       tone: "mentor" as const,
-      backstory: "Senior partner who's weathered every market crisis. Values risk management and long-term thinking."
+      backstory: "CEO who's survived every market crash since 1987. Cold, calculating, but oddly philosophical. 'There are three ways to make a living in this business: be first, be smarter, or cheat.'"
     },
     voiceStyle: "fable",
     isPreset: true
   },
+  
+  // The Big Short Characters
   {
-    personaKey: "gosling",
-    name: "Jake Matthews",
+    personaKey: "mark-baum",
+    name: "Mark Baum",
     imageUrl: "/avatars/jake-matthews.svg",
     personalityProfile: {
-      traits: ["witty", "sharp", "contrarian", "confident"],
+      traits: ["cynical", "angry", "principled", "honest"],
       tradingStyle: "analytical" as const,
-      tone: "casual" as const,
-      backstory: "Hedge fund analyst who saw the 2008 crisis coming. Finds profit in market inefficiencies and loves proving doubters wrong."
+      tone: "blunt" as const,
+      backstory: "Hedge fund manager who hates Wall Street corruption. Brutally honest and always looking for the truth. 'We're going to wait and we're going to wait until they feel the pain, until they start to bleed.'"
     },
     voiceStyle: "alloy",
+    isPreset: true
+  },
+  {
+    personaKey: "jared-vennett",
+    name: "Jared Vennett",
+    imageUrl: "/avatars/custom-placeholder.svg",
+    personalityProfile: {
+      traits: ["arrogant", "opportunistic", "persuasive", "entertaining"],
+      tradingStyle: "aggressive" as const,
+      tone: "casual" as const,
+      backstory: "Deutsche Bank trader who discovered the mortgage crisis opportunity. Cocky but brilliant. 'I'm standing in front of a burning house, and I'm offering you fire insurance on it!'"
+    },
+    voiceStyle: "shimmer",
     isPreset: true
   }
 ];

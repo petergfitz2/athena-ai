@@ -26,6 +26,7 @@ import ModeSelector from "@/components/ModeSelector";
 import InvestmentSimulator from "@/pages/InvestmentSimulator";
 import SocialTradingPage from "@/pages/SocialTradingPage";
 import AchievementsPage from "@/pages/AchievementsPage";
+import LeaderboardPage from "@/pages/LeaderboardPage";
 import NotFound from "@/pages/not-found";
 
 // Command Center is now the default - no mode selection needed
@@ -62,6 +63,9 @@ function Router() {
       </Route>
       <Route path="/achievements">
         {user ? <AchievementsPage /> : <Redirect to="/" />}
+      </Route>
+      <Route path="/leaderboard">
+        {user ? <LeaderboardPage /> : <Redirect to="/" />}
       </Route>
       {/* Archived mode pages - still accessible via URL but not in main navigation */}
       <Route path="/athena" component={AthenaMode} />

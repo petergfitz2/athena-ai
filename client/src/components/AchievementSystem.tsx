@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import AchievementBadge from "./AchievementBadge";
 import type { AchievementTier, AchievementStatus } from "./AchievementBadge";
 import { cn } from "@/lib/utils";
@@ -454,15 +455,50 @@ export default function AchievementSystem() {
       </div>
 
       {/* Achievements Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAchievements.map((achievement) => (
-          <AchievementBadge
-            key={achievement.id}
-            {...achievement}
-            onClick={() => setSelectedAchievement(achievement)}
-          />
-        ))}
-      </div>
+      <TooltipProvider>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredAchievements.map((achievement) => {
+            const progressText = achievement.maxProgress 
+              ? `Progress: ${achievement.progress || 0}/${achievement.maxProgress}`
+              : achievement.status === "unlocked" 
+                ? `Earned: ${achievement.earnedDate?.toLocaleDateString() || "Recently"}`
+                : "Not started";
+            
+            return (
+              <Tooltip key={achievement.id}>
+                <TooltipTrigger asChild>
+                  <div>
+                    <AchievementBadge
+                      {...achievement}
+                      onClick={() => setSelectedAchievement(achievement)}
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <div className="space-y-2">
+                    <div>
+                      <p className="font-semibold">{achievement.name}</p>
+                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                    </div>
+                    <div className="text-sm">
+                      <p>{progressText}</p>
+                      {achievement.reward && (
+                        <p className="text-primary">Reward: {achievement.reward}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {achievement.tier === "platinum" && "Elite achievement - Top 1% of traders"}
+                        {achievement.tier === "gold" && "Advanced achievement - Leaderboard points: 100"}
+                        {achievement.tier === "silver" && "Intermediate achievement - Leaderboard points: 50"}
+                        {achievement.tier === "bronze" && "Beginner achievement - Leaderboard points: 25"}
+                      </p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </TooltipProvider>
 
       {/* Rewards Section */}
       <Card className="bg-gradient-to-br from-primary/20 to-purple-600/20 border-white/10 rounded-[20px]">
