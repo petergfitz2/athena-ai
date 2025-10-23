@@ -169,6 +169,19 @@ export function useVoice({ onTranscript, onResponse, onError }: UseVoiceOptions 
   // Keyboard shortcut for push-to-talk (Space key)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the user is typing in an input field
+      const activeElement = document.activeElement;
+      const isInputField = activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.getAttribute('contenteditable') === 'true'
+      );
+      
+      // Don't intercept space key if user is typing in an input field
+      if (isInputField && e.code === "Space") {
+        return; // Let the space key work normally in input fields
+      }
+      
       // Space key or Cmd/Ctrl+K for push-to-talk
       if ((e.code === "Space" || (e.metaKey || e.ctrlKey) && e.key === "k") && !isRecording) {
         e.preventDefault();
@@ -177,6 +190,19 @@ export function useVoice({ onTranscript, onResponse, onError }: UseVoiceOptions 
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      // Check if the user is typing in an input field
+      const activeElement = document.activeElement;
+      const isInputField = activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.getAttribute('contenteditable') === 'true'
+      );
+      
+      // Don't intercept space key if user is typing in an input field
+      if (isInputField && e.code === "Space") {
+        return; // Let the space key work normally in input fields
+      }
+      
       if ((e.code === "Space" || e.key === "k") && isRecording) {
         e.preventDefault();
         stopRecording();
