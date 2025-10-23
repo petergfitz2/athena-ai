@@ -1,12 +1,15 @@
 import { db } from "./db";
 import { 
   users, holdings, conversations, messages, trades, watchlist,
+  avatars, userAvatars,
   type User, type InsertUser, 
   type Holding, type InsertHolding,
   type Conversation, type InsertConversation,
   type Message, type InsertMessage,
   type Trade, type InsertTrade,
-  type Watchlist, type InsertWatchlist
+  type Watchlist, type InsertWatchlist,
+  type Avatar, type InsertAvatar,
+  type UserAvatar, type InsertUserAvatar
 } from "@shared/schema";
 import { eq, and, desc } from "drizzle-orm";
 
@@ -48,6 +51,14 @@ export interface IStorage {
   getUserWatchlist(userId: string): Promise<Watchlist[]>;
   addToWatchlist(watchlist: InsertWatchlist): Promise<Watchlist>;
   removeFromWatchlist(id: string): Promise<boolean>;
+  
+  // Avatar operations
+  getPresetAvatars(): Promise<Avatar[]>;
+  getUserAvatarHistory(userId: string): Promise<UserAvatar[]>;
+  createCustomAvatar(avatar: Omit<Avatar, 'id'>): Promise<Avatar>;
+  createUserAvatar(userAvatar: Omit<UserAvatar, 'id'>): Promise<UserAvatar>;
+  setActiveAvatar(userId: string, avatarId: string): Promise<void>;
+  getActiveAvatar(userId: string): Promise<Avatar | null>;
 }
 
 export class DbStorage implements IStorage {
@@ -211,6 +222,55 @@ export class DbStorage implements IStorage {
   async removeFromWatchlist(id: string): Promise<boolean> {
     const result = await db.delete(watchlist).where(eq(watchlist.id, id)).returning();
     return result.length > 0;
+  }
+
+  // Avatar operations
+  async getPresetAvatars(): Promise<Avatar[]> {
+    return db.select().from(avatars).where(eq(avatars.isPreset, true));
+  }
+
+  async getUserAvatarHistory(userId: string): Promise<UserAvatar[]> {
+    return db.select().from(userAvatars)
+      .where(eq(userAvatars.userId, userId))
+      .orderBy(desc(userAvatars.createdAt));
+  }
+
+  async createCustomAvatar(avatar: Omit<Avatar, 'id'>): Promise<Avatar> {
+    const result = await db.insert(avatars).values(avatar).returning();
+    return result[0];
+  }
+
+  async createUserAvatar(userAvatar: Omit<UserAvatar, 'id'>): Promise<UserAvatar> {
+    const result = await db.insert(userAvatars).values(userAvatar).returning();
+    return result[0];
+  }
+
+  async setActiveAvatar(userId: string, avatarId: string): Promise<void> {
+    // First, deactivate all avatars for this user
+    await db.update(userAvatars)
+      .set({ isActive: false })
+      .where(eq(userAvatars.userId, userId));
+    
+    // Activate the selected avatar
+    await db.update(userAvatars)
+      .set({ isActive: true })
+      .where(and(eq(userAvatars.userId, userId), eq(userAvatars.avatarId, avatarId)));
+    
+    // Update user's active avatar
+    await db.update(users)
+      .set({ activeAvatarId: avatarId })
+      .where(eq(users.id, userId));
+  }
+
+  async getActiveAvatar(userId: string): Promise<Avatar | null> {
+    const user = await this.getUser(userId);
+    if (!user?.activeAvatarId) return null;
+    
+    const result = await db.select().from(avatars)
+      .where(eq(avatars.id, user.activeAvatarId))
+      .limit(1);
+    
+    return result[0] || null;
   }
 }
 

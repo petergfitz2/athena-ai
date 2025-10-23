@@ -18,6 +18,9 @@ export async function generateAIResponse(
   userMessage: string,
   context: ConversationContext
 ): Promise<string> {
+  // Fetch user's active avatar
+  const activeAvatar = await storage.getActiveAvatar(context.userId);
+  
   // Build portfolio context for the AI
   const portfolioSummary = context.holdings.length > 0
     ? context.holdings
@@ -25,9 +28,37 @@ export async function generateAIResponse(
         .join(", ")
     : "No holdings yet";
 
+  // Build avatar personality context
+  let avatarContext = "";
+  let avatarName = "Athena";
+  let temperature = 0.7; // Default temperature
+  
+  if (activeAvatar) {
+    avatarName = activeAvatar.name;
+    const profile = activeAvatar.personalityProfile as any;
+    
+    avatarContext = `
+You are ${avatarName}, an investment advisor with the following characteristics:
+- Personality traits: ${profile.traits?.join(', ') || 'professional, knowledgeable'}
+- Trading style: ${profile.tradingStyle || 'balanced'}
+- Communication tone: ${profile.tone || 'professional'}
+${profile.backstory ? `- Background: ${profile.backstory}` : ''}
+
+Embody these characteristics in your responses while maintaining professionalism and accuracy.
+`;
+    
+    // Adjust temperature based on trading style
+    if (profile.tradingStyle === 'aggressive') {
+      temperature = 0.8;
+    } else if (profile.tradingStyle === 'conservative') {
+      temperature = 0.5;
+    } else if (profile.tradingStyle === 'analytical') {
+      temperature = 0.6;
+    }
+  }
+
   // Adapt system prompt based on detected context mode
   let contextInstructions = "";
-  let temperature = 0.7;
   let maxTokens = 500;
 
   if (context.contextMode === "amanda") {
@@ -47,7 +78,7 @@ export async function generateAIResponse(
     maxTokens = 500;
   }
 
-  const systemPrompt = `You are Athena, a professional AI investment advisor with deep expertise in financial markets, portfolio management, and investment strategies. You provide thoughtful, actionable advice to all investors regardless of their experience level or portfolio size.
+  const systemPrompt = `${avatarContext || `You are ${avatarName}, a professional AI investment advisor with deep expertise in financial markets, portfolio management, and investment strategies.`} You provide thoughtful, actionable advice to all investors regardless of their experience level or portfolio size.
 
 CORE CAPABILITIES:
 • Answer ALL investment questions comprehensively - from "what is a stock?" to advanced trading strategies

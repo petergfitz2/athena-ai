@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="victorBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#DC2626;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="90" fill="url(#victorBg)" stroke="#EF4444" stroke-width="2" opacity="0.9"/>
+  <g transform="translate(100, 100)">
+    <!-- Head -->
+    <circle cx="0" cy="-10" r="35" fill="#fdbcb4" stroke="#EF4444" stroke-width="1" opacity="0.9"/>
+    <!-- Hair (Slicked back, graying) -->
+    <path d="M -35,-40 Q 0,-48 35,-40 L 35,-25 L 30,-20 Q 0,-22 -30,-20 L -35,-25 Z" 
+          fill="#5a5a5a" opacity="0.9"/>
+    <!-- Gray streaks -->
+    <path d="M -20,-40 L -15,-25 M 0,-45 L 0,-25 M 20,-40 L 15,-25" 
+          stroke="#888" stroke-width="2" opacity="0.5"/>
+    <!-- Eyes (Intense) -->
+    <circle cx="-12" cy="-10" r="3" fill="#1a1a1a"/>
+    <circle cx="12" cy="-10" r="3" fill="#1a1a1a"/>
+    <!-- Eyebrows (Heavy) -->
+    <path d="M -18,-18 L -8,-16" stroke="#2a2a2a" stroke-width="2"/>
+    <path d="M 8,-16 L 18,-18" stroke="#2a2a2a" stroke-width="2"/>
+    <!-- Mouth (Stern) -->
+    <path d="M -10,5 L 10,5" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+    <!-- Power suit collar -->
+    <path d="M -35,20 L -30,25 L -25,20 L -20,25 L 0,22 L 20,25 L 25,20 L 30,25 L 35,20" 
+          stroke="#EF4444" stroke-width="2" fill="none" opacity="0.8"/>
+    <!-- Tie -->
+    <path d="M 0,22 L 0,35 L -3,40 L 0,45 L 3,40 L 0,35" fill="#EF4444" opacity="0.7"/>
+  </g>
+  <text x="100" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="300" fill="#EF4444">Victor Steele</text>
+</svg>

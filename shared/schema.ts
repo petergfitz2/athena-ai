@@ -1,7 +1,39 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, decimal, pgEnum, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, decimal, pgEnum, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Avatar definitions
+export const avatars = pgTable("avatars", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull(),
+  personaKey: varchar("persona_key", { length: 50 }).unique(),
+  imageUrl: text("image_url").notNull(),
+  personalityProfile: jsonb("personality_profile").$type<{
+    traits: string[];
+    tradingStyle: 'aggressive' | 'conservative' | 'analytical' | 'balanced';
+    tone: 'professional' | 'casual' | 'mentor' | 'peer';
+    backstory?: string;
+  }>().notNull(),
+  voiceStyle: varchar("voice_style", { length: 50 }),
+  isPreset: boolean("is_preset").default(false).notNull(),
+  generationParams: jsonb("generation_params").$type<{
+    prompt?: string;
+    style?: string;
+    mood?: string;
+  }>(),
+});
+
+// User avatar selections and custom creations
+export const userAvatars = pgTable("user_avatars", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  avatarId: varchar("avatar_id").references(() => avatars.id),
+  customPrompt: text("custom_prompt"),
+  tradingStyle: varchar("trading_style", { length: 50 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  isActive: boolean("is_active").default(false).notNull(),
+});
 
 // Users table
 export const users = pgTable("users", {
@@ -16,6 +48,7 @@ export const users = pgTable("users", {
   preferredMode: text("preferred_mode").default('amanda'),
   emailNotifications: boolean("email_notifications").notNull().default(true),
   pushNotifications: boolean("push_notifications").notNull().default(true),
+  activeAvatarId: varchar("active_avatar_id").references(() => avatars.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -38,6 +71,21 @@ export const updateUserProfileSchema = z.object({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
 export type User = typeof users.$inferSelect;
+
+// Avatar schemas and types
+export const insertAvatarSchema = createInsertSchema(avatars).omit({
+  id: true,
+});
+
+export const insertUserAvatarSchema = createInsertSchema(userAvatars).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertAvatar = z.infer<typeof insertAvatarSchema>;
+export type Avatar = typeof avatars.$inferSelect;
+export type InsertUserAvatar = z.infer<typeof insertUserAvatarSchema>;
+export type UserAvatar = typeof userAvatars.$inferSelect;
 
 // Password reset tokens
 export const passwordResetTokens = pgTable("password_reset_tokens", {

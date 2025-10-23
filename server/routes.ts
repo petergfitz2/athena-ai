@@ -666,6 +666,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Avatar endpoints
+  app.get("/api/avatars/presets", async (req, res) => {
+    try {
+      const presets = await storage.getPresetAvatars();
+      res.json(presets);
+    } catch (error) {
+      console.error("Error fetching preset avatars:", error);
+      res.status(500).json({ error: "Failed to fetch preset avatars" });
+    }
+  });
+
+  app.get("/api/avatars/history", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const history = await storage.getUserAvatarHistory(user.id);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching avatar history:", error);
+      res.status(500).json({ error: "Failed to fetch avatar history" });
+    }
+  });
+
+  app.post("/api/avatars/custom", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { name, personality, tradingStyle, appearance } = req.body;
+      
+      // Generate prompt for AI
+      const prompt = `Professional trader avatar: ${personality}. Style: ${tradingStyle}. Appearance: ${appearance}`;
+      
+      // Create avatar record
+      const avatar = await storage.createCustomAvatar({
+        name: name || "Custom Avatar",
+        imageUrl: "/avatars/custom-placeholder.svg",
+        personalityProfile: {
+          traits: personality.split(',').map((t: string) => t.trim()),
+          tradingStyle,
+          tone: "professional",
+          backstory: `A custom trader persona tailored to your preferences.`
+        },
+        voiceStyle: null,
+        isPreset: false,
+        generationParams: { prompt, style: tradingStyle, mood: appearance }
+      } as any);
+      
+      // Create user avatar association
+      await storage.createUserAvatar({
+        userId: user.id,
+        avatarId: avatar.id,
+        customPrompt: prompt,
+        tradingStyle,
+        isActive: false
+      } as any);
+      
+      res.json(avatar);
+    } catch (error) {
+      console.error("Error creating custom avatar:", error);
+      res.status(500).json({ error: "Failed to create custom avatar" });
+    }
+  });
+
+  app.post("/api/avatars/:id/select", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const avatarId = req.params.id;
+      
+      await storage.setActiveAvatar(user.id, avatarId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error selecting avatar:", error);
+      res.status(500).json({ error: "Failed to select avatar" });
+    }
+  });
+
   // Voice Chat endpoint
   app.post("/api/voice/chat", requireAuth, async (req, res) => {
     try {

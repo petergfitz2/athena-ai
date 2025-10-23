@@ -18,12 +18,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard, Palette } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useMode } from "@/contexts/ModeContext";
 import ModeSwitcherMenu from "./ModeSwitcherMenu";
+import AvatarStudio from "./AvatarStudio";
 import {
   Tooltip,
   TooltipContent,
@@ -40,6 +41,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   const { toast } = useToast();
   const { currentMode, setMode } = useMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [avatarStudioOpen, setAvatarStudioOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -289,6 +291,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  onClick={() => setAvatarStudioOpen(true)}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-avatar-studio"
+                >
+                  <Palette className="w-4 h-4 mr-2" />
+                  Change Avatar
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={() => setLocation("/settings")}
                   className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
                   data-testid="menu-item-settings"
@@ -475,6 +485,9 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           </Sheet>
         </div>
       </div>
+      
+      {/* Avatar Studio Modal */}
+      <AvatarStudio open={avatarStudioOpen} onClose={() => setAvatarStudioOpen(false)} />
     </nav>
   );
 }
