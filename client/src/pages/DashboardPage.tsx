@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth, ProtectedRoute } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon, Sparkles, Wallet } from "lucide-react";
 import type { PortfolioSummary, Holding, MarketQuote } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -176,6 +176,132 @@ function DashboardPageContent() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Portfolio Insights Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              {/* Top Performer Card */}
+              {holdings && holdings.length > 0 && (
+                (() => {
+                  const topPerformer = holdings
+                    .map((holding) => {
+                      const quote = quotes?.[holding.symbol];
+                      const currentPrice = quote?.price || Number(holding.averageCost);
+                      const quantity = Number(holding.quantity);
+                      const avgCost = Number(holding.averageCost);
+                      const marketValue = quantity * currentPrice;
+                      const costBasis = quantity * avgCost;
+                      const gainLoss = marketValue - costBasis;
+                      const gainLossPercent = costBasis > 0 ? (gainLoss / costBasis) * 100 : 0;
+                      return { symbol: holding.symbol, gainLossPercent, gainLoss };
+                    })
+                    .sort((a, b) => b.gainLossPercent - a.gainLossPercent)[0];
+                  
+                  return (
+                    <Card className="bg-gradient-to-br from-green-500/10 to-transparent border-green-500/20 rounded-[28px] hover-elevate" data-testid="card-top-performer">
+                      <CardHeader className="pb-2">
+                        <CardDescription className="text-xs text-green-400 font-light flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4" />
+                          Top Performer
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-light text-foreground mb-1">{topPerformer?.symbol}</div>
+                        <div className="text-3xl font-extralight text-green-400">
+                          +{topPerformer?.gainLossPercent.toFixed(2)}%
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {formatCurrency(topPerformer?.gainLoss || 0)} gain
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()
+              )}
+
+              {/* Sector Alert Card */}
+              {sectorData && sectorData.length > 0 && (
+                (() => {
+                  const topSector = sectorData[0];
+                  const totalSectorValue = sectorData.reduce((acc, s) => acc + s.value, 0);
+                  const concentration = (topSector.value / totalSectorValue) * 100;
+                  const isHighConcentration = concentration > 40;
+                  
+                  return (
+                    <Card 
+                      className={`${
+                        isHighConcentration 
+                          ? 'bg-gradient-to-br from-yellow-500/10 to-transparent border-yellow-500/20' 
+                          : 'bg-gradient-to-br from-primary/10 to-transparent border-primary/20'
+                      } rounded-[28px] hover-elevate`}
+                      data-testid="card-sector-alert"
+                    >
+                      <CardHeader className="pb-2">
+                        <CardDescription className={`text-xs font-light flex items-center gap-2 ${
+                          isHighConcentration ? 'text-yellow-400' : 'text-primary'
+                        }`}>
+                          <TrendingUp className="w-4 h-4" />
+                          Sector Concentration
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-light text-foreground mb-1">{topSector?.name}</div>
+                        <div className={`text-3xl font-extralight ${
+                          isHighConcentration ? 'text-yellow-400' : 'text-primary'
+                        }`}>
+                          {concentration.toFixed(1)}%
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {isHighConcentration ? 'High concentration' : 'Well balanced'}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()
+              )}
+
+              {/* Cash Utilization Card */}
+              {summary && (
+                (() => {
+                  const cashBalance = summary.cashBalance || 0;
+                  const totalValue = summary.totalValue || 0;
+                  const cashUtilization = totalValue > 0 ? ((totalValue - cashBalance) / totalValue) * 100 : 0;
+                  const isUnderUtilized = cashBalance > totalValue * 0.2;
+                  
+                  return (
+                    <Card 
+                      className={`${
+                        isUnderUtilized
+                          ? 'bg-gradient-to-br from-blue-500/10 to-transparent border-blue-500/20'
+                          : 'bg-gradient-to-br from-primary/10 to-transparent border-primary/20'
+                      } rounded-[28px] hover-elevate`}
+                      data-testid="card-cash-utilization"
+                    >
+                      <CardHeader className="pb-2">
+                        <CardDescription className={`text-xs font-light flex items-center gap-2 ${
+                          isUnderUtilized ? 'text-blue-400' : 'text-primary'
+                        }`}>
+                          <Wallet className="w-4 h-4" />
+                          Cash Utilization
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-light text-foreground mb-1">
+                          {cashUtilization.toFixed(1)}% Invested
+                        </div>
+                        <div className={`text-3xl font-extralight ${
+                          isUnderUtilized ? 'text-blue-400' : 'text-primary'
+                        }`}>
+                          {formatCurrency(cashBalance)}
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {isUnderUtilized ? 'Consider investing' : 'Cash available'}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()
+              )}
             </div>
 
             {/* Portfolio Visualizations */}
