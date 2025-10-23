@@ -147,10 +147,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           : "bg-black border-white/10"
       }`}
     >
-      <div className="max-w-[1600px] ml-0 mr-auto px-6 sm:px-10 lg:px-16">
+      <div className="w-full pl-4 pr-6 sm:pr-10 lg:pr-16">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo and Navigation Links */}
-          <div className="flex items-center gap-8 h-full">
+          <div className="flex items-center gap-4 h-full">
             {/* Logo - aligned with consistent height */}
             <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
               <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap leading-none">
