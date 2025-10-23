@@ -61,7 +61,7 @@ Embody these characteristics in your responses while maintaining professionalism
   let contextInstructions = "";
   let maxTokens = 500;
 
-  if (context.contextMode === "amanda") {
+  if (context.contextMode === "athena") {
     // User wants quick, conversational responses
     contextInstructions = `\n\nCONTEXT: The user is looking for quick, conversational answers. Keep responses concise (2-3 sentences max) and actionable. Focus on the most important point first.`;
     temperature = 0.6;

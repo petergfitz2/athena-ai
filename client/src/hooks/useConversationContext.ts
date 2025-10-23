@@ -7,14 +7,14 @@ interface ConversationAnalysis {
   hurriedScore: number;
   analyticalScore: number;
   conversationalScore: number;
-  recommendedMode: "amanda" | "hybrid" | "terminal";
+  recommendedMode: "athena" | "hybrid" | "terminal";
   messageCount: number;
   avgResponseTimeSeconds: number | null;
 }
 
 interface ModeSuggestion {
   shouldSuggest: boolean;
-  recommendedMode: "amanda" | "hybrid" | "terminal" | null;
+  recommendedMode: "athena" | "hybrid" | "terminal" | null;
   reason: string;
   scores: {
     hurriedScore: string;

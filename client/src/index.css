@@ -520,6 +520,77 @@
     animation: thinking-dots 1.5s infinite;
   }
 
+  /* Avatar Animations - Applied directly to IMG elements */
+  @keyframes avatar-breathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.03) translateY(-2px); }
+  }
+
+  @keyframes avatar-talk {
+    0%, 100% { transform: scaleY(1); }
+    25% { transform: scaleY(0.95); }
+    75% { transform: scaleY(1.05); }
+  }
+
+  @keyframes avatar-blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.85); }
+  }
+
+  @keyframes avatar-head-tilt {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-2deg); }
+    75% { transform: rotate(2deg); }
+  }
+
+  @keyframes listening-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.3);
+      opacity: 0;
+    }
+  }
+
+  /* Avatar animation classes */
+  .avatar-breathing {
+    animation: avatar-breathe 4s ease-in-out infinite;
+  }
+
+  .avatar-talking {
+    animation: avatar-talk 0.3s ease-in-out infinite;
+  }
+
+  .avatar-blink {
+    animation: avatar-blink 10s ease-in-out infinite;
+  }
+
+  .avatar-head-tilt {
+    animation: avatar-head-tilt 8s ease-in-out infinite;
+  }
+
+  .animate-listening-pulse {
+    animation: listening-pulse 1.5s ease-out infinite;
+  }
+
+  .animate-breathe {
+    animation: avatar-breathe 4s ease-in-out infinite;
+  }
+
+  .animate-talking {
+    animation: avatar-talk 0.3s ease-in-out infinite;
+  }
+
+  .animate-blink {
+    animation: avatar-blink 10s ease-in-out infinite;
+  }
+
+  .animate-head-tilt {
+    animation: avatar-head-tilt 8s ease-in-out infinite;
+  }
+
   /* Thinking pulse animation */
   @keyframes thinking-pulse {
     0%, 100% {

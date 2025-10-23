@@ -138,7 +138,7 @@ export default function CommandCenter() {
       return { text: "Markets Open", color: "text-success", icon: Activity };
     }
     
-    return { text: "After Hours", color: "text-warning", icon: Clock };
+    return { text: "After Hours", color: "text-warning font-semibold", icon: Clock };
   };
 
   const marketStatus = getMarketStatus();
@@ -982,7 +982,11 @@ export default function CommandCenter() {
       
       {/* News Detail Modal */}
       <NewsDetailModal
-        article={selectedNewsArticle}
+        article={selectedNewsArticle ? {
+          ...selectedNewsArticle,
+          source: selectedNewsArticle.source || 'Unknown Source',
+          url: selectedNewsArticle.url || '#'
+        } : null}
         open={newsModalOpen}
         onClose={() => {
           setNewsModalOpen(false);

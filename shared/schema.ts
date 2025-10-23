@@ -228,7 +228,7 @@ export type Watchlist = typeof watchlist.$inferSelect;
 export const questionDepthEnum = pgEnum("question_depth", ["none", "simple", "moderate", "deep"]);
 
 // Interface mode enum
-export const interfaceModeEnum = pgEnum("interface_mode", ["amanda", "hybrid", "terminal"]);
+export const interfaceModeEnum = pgEnum("interface_mode", ["athena", "hybrid", "terminal"]);
 
 // Message metrics (per-message analysis)
 export const messageMetrics = pgTable("message_metrics", {

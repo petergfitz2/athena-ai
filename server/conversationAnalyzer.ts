@@ -29,7 +29,7 @@ const DEEP_KEYWORDS = [
 const CONVERSATIONAL_KEYWORDS = [
   'thanks', 'thank you', 'appreciate', 'great', 'awesome', 'nice', 'cool',
   'hello', 'hi', 'hey', 'good morning', 'good afternoon', 'how are you',
-  'amanda', 'you', 'your', 'think', 'feel', 'opinion'
+  'athena', 'you', 'your', 'think', 'feel', 'opinion'
 ];
 
 interface MessageAnalysisResult {

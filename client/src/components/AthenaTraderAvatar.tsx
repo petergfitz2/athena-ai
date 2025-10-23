@@ -119,21 +119,22 @@ export default function AthenaTraderAvatar({
         )}>
           <div className="relative w-full h-full rounded-full overflow-hidden bg-black/50 backdrop-blur-xl border border-white/20">
             {/* Avatar Image */}
-            <div className={cn(
-              "absolute inset-2 flex items-center justify-center",
-              !isListening && !isSpeaking && !isTyping && "animate-head-tilt"
-            )}>
+            <div className="absolute inset-2 flex items-center justify-center">
               <img 
                 src={avatarImage}
                 alt="Athena - Professional AI Trader"
                 className={cn(
-                  "rounded-full object-cover animate-blink",
-                  imageSizes[size]
+                  "rounded-full object-cover",
+                  imageSizes[size],
+                  // Apply animations directly to the IMG element
+                  isSpeaking && "avatar-talking",
+                  !isListening && !isSpeaking && !isTyping && "avatar-breathing animate-blink animate-head-tilt",
+                  isListening && "animate-pulse"
                 )}
               />
               
               {/* Professional overlay effect */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             </div>
 
             {/* Status Indicator Dot */}
@@ -185,7 +186,10 @@ export default function AthenaTraderAvatar({
                 "w-1.5 h-1.5 rounded-full",
                 statusConfig.color
               )} />
-              <p className="text-xs text-muted-foreground font-light">
+              <p className={cn(
+                "text-xs text-muted-foreground",
+                statusConfig.text === "After Hours" ? "font-semibold" : "font-light"
+              )}>
                 {isListening ? "Listening..." : 
                  isSpeaking ? "Speaking..." :
                  isTyping ? "Analyzing..." :

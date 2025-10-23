@@ -221,9 +221,17 @@ function HybridModeContent() {
           </div>
         </div>
 
-        {/* Content Area */}
+        {/* Content Area - Add key to force remount and prevent conflicts */}
         <div className="flex-1 overflow-auto">
-          {view === "dashboard" ? <DashboardPage /> : <PortfolioPage />}
+          {view === "dashboard" ? (
+            <div key="dashboard-hybrid">
+              <DashboardPage />
+            </div>
+          ) : (
+            <div key="portfolio-hybrid">
+              <PortfolioPage />
+            </div>
+          )}
         </div>
       </div>
 

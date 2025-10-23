@@ -158,7 +158,9 @@ function PortfolioPageContent() {
           </div>
         ) : (
           <div>
-            <h2 className="text-4xl font-extralight text-foreground mb-8">Your Holdings</h2>
+            <div className="sticky top-0 z-10 bg-black/95 backdrop-blur-sm pb-4 -mt-4 pt-4 mb-4">
+              <h2 className="text-4xl font-extralight text-foreground">Your Holdings</h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {holdings.map((holding) => {
                 const currentPrice = getMockPrice(holding.symbol);
