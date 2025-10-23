@@ -53,11 +53,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   };
 
   const navLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, shortcut: "⌘1" },
-    { href: "/watchlist", label: "Watchlist", icon: ListChecks, shortcut: "⌘2" },
-    { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘3" },
-    { href: "/trades", label: "Trades", icon: History, shortcut: "⌘4" },
-    { href: "/analytics", label: "Analytics", icon: TrendingUp, shortcut: "⌘5" },
+    { href: "/command-center", label: "Command Center", icon: LayoutDashboard, shortcut: "⌘1" },
+    { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘2" },
+    { href: "/watchlist", label: "Discover", icon: ListChecks, shortcut: "⌘3" },
+    { href: "/analytics", label: "Learn", icon: BookOpen, shortcut: "⌘4" },
   ];
 
   // Add keyboard shortcuts
@@ -68,21 +67,17 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
         switch (e.key) {
           case '1':
             e.preventDefault();
-            setLocation('/dashboard');
+            setLocation('/command-center');
             break;
           case '2':
             e.preventDefault();
-            setLocation('/watchlist');
+            setLocation('/portfolio');
             break;
           case '3':
             e.preventDefault();
-            setLocation('/portfolio');
+            setLocation('/watchlist');
             break;
           case '4':
-            e.preventDefault();
-            setLocation('/trades');
-            break;
-          case '5':
             e.preventDefault();
             setLocation('/analytics');
             break;
@@ -122,7 +117,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-3 hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
+          <Link href="/command-center" className="flex items-center gap-3 hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>

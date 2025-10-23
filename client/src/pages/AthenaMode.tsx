@@ -8,7 +8,7 @@ import { useVoice } from "@/hooks/useVoice";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
-import AthenaOrb from "@/components/AthenaOrb";
+import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
@@ -221,30 +221,33 @@ function AthenaModeContent() {
           <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 min-h-[300px] lg:min-h-[400px]">
             <div className="relative flex flex-col items-center">
               <div className="hidden lg:block">
-                <AthenaOrb 
+                <AthenaTraderAvatar 
                   size="full" 
                   isListening={isRecording || voiceStatus === "listening"}
                   isSpeaking={voiceStatus === "speaking"}
                   isTyping={isLoading}
                   showStatus={false}
+                  showName={false}
                 />
               </div>
               <div className="hidden sm:block lg:hidden">
-                <AthenaOrb 
+                <AthenaTraderAvatar 
                   size="large" 
                   isListening={isRecording || voiceStatus === "listening"}
                   isSpeaking={voiceStatus === "speaking"}
                   isTyping={isLoading}
                   showStatus={false}
+                  showName={false}
                 />
               </div>
               <div className="block sm:hidden">
-                <AthenaOrb 
+                <AthenaTraderAvatar 
                   size="medium" 
                   isListening={isRecording || voiceStatus === "listening"}
                   isSpeaking={voiceStatus === "speaking"}
                   isTyping={isLoading}
                   showStatus={false}
+                  showName={false}
                 />
               </div>
               {/* Athena Text - Responsive sizes */}

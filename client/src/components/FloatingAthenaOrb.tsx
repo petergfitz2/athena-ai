@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocation } from "wouter";
-import AthenaOrb from "@/components/AthenaOrb";
+import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import { useMutation } from "@tanstack/react-query";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -95,7 +95,7 @@ export default function FloatingAthenaOrb() {
             className="relative h-16 w-16 rounded-full bg-gradient-to-br from-primary to-purple-600 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300 p-0"
             data-testid="button-floating-athena"
           >
-            <AthenaOrb size="mini" showStatus={false} className="pointer-events-none" />
+            <AthenaTraderAvatar size="mini" showStatus={false} showName={false} className="pointer-events-none" />
             <Badge 
               className="absolute -top-1 -right-1 bg-destructive text-white border-0 animate-pulse"
               data-testid="badge-demo-mode"
@@ -115,7 +115,7 @@ export default function FloatingAthenaOrb() {
           <Card className="bg-black/95 backdrop-blur-xl border-white/10 rounded-[28px] shadow-2xl">
             <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <AthenaOrb size="mini" showStatus={false} />
+                <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
                 <div>
                   <CardTitle className="text-lg font-light">Athena AI Assistant</CardTitle>
                   <Badge variant="outline" className="mt-1 text-xs">
@@ -163,7 +163,7 @@ export default function FloatingAthenaOrb() {
                   {sendMessage.isPending && (
                     <div className="flex justify-start">
                       <div className="bg-card border border-white/10 rounded-[20px] px-4 py-3">
-                        <AthenaOrb size="mini" isTyping={true} showStatus={false} />
+                        <AthenaTraderAvatar size="mini" isTyping={true} showStatus={false} showName={false} />
                       </div>
                     </div>
                   )}

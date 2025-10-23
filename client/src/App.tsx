@@ -6,6 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ModeProvider, useMode } from "@/contexts/ModeContext";
 import AuthPage from "@/pages/AuthPage";
+import CommandCenter from "@/components/CommandCenter";
+import PortfolioPage from "@/pages/PortfolioPage";
+// Archived mode pages - kept for reference but not in main navigation
 import AthenaMode from "@/pages/AthenaMode";
 import HybridMode from "@/pages/HybridMode";
 import TerminalMode from "@/pages/TerminalMode";
@@ -20,49 +23,41 @@ import HelpPage from "@/pages/HelpPage";
 import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
 
-function ModeSelectorPage() {
+// Command Center is now the default - no mode selection needed
+function CommandCenterWrapper() {
   const { user } = useAuth();
-  const { currentMode } = useMode();
 
   if (!user) {
     return <Redirect to="/" />;
   }
 
-  // Auto-redirect to saved mode
-  if (currentMode) {
-    return <Redirect to={`/${currentMode}`} />;
-  }
-
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground mb-4">
-            Welcome to Athena
-          </h1>
-          <p className="text-lg text-muted-foreground font-light">
-            Choose your interface mode
-          </p>
-        </div>
-        <ModeSelector />
-      </div>
-    </div>
-  );
+  return <CommandCenter />;
 }
 
 function Router() {
+  const { user } = useAuth();
+  
   return (
     <Switch>
       <Route path="/" component={AuthPage} />
-      <Route path="/select-mode" component={ModeSelectorPage} />
-      <Route path="/dashboard" component={DashboardPage} />
+      {/* Command Center is now the main dashboard */}
+      <Route path="/command-center" component={CommandCenterWrapper} />
+      <Route path="/dashboard">
+        {user ? <Redirect to="/command-center" /> : <Redirect to="/" />}
+      </Route>
+      <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/watchlist" component={WatchlistPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/trades" component={TradesPage} />
       <Route path="/analytics" component={AnalyticsPage} />
+      {/* Archived mode pages - still accessible via URL but not in main navigation */}
       <Route path="/athena" component={AthenaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />
+      <Route path="/select-mode">
+        {user ? <Redirect to="/command-center" /> : <Redirect to="/" />}
+      </Route>
+      {/* Help pages */}
       <Route path="/tutorials" component={TutorialsPage} />
       <Route path="/faq" component={FAQPage} />
       <Route path="/help" component={HelpPage} />

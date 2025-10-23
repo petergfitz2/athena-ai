@@ -7,7 +7,7 @@ import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
-import AthenaOrb from "@/components/AthenaOrb";
+import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
@@ -235,10 +235,10 @@ function HybridModeContent() {
             data-testid="button-expand-athena"
           >
             <div className="sm:hidden">
-              <AthenaOrb size="mini" showStatus={false} isListening={isRecording} />
+              <AthenaTraderAvatar size="mini" showStatus={false} showName={false} isListening={isRecording} />
             </div>
             <div className="hidden sm:block">
-              <AthenaOrb size="small" showStatus={false} isListening={isRecording} />
+              <AthenaTraderAvatar size="small" showStatus={false} showName={false} isListening={isRecording} />
             </div>
             <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
               <div className="px-3 py-1 bg-black/90 backdrop-blur-xl rounded-full border border-white/10">
@@ -255,9 +255,10 @@ function HybridModeContent() {
           {/* Chat Header */}
           <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between glass">
             <div className="flex items-center gap-4">
-              <AthenaOrb 
+              <AthenaTraderAvatar 
                 size="mini" 
                 showStatus={false}
+                showName={false}
                 isListening={isRecording}
                 isSpeaking={false}
               />
