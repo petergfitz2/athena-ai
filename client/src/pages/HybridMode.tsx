@@ -9,7 +9,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
 import AthenaOrb from "@/components/AthenaOrb";
 import ChatMessage from "@/components/ChatMessage";
-import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
+import UnifiedHeader from "@/components/UnifiedHeader";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -134,59 +134,24 @@ function HybridModeContent() {
   };
 
   return (
-    <div className="relative h-screen bg-black overflow-hidden">
-      {/* Main Dashboard Area */}
-      <div className={`transition-all duration-300 ${chatExpanded ? 'mr-[500px]' : 'mr-0'}`}>
-        {/* Header with View Selector */}
-        <div className="border-b border-white/10 px-6 py-4">
+    <div className="relative h-screen bg-black overflow-hidden flex flex-col">
+      {/* Unified Header */}
+      <UnifiedHeader showModeSwitcher={true} transparentBg={false} />
+
+      {/* Main Container - Responsive */}
+      <div className={`flex-1 mt-16 flex flex-col lg:flex-row transition-all duration-300 ${chatExpanded ? 'lg:mr-[450px]' : 'mr-0'}`}>
+        {/* Sub Header with View Selector - Mobile responsive */}
+        <div className="w-full border-b border-white/10 px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-extralight text-foreground">Athena</h1>
-              <ModeSwitcherMenu />
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/dashboard")}
-                  className="rounded-full"
-                  data-testid="button-dashboard"
-                >
-                  <LayoutDashboard className="w-5 h-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/analytics")}
-                  className="rounded-full"
-                  data-testid="button-analytics"
-                >
-                  <BarChart3 className="w-5 h-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/trades")}
-                  className="rounded-full"
-                  data-testid="button-trades"
-                >
-                  <List className="w-5 h-5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLocation("/settings")}
-                  className="rounded-full"
-                  data-testid="button-settings"
-                >
-                  <Settings className="w-5 h-5" />
-                </Button>
-              </div>
+            <div className="text-sm text-muted-foreground font-light hidden sm:block">
+              {view === "dashboard" ? "Investment Dashboard" : "Portfolio Overview"}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 variant={view === "dashboard" ? "default" : "ghost"}
                 onClick={() => setView("dashboard")}
-                className="rounded-full"
+                className="rounded-full flex-1 sm:flex-initial"
+                size="sm"
                 data-testid="button-view-dashboard"
               >
                 Dashboard
@@ -194,7 +159,8 @@ function HybridModeContent() {
               <Button
                 variant={view === "portfolio" ? "default" : "ghost"}
                 onClick={() => setView("portfolio")}
-                className="rounded-full"
+                className="rounded-full flex-1 sm:flex-initial"
+                size="sm"
                 data-testid="button-view-portfolio"
               >
                 Portfolio
@@ -204,25 +170,26 @@ function HybridModeContent() {
         </div>
 
         {/* Content Area */}
-        <div className="h-[calc(100vh-73px)] overflow-auto">
+        <div className="flex-1 overflow-auto">
           {view === "dashboard" ? <DashboardPage /> : <PortfolioPage />}
         </div>
       </div>
 
-      {/* Floating Athena Orb (Bottom-Right) */}
+      {/* Floating Athena Orb - Responsive positioning */}
       {!chatExpanded && (
-        <div className="fixed bottom-8 right-8 z-50">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-50">
           <div 
             onClick={() => setChatExpanded(true)}
             className="cursor-pointer group transition-all duration-300 hover:scale-105"
             data-testid="button-expand-athena"
           >
-            <AthenaOrb 
-              size="small" 
-              showStatus={false}
-              isListening={isRecording}
-            />
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="sm:hidden">
+              <AthenaOrb size="mini" showStatus={false} isListening={isRecording} />
+            </div>
+            <div className="hidden sm:block">
+              <AthenaOrb size="small" showStatus={false} isListening={isRecording} />
+            </div>
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block">
               <div className="px-3 py-1 bg-black/90 backdrop-blur-xl rounded-full border border-white/10">
                 <p className="text-xs text-white/90 whitespace-nowrap">Click to chat</p>
               </div>
@@ -231,9 +198,9 @@ function HybridModeContent() {
         </div>
       )}
 
-      {/* Expanded Chat Panel (Right Side) */}
+      {/* Expanded Chat Panel - Full screen on mobile, side panel on desktop */}
       {chatExpanded && (
-        <div className="fixed right-0 top-0 h-screen w-[500px] glass border-l border-white/10 flex flex-col z-40">
+        <div className="fixed inset-0 lg:inset-auto lg:right-0 lg:top-16 lg:h-[calc(100vh-64px)] w-full lg:w-[450px] glass border-l border-white/10 flex flex-col z-40">
           {/* Chat Header */}
           <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between glass">
             <div className="flex items-center gap-4">
@@ -296,7 +263,7 @@ function HybridModeContent() {
                   }
                 }}
                 placeholder="Ask Athena anything..."
-                className="flex-1 min-h-[48px] max-h-32 resize-none rounded-[20px] bg-white/5 border-white/10"
+                className="flex-1 min-h-[48px] max-h-32 resize-none rounded-[20px] bg-white/10 border-white/20 text-foreground placeholder:text-white/40 px-4"
                 disabled={isLoading}
                 data-testid="input-hybrid-message"
               />
