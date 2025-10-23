@@ -22,6 +22,7 @@ import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Men
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import ModeSwitcherMenu from "./ModeSwitcherMenu";
 
 interface NavigationProps {
   variant?: "default" | "transparent";
@@ -106,6 +107,11 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 </Link>
               );
             })}
+          </div>
+
+          {/* Mode Switcher (Desktop) */}
+          <div className="hidden md:block">
+            <ModeSwitcherMenu />
           </div>
 
           {/* Mobile Menu Button */}
