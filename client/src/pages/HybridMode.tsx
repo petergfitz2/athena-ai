@@ -34,7 +34,7 @@ function HybridModeContent() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
-    content: "Hi! I'm Amanda. Click here to start chatting or press Cmd/Ctrl + K.",
+    content: "Hi! I'm Athena. Click here to start chatting or press Cmd/Ctrl + K.",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState("");
@@ -295,7 +295,7 @@ function HybridModeContent() {
                     handleSendMessage();
                   }
                 }}
-                placeholder="Ask Amanda anything..."
+                placeholder="Ask Athena anything..."
                 className="flex-1 min-h-[48px] max-h-32 resize-none rounded-[20px] bg-white/5 border-white/10"
                 disabled={isLoading}
                 data-testid="input-hybrid-message"

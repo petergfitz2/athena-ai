@@ -443,7 +443,7 @@ function TerminalModeContent() {
         <div className="px-6 py-2 max-h-20 overflow-y-auto space-y-1">
           {messages.slice(-2).map((message) => (
             <div key={message.id} className="flex items-start gap-2">
-              <p className="text-xs text-muted-foreground flex-shrink-0">{message.role === 'user' ? 'You' : 'Amanda'}:</p>
+              <p className="text-xs text-muted-foreground flex-shrink-0">{message.role === 'user' ? 'You' : 'Athena'}:</p>
               <p className="text-xs text-foreground line-clamp-1">{message.content}</p>
             </div>
           ))}

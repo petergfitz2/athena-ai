@@ -30,7 +30,7 @@ function AmandaModeContent() {
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
-    content: "Hello! I'm Amanda, your AI investment advisor. I can help you with portfolio questions, market insights, or trade suggestions. How can I assist you today?",
+    content: "Hello! I'm Athena, your AI investment advisor. I can help you with portfolio questions, market insights, or trade suggestions. How can I assist you today?",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState("");
@@ -279,7 +279,7 @@ function AmandaModeContent() {
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
-                  <span className="text-sm font-light">Amanda is thinking...</span>
+                  <span className="text-sm font-light">Athena is thinking...</span>
                 </div>
               )}
               <div ref={messagesEndRef} />
