@@ -17,7 +17,7 @@ Athena provides a conversational interface for investment advice and portfolio m
 
 ## Features
 
-### Phase 1 (Current) - Three Adaptive Interface Modes 🚧 IN PROGRESS
+### Phase 1 (Complete) ✅ - Three Adaptive Interface Modes
 - ✅ User authentication (username/password)
 - ✅ **Three Interface Modes:**
   - ✅ **Amanda Mode**: Full-screen conversational UI with photorealistic AI avatar (voice-first)
@@ -29,6 +29,7 @@ Athena provides a conversational interface for investment advice and portfolio m
   - ✅ Audio transcription via Whisper API
   - ✅ Voice synthesis from Amanda using TTS (nova voice)
   - ✅ Integrated with portfolio context
+  - ✅ Voice authentication (credentials included in API calls)
 - ✅ Conversational AI chat interface with portfolio context
 - ✅ Portfolio view with holdings management
   - ✅ Add holding modal with validation
@@ -39,8 +40,9 @@ Athena provides a conversational interface for investment advice and portfolio m
 - ✅ Real-time WebSocket support
 - ✅ Luxury design system (pure black, purple accents, glassmorphism)
 - ✅ Desktop-optimized responsive design
-- 🚧 Navigation improvements (keyboard shortcuts, mode switching)
-- 🚧 Mode onboarding/tutorial
+- ✅ Navigation improvements (keyboard shortcuts Cmd/Ctrl+1/2/3, mode switching via dropdown)
+- ✅ Logout functionality via mode switcher menu
+- ✅ E2E testing passed (registration, mode selection, chat, mode persistence, logout)
 
 ### Phase 2 (Planned)
 - Real-time market data integration
@@ -90,7 +92,7 @@ Athena provides a conversational interface for investment advice and portfolio m
 
 ## Recent Changes (October 23, 2025)
 
-### Major Architecture Update: Three Interface Modes
+### Phase 1 Completion: Three Interface Modes ✅
 1. **ModeContext & ModeSelector**: Context provider for managing interface mode (Amanda/Hybrid/Terminal) with localStorage persistence
 2. **Amanda Mode** (`/amanda`): Full-screen conversational interface
    - Photorealistic AI avatar (top third) with listening/speaking animations
@@ -110,10 +112,15 @@ Athena provides a conversational interface for investment advice and portfolio m
    - `useVoice` hook for push-to-talk functionality
    - OpenAI Whisper API for transcription
    - OpenAI TTS API for Amanda's voice (nova model)
-   - Backend `/api/voice/chat` endpoint
+   - Backend `/api/voice/chat` endpoint with credential authentication
    - Integrated with portfolio context for personalized responses
 6. **Updated Navigation**: App.tsx restructured with ModeProvider, route updates to `/amanda`, `/hybrid`, `/terminal`
-7. **Auth Flow**: Redirects to `/select-mode` after login for mode selection
+7. **Auth Flow**: Redirects to `/select-mode` after login/register for mode selection
+8. **Bug Fixes**:
+   - Fixed voice API authentication (credentials now included)
+   - Fixed post-auth redirect (now goes to `/select-mode` instead of `/dashboard`)
+   - Added logout button to ModeSwitcherMenu
+9. **E2E Testing**: Comprehensive test passed covering registration, mode selection, chat functionality, mode switching (via menu and keyboard shortcuts), mode persistence, and logout
 
 ## Design System
 
