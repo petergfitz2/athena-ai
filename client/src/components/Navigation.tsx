@@ -168,10 +168,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium transition-all relative ${
+                      className={`flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all relative ${
                         active
-                          ? "bg-primary/20 text-primary font-semibold"
-                          : "text-muted-foreground hover-elevate active-elevate-2"
+                          ? "bg-primary/20 text-primary font-bold"
+                          : "text-foreground/80 font-semibold hover:text-foreground hover-elevate active-elevate-2"
                       }`}
                       data-testid={`link-${link.label.toLowerCase()}`}
                     >
@@ -202,10 +202,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   {currentMode === "athena" && <MessageCircle className="w-4 h-4" />}
                   {currentMode === "hybrid" && <Layout className="w-4 h-4" />}
                   {currentMode === "terminal" && <Grid3x3 className="w-4 h-4" />}
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-semibold text-foreground">
                     {modes.find(m => m.id === currentMode)?.label || "Select Mode"}
                   </span>
-                  <ChevronDown className="w-4 h-4 opacity-50" />
+                  <ChevronDown className="w-4 h-4 opacity-70" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -261,11 +261,11 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   data-testid="button-user-menu"
                 >
                   <Avatar className="w-7 h-7">
-                    <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                    <AvatarFallback className="bg-primary/20 text-primary text-xs font-semibold">
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden lg:block text-sm font-medium">
+                  <span className="hidden lg:block text-sm font-semibold text-foreground">
                     {user?.username}
                   </span>
                 </Button>
