@@ -150,16 +150,16 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo and Navigation Links */}
-          <div className="flex items-center gap-8">
-            {/* Logo */}
-            <Link href="/" className="flex items-center hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap">
+          <div className="flex items-center gap-8 h-full">
+            {/* Logo - aligned with consistent height */}
+            <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
+              <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap leading-none">
                 Athena AI Investing
               </span>
             </Link>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-2">
+            {/* Desktop Navigation Links - consistent height */}
+            <div className="hidden md:flex items-center gap-2 h-full">
               {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -168,7 +168,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all relative ${
+                      className={`flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium transition-all relative ${
                         active
                           ? "bg-primary/20 text-primary font-semibold"
                           : "text-muted-foreground hover-elevate active-elevate-2"
@@ -189,14 +189,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             </div>
           </div>
 
-          {/* Right Side Actions */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Mode Switcher Dropdown */}
+          {/* Right Side Actions - aligned height */}
+          <div className="hidden md:flex items-center gap-3 h-full">
+            {/* Mode Switcher Dropdown - consistent height */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 rounded-full hover-elevate active-elevate-2"
+                  className="flex items-center gap-2 h-10 px-4 rounded-full hover-elevate active-elevate-2"
                   data-testid="button-mode-switcher"
                 >
                   {currentMode === "athena" && <MessageCircle className="w-4 h-4" />}
@@ -252,15 +252,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Menu */}
+            {/* User Menu - consistent height and alignment */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-3 rounded-full hover-elevate active-elevate-2"
+                  className="flex items-center gap-2 h-10 px-3 rounded-full hover-elevate active-elevate-2"
                   data-testid="button-user-menu"
                 >
-                  <Avatar className="w-8 h-8">
+                  <Avatar className="w-7 h-7">
                     <AvatarFallback className="bg-primary/20 text-primary text-xs">
                       {getUserInitials()}
                     </AvatarFallback>
