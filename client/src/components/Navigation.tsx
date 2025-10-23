@@ -354,16 +354,16 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           </div>
 
           {/* Mobile Menu Button - positioned on the right for mobile */}
-          <div className="ml-auto md:hidden">
+          <div className="ml-auto md:hidden mr-2">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden rounded-full hover-elevate active-elevate-2"
+                  className="md:hidden rounded-full hover-elevate active-elevate-2 bg-white/10"
                   data-testid="button-mobile-menu"
                 >
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-5 h-5 text-white" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
