@@ -333,27 +333,63 @@ export default function CommandCenter() {
     setTradeModalOpen(true);
   };
   
-  // Common greetings and conversational words that should NOT be treated as tickers
-  const COMMON_GREETINGS = new Set([
-    'HI', 'HELLO', 'HEY', 'BYE', 'GOODBYE', 
-    'THANKS', 'THX', 'OK', 'OKAY', 'YES', 'NO', 
-    'YEP', 'NOPE', 'SURE', 'MAYBE', 'PLEASE',
-    'SORRY', 'WOW', 'OH', 'AH', 'UM', 'UH',
-    'COOL', 'NICE', 'GREAT', 'GOOD', 'BAD',
-    'UP', 'DOWN', 'IN', 'OUT', 'ON', 'OFF',
-    'GO', 'STOP', 'WAIT', 'RUN', 'HELP',
-    'ASK', 'TELL', 'SHOW', 'SEE', 'LOOK'
-  ]);
-
-  // Function to check if a term is a greeting or common word
-  const isGreetingOrCommonWord = (term: string): boolean => {
-    return COMMON_GREETINGS.has(term.toUpperCase());
+  // Smart contextual detection to determine if input is likely a stock ticker or conversational
+  const isLikelyStockTicker = (input: string): boolean => {
+    const trimmed = input.trim();
+    
+    // Check for explicit stock intent indicators
+    const hasExplicitStockIntent = /^[$]|^(buy|sell|trade|stock|quote)\s+/i.test(trimmed);
+    if (hasExplicitStockIntent) {
+      return true;
+    }
+    
+    // If it contains spaces, punctuation, or lowercase letters, it's likely conversational
+    if (/[\s.,!?;:]/.test(trimmed) || /[a-z]/.test(trimmed)) {
+      return false;
+    }
+    
+    const upperTrimmed = trimmed.toUpperCase();
+    
+    // Only auto-detect as ticker if it's 3-5 uppercase letters
+    // This avoids false positives for common 1-2 letter words like: 
+    // HI, SO, AT, IT, OR, IF, BY, TO, GO, IN, UP, NO, OK, etc.
+    if (upperTrimmed.length >= 3 && upperTrimmed.length <= 5 && /^[A-Z]+$/.test(upperTrimmed)) {
+      return true;
+    }
+    
+    // For 1-2 character inputs without explicit intent, default to conversational
+    // Users can still look up 1-2 letter tickers by using $ prefix (e.g., "$F" for Ford)
+    return false;
   };
   
-  // Handle ticker search - also send to AI
+  // Extract ticker from input with explicit intent (e.g., "$AAPL" or "buy AAPL")
+  const extractTicker = (input: string): string | null => {
+    const trimmed = input.trim();
+    
+    // Check for $ prefix (e.g., "$AAPL")
+    const dollarMatch = trimmed.match(/^\$([A-Z]{1,5})/i);
+    if (dollarMatch) {
+      return dollarMatch[1].toUpperCase();
+    }
+    
+    // Check for explicit commands (e.g., "buy AAPL", "trade MSFT")
+    const commandMatch = trimmed.match(/^(?:buy|sell|trade|stock|quote)\s+([A-Z]{1,5})/i);
+    if (commandMatch) {
+      return commandMatch[1].toUpperCase();
+    }
+    
+    // If no explicit intent, return the input if it matches ticker pattern
+    const upper = trimmed.toUpperCase();
+    if (upper.length >= 1 && upper.length <= 5 && /^[A-Z]+$/.test(upper)) {
+      return upper;
+    }
+    
+    return null;
+  };
+  
+  // Handle ticker search - with smart contextual detection
   const handleTickerSearch = async (searchTerm: string) => {
-    const term = searchTerm.trim().toUpperCase();
-    if (term.length === 0) return;
+    if (searchTerm.trim().length === 0) return;
     
     // Common stock mappings for company names
     const companyMappings: Record<string, string> = {
@@ -369,25 +405,12 @@ export default function CommandCenter() {
       "DISNEY": "DIS",
     };
     
-    // Check if it's a company name
-    const mappedTicker = companyMappings[term];
-    const finalTicker = mappedTicker || term;
+    const upperTerm = searchTerm.trim().toUpperCase();
+    const mappedTicker = companyMappings[upperTerm];
     
-    // First check if it's a common greeting or conversational word - these should go to AI chat
-    if (isGreetingOrCommonWord(term) && !mappedTicker) {
-      // Send to AI chat instead of treating as ticker
-      if (!sidebarOpen) {
-        setSidebarOpen(true);
-      }
-      handleSendMessage(searchTerm);
-      setTickerSearch("");
-      return;
-    }
-    
-    // If it looks like a valid ticker or company name (but NOT a greeting)
-    if (mappedTicker || (term.length >= 1 && term.length <= 5 && /^[A-Z]+$/.test(term))) {
-      // Open trade modal
-      handleOpenTradeModal("buy", finalTicker);
+    // If it's a known company name, treat it as a stock lookup
+    if (mappedTicker) {
+      handleOpenTradeModal("buy", mappedTicker);
       setTickerSearch("");
       
       // Also send query to Athena AI for insights
@@ -395,18 +418,33 @@ export default function CommandCenter() {
         setSidebarOpen(true);
       }
       
-      // Send AI query about the stock
-      const aiQuery = `Tell me about ${finalTicker} stock. What's the current market sentiment and any recent news?`;
+      const aiQuery = `Tell me about ${mappedTicker} stock. What's the current market sentiment and any recent news?`;
       handleSendMessage(aiQuery);
-      
-    } else if (term.length > 5) {
-      // Try searching as a company name through AI
+      return;
+    }
+    
+    // Use smart contextual detection
+    if (isLikelyStockTicker(searchTerm)) {
+      const ticker = extractTicker(searchTerm);
+      if (ticker) {
+        // Open trade modal for the ticker
+        handleOpenTradeModal("buy", ticker);
+        setTickerSearch("");
+        
+        // Also send query to Athena AI for insights
+        if (!sidebarOpen) {
+          setSidebarOpen(true);
+        }
+        
+        const aiQuery = `Tell me about ${ticker} stock. What's the current market sentiment and any recent news?`;
+        handleSendMessage(aiQuery);
+      }
+    } else {
+      // Default to conversational AI for everything else
       if (!sidebarOpen) {
         setSidebarOpen(true);
       }
-      
-      const aiQuery = `What can you tell me about ${searchTerm}? Is this a publicly traded company?`;
-      handleSendMessage(aiQuery);
+      handleSendMessage(searchTerm);
       setTickerSearch("");
     }
   };
@@ -502,24 +540,15 @@ export default function CommandCenter() {
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && searchInput.trim()) {
-                  // Check if it looks like a ticker
-                  const trimmed = searchInput.trim().toUpperCase();
-                  // First check if it's a common greeting - send to chat
-                  if (isGreetingOrCommonWord(trimmed)) {
-                    // Send to AI chat
-                    if (!sidebarOpen) setSidebarOpen(true);
-                    handleSendMessage(searchInput);
-                    setSearchInput("");
-                  } else if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
-                    // It's a ticker pattern and NOT a greeting
-                    handleTickerSearch(trimmed);
-                    setSearchInput("");
+                  // Use smart contextual detection
+                  if (isLikelyStockTicker(searchInput)) {
+                    handleTickerSearch(searchInput);
                   } else {
-                    // Send to AI chat
+                    // Default to AI chat for conversational input
                     if (!sidebarOpen) setSidebarOpen(true);
                     handleSendMessage(searchInput);
-                    setSearchInput("");
                   }
+                  setSearchInput("");
                 }
               }}
               className="w-full pl-12 pr-4 h-14 text-lg rounded-full bg-white/5 border-white/20 text-foreground placeholder:text-white/40 focus:border-primary focus:bg-white/8 transition-all"
@@ -533,15 +562,11 @@ export default function CommandCenter() {
                 className="rounded-full text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   if (searchInput.trim()) {
-                    const trimmed = searchInput.trim().toUpperCase();
-                    // First check if it's a common greeting - send to chat
-                    if (isGreetingOrCommonWord(trimmed)) {
-                      if (!sidebarOpen) setSidebarOpen(true);
-                      handleSendMessage(searchInput);
-                    } else if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
-                      // It's a ticker pattern and NOT a greeting
-                      handleTickerSearch(trimmed);
+                    // Use smart contextual detection
+                    if (isLikelyStockTicker(searchInput)) {
+                      handleTickerSearch(searchInput);
                     } else {
+                      // Default to AI chat for conversational input
                       if (!sidebarOpen) setSidebarOpen(true);
                       handleSendMessage(searchInput);
                     }
@@ -814,11 +839,11 @@ export default function CommandCenter() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Search Stocks (e.g., AAPL, GOOGL)"
+                    placeholder="Search Stocks (e.g., AAPL, GOOGL, $F)"
                     value={tickerSearch}
-                    onChange={(e) => setTickerSearch(e.target.value.toUpperCase())}
+                    onChange={(e) => setTickerSearch(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === "Enter" && tickerSearch.trim()) {
                         handleTickerSearch(tickerSearch);
                       }
                     }}
