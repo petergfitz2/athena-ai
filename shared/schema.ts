@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, decimal, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, decimal, pgEnum, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -121,3 +121,56 @@ export const insertWatchlistSchema = createInsertSchema(watchlist).omit({
 
 export type InsertWatchlist = z.infer<typeof insertWatchlistSchema>;
 export type Watchlist = typeof watchlist.$inferSelect;
+
+// Question depth enum
+export const questionDepthEnum = pgEnum("question_depth", ["none", "simple", "moderate", "deep"]);
+
+// Interface mode enum
+export const interfaceModeEnum = pgEnum("interface_mode", ["amanda", "hybrid", "terminal"]);
+
+// Message metrics (per-message analysis)
+export const messageMetrics = pgTable("message_metrics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  messageId: varchar("message_id").notNull().references(() => messages.id, { onDelete: 'cascade' }),
+  conversationId: varchar("conversation_id").notNull().references(() => conversations.id, { onDelete: 'cascade' }),
+  wordCount: integer("word_count").notNull(),
+  characterCount: integer("character_count").notNull(),
+  hasQuestion: boolean("has_question").notNull().default(false),
+  questionDepth: questionDepthEnum("question_depth").notNull().default('none'),
+  technicalTermCount: integer("technical_term_count").notNull().default(0),
+  urgencySignals: text("urgency_signals").array(),
+  responseTimeSeconds: integer("response_time_seconds"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertMessageMetricsSchema = createInsertSchema(messageMetrics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertMessageMetrics = z.infer<typeof insertMessageMetricsSchema>;
+export type MessageMetrics = typeof messageMetrics.$inferSelect;
+
+// Conversation analysis (aggregate scores)
+export const conversationAnalysis = pgTable("conversation_analysis", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").notNull().references(() => conversations.id, { onDelete: 'cascade' }).unique(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  hurriedScore: decimal("hurried_score", { precision: 5, scale: 2 }).notNull().default('0'),
+  analyticalScore: decimal("analytical_score", { precision: 5, scale: 2 }).notNull().default('0'),
+  conversationalScore: decimal("conversational_score", { precision: 5, scale: 2 }).notNull().default('0'),
+  recommendedMode: interfaceModeEnum("recommended_mode"),
+  messageCount: integer("message_count").notNull().default(0),
+  avgResponseTimeSeconds: integer("avg_response_time_seconds"),
+  lastAnalyzedAt: timestamp("last_analyzed_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertConversationAnalysisSchema = createInsertSchema(conversationAnalysis).omit({
+  id: true,
+  lastAnalyzedAt: true,
+  updatedAt: true,
+});
+
+export type InsertConversationAnalysis = z.infer<typeof insertConversationAnalysisSchema>;
+export type ConversationAnalysis = typeof conversationAnalysis.$inferSelect;

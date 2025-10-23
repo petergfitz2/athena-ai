@@ -11,6 +11,7 @@ interface ConversationContext {
   userId: string;
   holdings: Holding[];
   recentTrades?: any[];
+  contextMode?: string | null;
 }
 
 export async function generateAIResponse(
@@ -23,6 +24,28 @@ export async function generateAIResponse(
         .map((h) => `${h.symbol}: ${h.quantity} shares @ avg $${h.averageCost}`)
         .join(", ")
     : "No holdings yet";
+
+  // Adapt system prompt based on detected context mode
+  let contextInstructions = "";
+  let temperature = 0.7;
+  let maxTokens = 500;
+
+  if (context.contextMode === "amanda") {
+    // User wants quick, conversational responses
+    contextInstructions = `\n\nCONTEXT: The user is looking for quick, conversational answers. Keep responses concise (2-3 sentences max) and actionable. Focus on the most important point first.`;
+    temperature = 0.6;
+    maxTokens = 300;
+  } else if (context.contextMode === "terminal") {
+    // User wants deep, analytical responses
+    contextInstructions = `\n\nCONTEXT: The user is in analytical mode. Provide detailed, data-driven insights with specific metrics, comparisons, and thorough reasoning. Use technical terminology appropriately.`;
+    temperature = 0.5;
+    maxTokens = 800;
+  } else if (context.contextMode === "hybrid") {
+    // Balanced approach
+    contextInstructions = `\n\nCONTEXT: The user wants balanced responses - clear insights with supporting data, but not overly verbose. Aim for 3-5 sentences with key metrics.`;
+    temperature = 0.6;
+    maxTokens = 500;
+  }
 
   const systemPrompt = `You are Athena, an AI investment advisor with the intelligence of a multi-billion dollar hedge fund. 
 You are conversing with a client who trusts you as a friend.
@@ -46,7 +69,7 @@ Guidelines:
 - Always consider the user's current holdings when giving advice
 - Provide specific, actionable insights
 - When suggesting trades, explain your reasoning clearly
-- If asked about metrics you can't calculate, acknowledge that and offer related insights`;
+- If asked about metrics you can't calculate, acknowledge that and offer related insights${contextInstructions}`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -55,8 +78,8 @@ Guidelines:
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
       ],
-      temperature: 0.7,
-      max_tokens: 500,
+      temperature,
+      max_tokens: maxTokens,
     });
 
     return completion.choices[0]?.message?.content || "I apologize, I'm having trouble responding right now.";

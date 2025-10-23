@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import { insertUserSchema, insertHoldingSchema, insertTradeSchema } from "@shared/schema";
 import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { processVoiceInput } from "./voice";
+import { ConversationAnalyzer } from "./conversationAnalyzer";
 import { z } from "zod";
 
 // Middleware to require authentication
@@ -15,6 +16,38 @@ function requireAuth(req: any, res: any, next: any) {
     return next();
   }
   res.status(401).json({ error: "Unauthorized" });
+}
+
+// Helper function to generate mode change reason
+function getModeChangeReason(
+  analysis: { hurriedScore: string; analyticalScore: string; conversationalScore: string; recommendedMode: string | null },
+  currentMode: string
+): string {
+  const hurried = Number(analysis.hurriedScore);
+  const analytical = Number(analysis.analyticalScore);
+  const conversational = Number(analysis.conversationalScore);
+
+  // Handle null recommended mode
+  if (!analysis.recommendedMode) {
+    return `Your conversation style is balanced across modes. Feel free to switch based on your needs.`;
+  }
+
+  if (analysis.recommendedMode === 'terminal' && currentMode !== 'terminal') {
+    return `You're diving deep into analysis (analytical score: ${analytical.toFixed(0)}). Terminal Mode offers multi-panel analytics perfect for this level of detail.`;
+  }
+  
+  if (analysis.recommendedMode === 'amanda' && currentMode !== 'amanda') {
+    if (hurried > 50) {
+      return `You seem to be looking for quick answers (hurried score: ${hurried.toFixed(0)}). Amanda Mode provides a faster, more conversational experience.`;
+    }
+    return `Let's make this more personal (conversational score: ${conversational.toFixed(0)}). Amanda Mode offers a natural conversation flow.`;
+  }
+  
+  if (analysis.recommendedMode === 'hybrid' && currentMode !== 'hybrid') {
+    return `Hybrid Mode might work better - it balances conversation with data visualization.`;
+  }
+
+  return `Your current mode works well for this conversation style.`;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -292,33 +325,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const { message, conversationId } = req.body;
+      const { message, conversationId, lastMessageTime } = req.body;
 
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
       }
 
+      // Calculate response time if provided
+      let responseTimeSeconds: number | undefined;
+      if (lastMessageTime) {
+        responseTimeSeconds = Math.floor((Date.now() - lastMessageTime) / 1000);
+      }
+
       // Get user's holdings for context
       const holdings = await storage.getUserHoldings(user.id);
 
-      // Generate AI response
+      // Get conversation context if available
+      let contextMode: string | null = null;
+      if (conversationId) {
+        const context = await ConversationAnalyzer.getConversationContext(conversationId);
+        if (context) {
+          contextMode = context.recommendedMode;
+        }
+      }
+
+      // Generate AI response (with context awareness)
       const aiResponse = await generateAIResponse(message, {
         userId: user.id,
         holdings,
+        contextMode,
       });
 
-      // Save messages if conversation ID provided
+      // Save messages and analyze if conversation ID provided
+      let userMessageId: string | undefined;
       if (conversationId) {
-        await storage.createMessage({
+        const userMsg = await storage.createMessage({
           conversationId,
           role: "user",
           content: message,
         });
+        userMessageId = userMsg.id;
+
         await storage.createMessage({
           conversationId,
           role: "assistant",
           content: aiResponse,
         });
+
+        // Analyze the user message
+        await ConversationAnalyzer.storeMessageMetrics(
+          userMessageId,
+          conversationId,
+          message,
+          responseTimeSeconds
+        );
+
+        // Update conversation analysis
+        const analysis = await ConversationAnalyzer.updateConversationAnalysis(
+          conversationId,
+          user.id
+        );
+
+        // Return response with analysis
+        res.json({ 
+          response: aiResponse,
+          analysis: analysis ? {
+            hurriedScore: Number(analysis.hurriedScore),
+            analyticalScore: Number(analysis.analyticalScore),
+            conversationalScore: Number(analysis.conversationalScore),
+            recommendedMode: analysis.recommendedMode,
+          } : null
+        });
+        return;
       }
 
       res.json({ response: aiResponse });
@@ -379,6 +457,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Voice chat error:", error);
       res.status(500).json({ error: "Failed to process voice input" });
+    }
+  });
+
+  // Context Analysis endpoints
+  app.get("/api/context/:conversationId", requireAuth, async (req, res) => {
+    try {
+      const { conversationId } = req.params;
+      const user = req.user as any;
+
+      // Verify ownership
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation || conversation.userId !== user.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const context = await ConversationAnalyzer.getConversationContext(conversationId);
+      
+      if (!context) {
+        return res.status(404).json({ error: "No context found for this conversation" });
+      }
+
+      res.json({
+        hurriedScore: Number(context.hurriedScore),
+        analyticalScore: Number(context.analyticalScore),
+        conversationalScore: Number(context.conversationalScore),
+        recommendedMode: context.recommendedMode,
+        messageCount: context.messageCount,
+        avgResponseTimeSeconds: context.avgResponseTimeSeconds,
+      });
+    } catch (error) {
+      console.error("Context fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch conversation context" });
+    }
+  });
+
+  app.get("/api/context/:conversationId/suggestion", requireAuth, async (req, res) => {
+    try {
+      const { conversationId } = req.params;
+      const user = req.user as any;
+      
+      // Verify ownership
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation || conversation.userId !== user.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Update analysis to get latest scores
+      const analysis = await ConversationAnalyzer.updateConversationAnalysis(
+        conversationId,
+        user.id
+      );
+
+      if (!analysis) {
+        return res.json({ shouldSuggest: false });
+      }
+
+      // Determine if we should suggest a mode change
+      const currentMode = req.query.currentMode as string;
+      const shouldSuggest = analysis.recommendedMode !== currentMode;
+
+      res.json({
+        shouldSuggest,
+        recommendedMode: analysis.recommendedMode,
+        reason: getModeChangeReason(analysis, currentMode),
+        scores: {
+          hurriedScore: analysis.hurriedScore,
+          analyticalScore: analysis.analyticalScore,
+          conversationalScore: analysis.conversationalScore,
+        }
+      });
+    } catch (error) {
+      console.error("Mode suggestion error:", error);
+      res.status(500).json({ error: "Failed to generate mode suggestion" });
     }
   });
 
