@@ -114,7 +114,7 @@ function DashboardPageContent() {
         ) : (
           <>
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
               {/* Total Value */}
               <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-total-value">
                 <CardHeader className="pb-2">
@@ -179,7 +179,7 @@ function DashboardPageContent() {
             </div>
 
             {/* Portfolio Visualizations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-8 lg:mb-12">
               {/* Performance Chart */}
               <PortfolioChart 
                 data={performanceData}
@@ -202,7 +202,7 @@ function DashboardPageContent() {
                     Your current positions
                   </CardDescription>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button 
                     onClick={() => generateSuggestions.mutate()}
                     disabled={generateSuggestions.isPending}

@@ -126,7 +126,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] bg-card border-white/10">
+            <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
               <SheetHeader>
                 <SheetTitle className="text-foreground">Navigation</SheetTitle>
                 <SheetDescription className="text-muted-foreground">
@@ -142,7 +142,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       key={link.href} 
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-[20px] text-sm font-light transition-all ${
+                      className={`flex items-center gap-3 px-4 py-4 rounded-[20px] text-base font-light transition-all min-h-[56px] ${
                         active
                           ? "bg-primary/20 text-primary"
                           : "text-muted-foreground hover-elevate active-elevate-2"
