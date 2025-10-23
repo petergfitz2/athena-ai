@@ -1,6 +1,7 @@
 import { useMode } from "@/contexts/ModeContext";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -16,6 +17,12 @@ const MODE_LABELS = {
   terminal: "Terminal Mode",
 };
 
+const MODE_DESCRIPTIONS = {
+  amanda: "Voice-first conversational interface for quick updates",
+  hybrid: "Desktop trading with portfolio dashboard and Amanda assistant",
+  terminal: "Multi-panel institutional analysis for deep research",
+};
+
 export default function ModeSuggestion({
   recommendedMode,
   reason,
@@ -23,10 +30,15 @@ export default function ModeSuggestion({
 }: ModeSuggestionProps) {
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const handleSwitch = () => {
     setMode(recommendedMode);
     setLocation(`/${recommendedMode}`);
+    toast({
+      title: `Switched to ${MODE_LABELS[recommendedMode]}`,
+      description: MODE_DESCRIPTIONS[recommendedMode],
+    });
     onDismiss();
   };
 

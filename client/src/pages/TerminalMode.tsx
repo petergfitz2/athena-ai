@@ -1,8 +1,12 @@
+import { useState, useEffect } from "react";
 import { ProtectedRoute } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useModeSuggestion } from "@/hooks/useConversationContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
+import ModeSuggestion from "@/components/ModeSuggestion";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
+import { apiJson } from "@/lib/queryClient";
 
 interface Holding {
   id: string;
@@ -13,6 +17,24 @@ interface Holding {
 
 function TerminalModeContent() {
   useKeyboardShortcuts();
+  
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId);
+
+  useEffect(() => {
+    const initConversation = async () => {
+      try {
+        const conv = await apiJson<{ id: string }>("POST", "/api/conversations", {
+          title: "Terminal Mode Session",
+        });
+        setConversationId(conv.id);
+      } catch (error) {
+        console.error("Failed to create conversation:", error);
+      }
+    };
+
+    initConversation();
+  }, []);
   
   const { data: holdings = [] } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
@@ -251,6 +273,15 @@ function TerminalModeContent() {
           Amanda voice available • Press Cmd/Ctrl + K to activate
         </p>
       </div>
+
+      {/* Mode Suggestion */}
+      {shouldShow && suggestion?.recommendedMode && (
+        <ModeSuggestion
+          recommendedMode={suggestion.recommendedMode}
+          reason={suggestion.reason}
+          onDismiss={dismissSuggestion}
+        />
+      )}
     </div>
   );
 }

@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProtectedRoute } from "@/lib/auth";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useModeSuggestion } from "@/hooks/useConversationContext";
 import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
 import AmandaAvatar from "@/components/AmandaAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
+import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Mic, Send, X, MessageCircle } from "lucide-react";
@@ -33,6 +35,26 @@ function HybridModeContent() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<"dashboard" | "portfolio">("dashboard");
+  
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [lastMessageTime, setLastMessageTime] = useState<number | null>(null);
+  
+  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId);
+
+  useEffect(() => {
+    const initConversation = async () => {
+      try {
+        const conv = await apiJson<{ id: string }>("POST", "/api/conversations", {
+          title: "Hybrid Mode Session",
+        });
+        setConversationId(conv.id);
+      } catch (error) {
+        console.error("Failed to create conversation:", error);
+      }
+    };
+
+    initConversation();
+  }, []);
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -48,9 +70,13 @@ function HybridModeContent() {
     setInput("");
     setIsLoading(true);
 
+    const currentLastMessageTime = lastMessageTime;
+
     try {
       const data = await apiJson<{ response: string }>("POST", "/api/chat", {
         message: input,
+        conversationId,
+        lastMessageTime: currentLastMessageTime,
       });
 
       const assistantMessage: Message = {
@@ -61,6 +87,7 @@ function HybridModeContent() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      setLastMessageTime(Date.now());
     } catch (error: any) {
       toast({
         title: "Error",
@@ -199,6 +226,15 @@ function HybridModeContent() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Mode Suggestion */}
+      {shouldShow && suggestion?.recommendedMode && (
+        <ModeSuggestion
+          recommendedMode={suggestion.recommendedMode}
+          reason={suggestion.reason}
+          onDismiss={dismissSuggestion}
+        />
       )}
     </div>
   );
