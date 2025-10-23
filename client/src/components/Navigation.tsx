@@ -153,7 +153,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           <div className="flex items-center gap-6 h-full">
             {/* Logo */}
             <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap leading-none">
+              <span className="text-xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
                 Athena AI Investing
               </span>
             </Link>
@@ -168,15 +168,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-2 h-10 px-4 rounded-full text-sm transition-all relative ${
+                      className={`flex items-center gap-2 h-10 px-4 rounded-full text-base transition-all relative ${
                         active
                           ? "bg-primary/20 text-primary font-bold"
-                          : "text-foreground/80 font-semibold hover:text-foreground hover-elevate active-elevate-2"
+                          : "text-white font-medium hover:text-white hover:bg-white/10"
                       }`}
                       data-testid={`link-${link.label.toLowerCase()}`}
                     >
-                      <Icon className="w-4 h-4" />
-                      {link.label}
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium">{link.label}</span>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs">
@@ -196,16 +196,16 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 h-10 px-4 rounded-full hover-elevate active-elevate-2"
+                  className="flex items-center gap-2 h-10 px-4 rounded-full text-white bg-white/10 hover:bg-white/20"
                   data-testid="button-mode-switcher"
                 >
-                  {currentMode === "athena" && <MessageCircle className="w-4 h-4" />}
-                  {currentMode === "hybrid" && <Layout className="w-4 h-4" />}
-                  {currentMode === "terminal" && <Grid3x3 className="w-4 h-4" />}
-                  <span className="text-sm font-semibold text-foreground">
+                  {currentMode === "athena" && <MessageCircle className="w-5 h-5 text-white" />}
+                  {currentMode === "hybrid" && <Layout className="w-5 h-5 text-white" />}
+                  {currentMode === "terminal" && <Grid3x3 className="w-5 h-5 text-white" />}
+                  <span className="text-base font-semibold text-white">
                     {modes.find(m => m.id === currentMode)?.label || "Select Mode"}
                   </span>
-                  <ChevronDown className="w-4 h-4 opacity-70" />
+                  <ChevronDown className="w-4 h-4 text-white" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -257,15 +257,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 h-10 px-3 rounded-full hover-elevate active-elevate-2"
+                  className="flex items-center gap-2 h-10 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white"
                   data-testid="button-user-menu"
                 >
                   <Avatar className="w-7 h-7">
-                    <AvatarFallback className="bg-primary/20 text-primary text-xs font-semibold">
+                    <AvatarFallback className="bg-primary/30 text-white text-xs font-bold">
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden lg:block text-sm font-semibold text-foreground">
+                  <span className="hidden lg:block text-base font-semibold text-white">
                     {user?.username}
                   </span>
                 </Button>
