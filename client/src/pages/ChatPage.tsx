@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import DashboardHeader from "@/components/DashboardHeader";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
-import { ProtectedRoute, useAuth } from "@/lib/auth";
+import { ProtectedRoute } from "@/lib/auth";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { MessageSquare } from "lucide-react";
 
 type Message = {
   id: string;
@@ -21,7 +21,6 @@ type Conversation = {
 };
 
 function ChatPageContent() {
-  const { logout } = useAuth();
   const { toast } = useToast();
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([{
@@ -31,6 +30,15 @@ function ChatPageContent() {
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // Load conversation history
   const { data: conversations = [] } = useQuery<Conversation[]>({
@@ -58,7 +66,6 @@ function ChatPageContent() {
         }));
         setMessages(formattedMessages);
       } else {
-        // Empty conversation, show welcome
         setMessages([{
           id: "welcome",
           role: "assistant",
@@ -69,7 +76,6 @@ function ChatPageContent() {
     }
   }, [currentConversationId, conversationMessages]);
 
-  // Handle message loading errors
   useEffect(() => {
     if (messagesError) {
       setIsLoading(false);
@@ -92,12 +98,10 @@ function ChatPageContent() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    // Optimistically add user message
     setMessages(prev => [...prev, newMessage]);
     setIsLoading(true);
 
     try {
-      // Create conversation if doesn't exist
       let convId = currentConversationId;
       if (!convId) {
         const convData = await apiJson<Conversation>("POST", "/api/conversations", { 
@@ -105,17 +109,14 @@ function ChatPageContent() {
         });
         convId = convData.id;
         setCurrentConversationId(convId);
-        // Refresh conversations list
         queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
       }
 
-      // Send message to AI
       const data = await apiJson<{ response: string }>("POST", "/api/chat", { 
         message: content,
         conversationId: convId
       });
 
-      // Add AI response optimistically
       const aiResponse: Message = {
         id: tempAssistantId,
         role: "assistant",
@@ -124,45 +125,36 @@ function ChatPageContent() {
       };
       
       setMessages(prev => [...prev, aiResponse]);
-      
-      // Silently refresh messages in background to sync with server
-      // Don't replace local state to avoid losing optimistic updates
-      queryClient.invalidateQueries({ 
-        queryKey: ["/api/conversations", convId, "messages"] 
-      });
+      queryClient.invalidateQueries({ queryKey: ["/api/conversations", convId, "messages"] });
+      setIsLoading(false);
     } catch (error: any) {
-      // Remove optimistic user message on error
       setMessages(prev => prev.filter(m => m.id !== tempUserId));
-      
+      setIsLoading(false);
       toast({
         title: "Error",
-        description: error.message || "Failed to get AI response. Please try again.",
+        description: error.message || "Failed to send message",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleNewChat = () => {
+  const handleNewConversation = () => {
     setCurrentConversationId(null);
-    setIsLoading(false);
     setMessages([{
       id: "welcome",
       role: "assistant",
       content: "Hello! I'm Athena, your AI investment advisor. How can I help you today?",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }]);
+    setIsLoading(true);
   };
 
   const handleSelectConversation = (convId: string) => {
     setCurrentConversationId(convId);
     setIsLoading(true);
-    // Clear messages while loading to avoid showing stale content
     setMessages([]);
   };
 
-  // Stop loading when messages are loaded
   useEffect(() => {
     if (currentConversationId && conversationMessages !== undefined) {
       setIsLoading(false);
@@ -170,69 +162,78 @@ function ChatPageContent() {
   }, [currentConversationId, conversationMessages]);
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <DashboardHeader onLogout={logout} />
+    <div className="min-h-screen bg-black p-8">
+      <div className="max-w-5xl mx-auto h-[calc(100vh-4rem)] flex flex-col">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-6xl font-extralight text-foreground tracking-tight mb-3">
+            Chat
+          </h1>
+          <p className="text-lg text-muted-foreground font-light">
+            Talk to your AI investment advisor
+          </p>
+        </div>
 
-      <main className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            {conversations.length > 0 && (
-              <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
-                <button
-                  onClick={handleNewChat}
-                  data-testid="button-new-chat"
-                  className="px-4 py-2 rounded-[28px] bg-primary/20 border border-primary/30 text-primary text-sm whitespace-nowrap hover-elevate"
-                >
-                  New Chat
-                </button>
-                {conversations.map((conv) => (
-                  <button
-                    key={conv.id}
-                    onClick={() => handleSelectConversation(conv.id)}
-                    data-testid={`button-conversation-${conv.id}`}
-                    className={`px-4 py-2 rounded-[28px] border text-sm whitespace-nowrap hover-elevate ${
-                      currentConversationId === conv.id
-                        ? 'bg-primary/20 border-primary/30 text-primary'
-                        : 'bg-white/5 border-white/10 text-foreground'
-                    }`}
-                  >
-                    {conv.title || 'Chat'}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {messages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                content={msg.content}
-                role={msg.role}
-                timestamp={msg.timestamp}
-              />
+        {/* Conversation History */}
+        {conversations.length > 0 && (
+          <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
+            <button
+              onClick={handleNewConversation}
+              className="glass rounded-[28px] px-6 py-3 font-light text-sm whitespace-nowrap transition-all hover:bg-white/8"
+              data-testid="button-new-conversation"
+            >
+              + New Chat
+            </button>
+            {conversations.map((conv) => (
+              <button
+                key={conv.id}
+                onClick={() => handleSelectConversation(conv.id)}
+                className={`glass rounded-[28px] px-6 py-3 font-light text-sm whitespace-nowrap transition-all
+                  ${currentConversationId === conv.id ? 'bg-primary text-primary-foreground' : 'hover:bg-white/8'}`}
+                data-testid={`button-conversation-${conv.id}`}
+              >
+                <MessageSquare className="inline w-4 h-4 mr-2" />
+                {conv.title}
+              </button>
             ))}
-            {isLoading && currentConversationId === null && (
-              <div className="flex justify-start mb-4">
-                <div className="rounded-[28px] bg-white/5 border border-white/10 px-6 py-4">
-                  <div className="flex gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
-                  </div>
+          </div>
+        )}
+
+        {/* Messages */}
+        <div className="flex-1 glass rounded-[28px] p-8 overflow-y-auto mb-6" data-testid="chat-messages">
+          <div className="space-y-6">
+            {messages.map((message) => (
+              <ChatMessage key={message.id} {...message} />
+            ))}
+            {isLoading && messages.length > 0 && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
-        <div className="border-t border-white/10 bg-black/50 backdrop-blur-xl p-4">
-          <div className="max-w-4xl mx-auto">
-            <ChatInput 
-              onSend={handleSendMessage} 
-              disabled={isLoading && currentConversationId === null} 
-            />
-          </div>
-        </div>
-      </main>
+        {/* Input */}
+        <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+      </div>
+    </div>
+  );
+}
+
+function StopLoadingState() {
+  return (
+    <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[28px]">
+      <div className="flex gap-1">
+        <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+        <div className="w-2 h-2 bg-primary rounded-full animate-pulse animation-delay-150" />
+        <div className="w-2 h-2 bg-primary rounded-full animate-pulse animation-delay-300" />
+      </div>
+      <span className="text-sm text-muted-foreground font-light">Athena is thinking...</span>
     </div>
   );
 }

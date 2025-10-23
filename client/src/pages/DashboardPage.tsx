@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import DashboardHeader from "@/components/DashboardHeader";
 import MarketDataTile from "@/components/MarketDataTile";
 import TradeSuggestion from "@/components/TradeSuggestion";
-import GlassCard from "@/components/GlassCard";
-import { ProtectedRoute, useAuth } from "@/lib/auth";
+import { ProtectedRoute } from "@/lib/auth";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,7 +17,6 @@ interface Trade {
 }
 
 function DashboardPageContent() {
-  const { logout } = useAuth();
   const { toast } = useToast();
 
   const { data: pendingTrades = [] } = useQuery<Trade[]>({
@@ -72,27 +69,36 @@ function DashboardPageContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-black">
-      <DashboardHeader onLogout={logout} />
-
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h2 className="text-5xl font-extralight text-foreground mb-2">Dashboard</h2>
-          <p className="text-muted-foreground">Your investment command center</p>
+    <div className="min-h-screen bg-black p-8">
+      <div className="max-w-7xl mx-auto space-y-12">
+        {/* Header */}
+        <div>
+          <h1 className="text-6xl font-extralight text-foreground tracking-tight mb-3">
+            Dashboard
+          </h1>
+          <p className="text-lg text-muted-foreground font-light">
+            Your investment command center
+          </p>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-2xl font-light text-foreground mb-4">Market Overview</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Market Overview */}
+        <section>
+          <h2 className="text-3xl font-light text-foreground mb-6">
+            Market Overview
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {marketData.map((data) => (
               <MarketDataTile key={data.symbol} {...data} />
             ))}
           </div>
-        </div>
+        </section>
 
+        {/* AI Trade Suggestions */}
         {pendingTrades.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-light text-foreground mb-4">AI Trade Suggestions</h3>
+          <section>
+            <h2 className="text-3xl font-light text-foreground mb-6">
+              AI Trade Suggestions
+            </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {pendingTrades.map((trade) => (
                 <TradeSuggestion
@@ -108,9 +114,9 @@ function DashboardPageContent() {
                 />
               ))}
             </div>
-          </div>
+          </section>
         )}
-      </main>
+      </div>
     </div>
   );
 }

@@ -19,30 +19,30 @@ export default function MarketDataTile({
 
   return (
     <div
-      className="rounded-[28px] bg-white/5 backdrop-blur-xl border border-white/10 p-6 hover-elevate cursor-pointer"
+      className="glass glass-hover rounded-[28px] p-8 transition-all duration-300"
       data-testid={`tile-market-${symbol}`}
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <h4 className="text-xl font-light text-foreground">{symbol}</h4>
-          <p className="text-xs text-muted-foreground">{name}</p>
+          <h4 className="text-lg font-medium text-foreground">{symbol}</h4>
+          <p className="text-sm text-muted-foreground font-light">{name}</p>
         </div>
         <div className={isPositive ? "text-primary" : "text-destructive"}>
           {isPositive ? (
-            <TrendingUp className="h-4 w-4" />
+            <TrendingUp className="h-5 w-5" />
           ) : (
-            <TrendingDown className="h-4 w-4" />
+            <TrendingDown className="h-5 w-5" />
           )}
         </div>
       </div>
 
-      <p className="text-2xl font-extralight text-foreground mb-1">
-        ${price.toFixed(2)}
+      <p className="text-3xl font-extralight text-foreground mb-2">
+        ${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </p>
 
       <p
         className={cn(
-          "text-sm",
+          "text-sm font-light",
           isPositive ? "text-primary" : "text-destructive"
         )}
       >

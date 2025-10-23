@@ -39,41 +39,49 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-white/10">
-      <SidebarContent className="bg-black/40 backdrop-blur-xl">
+      <SidebarContent className="bg-black">
         <SidebarGroup>
-          <div className="px-6 py-8">
-            <h1 className="text-2xl font-extralight text-foreground tracking-wide">
+          <div className="px-8 py-12">
+            <h1 className="text-3xl font-extralight text-foreground tracking-wide">
               Athena
             </h1>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-2 font-light">
               AI Investment Platform
             </p>
           </div>
           
-          <SidebarGroupContent>
-            <SidebarMenu>
+          <SidebarGroupContent className="px-4">
+            <SidebarMenu className="space-y-2">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={() => setLocation(item.url)}
                     isActive={location === item.url}
-                    className="hover-elevate active-elevate-2"
+                    className={`
+                      rounded-[28px] py-6 px-6
+                      transition-all duration-300
+                      ${location === item.url 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'glass glass-hover'}
+                    `}
                     data-testid={`nav-${item.title.toLowerCase()}`}
                   >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.title}</span>
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
               
-              <SidebarMenuItem className="mt-8">
+              <div className="h-8" />
+              
+              <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={handleLogout}
-                  className="hover-elevate active-elevate-2"
+                  className="rounded-[28px] py-6 px-6 glass glass-hover transition-all duration-300"
                   data-testid="button-logout"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Logout</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
