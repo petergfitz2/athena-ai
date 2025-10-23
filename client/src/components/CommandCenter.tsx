@@ -5,6 +5,9 @@ import { apiJson } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useVoice } from "@/hooks/useVoice";
+import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
@@ -229,6 +232,11 @@ export default function CommandCenter() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-black">
+        {/* Navigation Bar */}
+        <Navigation />
+        <NavigationBreadcrumbs />
+        <FloatingAthenaOrb />
+        
         {/* Welcome Tutorial */}
         <WelcomeTutorial />
         
@@ -242,7 +250,7 @@ export default function CommandCenter() {
         <KeyboardShortcutsGuide />
         
         {/* Header with Avatar and Greeting */}
-        <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10">
+        <div className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-white/10">
           <div className="max-w-[1600px] mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">

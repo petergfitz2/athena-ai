@@ -18,10 +18,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
+import { useMode } from "@/contexts/ModeContext";
 import ModeSwitcherMenu from "./ModeSwitcherMenu";
 import {
   Tooltip,
@@ -37,6 +38,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { currentMode, setMode } = useMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -53,43 +55,66 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   };
 
   const navLinks = [
-    { href: "/command-center", label: "Command", icon: LayoutDashboard, shortcut: "⌘1" },
-    { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘2" },
-    { href: "/simulator", label: "Simulator", icon: Activity, shortcut: "⌘3" },
-    { href: "/social", label: "Social", icon: Users, shortcut: "⌘4" },
-    { href: "/achievements", label: "Rewards", icon: Trophy, shortcut: "⌘5" },
+    { href: "/command-center", label: "Dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
+    { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘P" },
+    { href: "/watchlist", label: "Watchlist", icon: ListChecks, shortcut: "⌘W" },
+    { href: "/trades", label: "Trades", icon: TrendingUp, shortcut: "⌘T" },
+    { href: "/analytics", label: "Analytics", icon: Activity, shortcut: "⌘A" },
   ];
+
+  const modes = [
+    { id: "athena", label: "Athena Mode", icon: MessageCircle, href: "/athena", description: "Chat-first interface" },
+    { id: "hybrid", label: "Hybrid Mode", icon: Layout, href: "/hybrid", description: "Dashboard + Chat" },
+    { id: "terminal", label: "Terminal Mode", icon: Grid3x3, href: "/terminal", description: "Multi-panel pro" },
+  ];
+
+  const handleModeSwitch = (modeId: string, href: string) => {
+    setMode(modeId as "athena" | "hybrid" | "terminal");
+    setLocation(href);
+  };
 
   // Add keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check if Cmd (Mac) or Ctrl (Windows/Linux) is pressed
       if (e.metaKey || e.ctrlKey) {
-        switch (e.key) {
-          case '1':
+        switch (e.key.toLowerCase()) {
+          case 'd':
             e.preventDefault();
             setLocation('/command-center');
             break;
-          case '2':
+          case 'p':
             e.preventDefault();
             setLocation('/portfolio');
             break;
+          case 'w':
+            e.preventDefault();
+            setLocation('/watchlist');
+            break;
+          case 't':
+            e.preventDefault();
+            setLocation('/trades');
+            break;
+          case 'a':
+            e.preventDefault();
+            setLocation('/analytics');
+            break;
+          case '1':
+            e.preventDefault();
+            handleModeSwitch('athena', '/athena');
+            break;
+          case '2':
+            e.preventDefault();
+            handleModeSwitch('hybrid', '/hybrid');
+            break;
           case '3':
             e.preventDefault();
-            setLocation('/simulator');
-            break;
-          case '4':
-            e.preventDefault();
-            setLocation('/social');
-            break;
-          case '5':
-            e.preventDefault();
-            setLocation('/achievements');
+            handleModeSwitch('terminal', '/terminal');
             break;
         }
       }
       // Escape to go back
-      if (e.key === 'Escape' && location !== '/dashboard') {
+      if (e.key === 'Escape' && location !== '/command-center') {
         e.preventDefault();
         window.history.back();
       }
@@ -150,9 +175,6 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                     >
                       <Icon className="w-4 h-4" />
                       {link.label}
-                      {active && (
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full" />
-                      )}
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs">
@@ -164,9 +186,160 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             })}
           </div>
 
-          {/* Mode Switcher (Desktop) */}
-          <div className="hidden md:block">
-            <ModeSwitcherMenu />
+          {/* Right Side Actions */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* Mode Switcher Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 rounded-full hover-elevate active-elevate-2"
+                  data-testid="button-mode-switcher"
+                >
+                  {currentMode === "athena" && <MessageCircle className="w-4 h-4" />}
+                  {currentMode === "hybrid" && <Layout className="w-4 h-4" />}
+                  {currentMode === "terminal" && <Grid3x3 className="w-4 h-4" />}
+                  <span className="text-sm font-light">
+                    {modes.find(m => m.id === currentMode)?.label || "Select Mode"}
+                  </span>
+                  <ChevronDown className="w-4 h-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-64 bg-card border-white/10 rounded-[20px]"
+              >
+                <DropdownMenuLabel className="font-light text-xs text-muted-foreground">
+                  Interface Mode
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                {modes.map((mode) => {
+                  const Icon = mode.icon;
+                  const isActive = currentMode === mode.id;
+                  return (
+                    <DropdownMenuItem
+                      key={mode.id}
+                      onClick={() => handleModeSwitch(mode.id, mode.href)}
+                      className={`cursor-pointer py-3 hover-elevate active-elevate-2 rounded-lg ${
+                        isActive ? "bg-primary/10" : ""
+                      }`}
+                      data-testid={`menu-mode-${mode.id}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <Icon className={`w-5 h-5 flex-shrink-0 ${
+                          isActive ? "text-primary" : "text-muted-foreground"
+                        }`} />
+                        <div className="flex-1">
+                          <p className={`text-sm font-medium ${
+                            isActive ? "text-primary" : "text-foreground"
+                          }`}>
+                            {mode.label}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {mode.description}
+                          </p>
+                        </div>
+                        {isActive && (
+                          <div className="w-1 h-6 bg-primary rounded-full" />
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-3 rounded-full hover-elevate active-elevate-2"
+                  data-testid="button-user-menu"
+                >
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden lg:block text-sm font-light">
+                    {user?.username}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-56 bg-card border-white/10 rounded-[20px]"
+              >
+                <DropdownMenuLabel className="font-light">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user?.username}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem
+                  onClick={() => setLocation("/profile")}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-profile"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocation("/settings")}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-settings"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem
+                  onClick={() => setLocation("/tutorials")}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-tutorials"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Tutorials
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocation("/faq")}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-faq"
+                >
+                  <FileQuestion className="w-4 h-4 mr-2" />
+                  FAQ
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocation("/help")}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-help"
+                >
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Help Center
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-shortcuts"
+                >
+                  <Keyboard className="w-4 h-4 mr-2" />
+                  <span className="flex-1">Keyboard Shortcuts</span>
+                  <span className="text-xs text-muted-foreground">⌘K</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer text-destructive focus:text-destructive hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-logout"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile Menu Button */}
@@ -185,10 +358,37 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               <SheetHeader>
                 <SheetTitle className="text-foreground">Navigation</SheetTitle>
                 <SheetDescription className="text-muted-foreground">
-                  Access all pages and settings
+                  Access all features and settings
                 </SheetDescription>
               </SheetHeader>
               <div className="flex flex-col gap-2 mt-8">
+                {/* Mode Selector */}
+                <div className="mb-4 p-2 bg-card/50 rounded-[20px]">
+                  <p className="text-xs text-muted-foreground mb-2 px-2">Interface Mode</p>
+                  {modes.map((mode) => {
+                    const Icon = mode.icon;
+                    const isActive = currentMode === mode.id;
+                    return (
+                      <Button
+                        key={mode.id}
+                        onClick={() => {
+                          handleModeSwitch(mode.id, mode.href);
+                          setMobileMenuOpen(false);
+                        }}
+                        variant={isActive ? "default" : "ghost"}
+                        className="w-full justify-start gap-3 rounded-[16px] mb-1"
+                        data-testid={`mobile-mode-${mode.id}`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="flex-1 text-left">{mode.label}</span>
+                      </Button>
+                    );
+                  })}
+                </div>
+                
+                <div className="border-t border-white/10 my-2"></div>
+                
+                {/* Navigation Links */}
                 {navLinks.map((link) => {
                   const Icon = link.icon;
                   const active = isActive(link.href);
@@ -209,7 +409,6 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       {active && (
                         <div className="w-1 h-6 bg-primary rounded-full" />
                       )}
-                      <span className="text-xs text-muted-foreground">{link.shortcut}</span>
                     </Link>
                   );
                 })}
