@@ -338,8 +338,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quantity: data.quantity.toString(),
         price: executionPrice.toString(),
         status: 'executed', // For market orders, execute immediately
-        orderType: data.orderType,
-        timeInForce: data.timeInForce,
       });
 
       // Update or create holding
@@ -1029,7 +1027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let totalValue = 0;
 
       holdings.forEach(holding => {
-        const quote = quotes.find(q => q.symbol === holding.symbol);
+        const quote = quotes.get(holding.symbol);
         if (quote) {
           const value = parseFloat(holding.quantity) * quote.price;
           const sector = sectorMap[holding.symbol] || 'Other';
