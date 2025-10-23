@@ -67,16 +67,61 @@ function AmandaModeContent() {
   const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId, modeReady);
 
   const { status: voiceStatus, transcript, isRecording, startRecording, stopRecording } = useVoice({
-    onTranscript: (text) => {
-      const userMessage: Message = {
-        id: `user-${Date.now()}`,
-        role: "user",
-        content: text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages(prev => [...prev, userMessage]);
+    onTranscript: async (text) => {
+      // Set the input field with the transcript first
+      setInput(text);
+      
+      // Automatically send the message after transcript is received
+      // Use a timeout to ensure state updates properly
+      setTimeout(async () => {
+        // Only proceed if we have text and not already loading
+        if (!text.trim() || isLoading) return;
+        
+        const userMessage: Message = {
+          id: `user-${Date.now()}`,
+          role: "user",
+          content: text,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setInput(""); // Clear the input after creating the message
+        setIsLoading(true);
+
+        const currentLastMessageTime = lastMessageTime;
+
+        try {
+          const data = await apiJson<{ response: string; analysis?: any }>("POST", "/api/chat", {
+            message: text, // Use the transcript text directly
+            conversationId,
+            lastMessageTime: currentLastMessageTime,
+          });
+
+          const assistantMessage: Message = {
+            id: `assistant-${Date.now()}`,
+            role: "assistant",
+            content: data.response,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+
+          setMessages(prev => [...prev, assistantMessage]);
+          setLastMessageTime(Date.now());
+        } catch (error: any) {
+          toast({
+            title: "Error",
+            description: error.message || "Failed to send voice message",
+            variant: "destructive",
+          });
+          // Remove the failed message from the list
+          setMessages(prev => prev.filter(m => m.id !== userMessage.id));
+        } finally {
+          setIsLoading(false);
+        }
+      }, 100);
     },
     onResponse: (text) => {
+      // This is for TTS response if backend sends audio back
+      // Currently not used in our implementation but kept for future
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
