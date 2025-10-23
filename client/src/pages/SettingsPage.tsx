@@ -13,7 +13,9 @@ import Navigation from "@/components/Navigation";
 function SettingsPageContent() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isAddingFunds, setIsAddingFunds] = useState(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [fundAmount, setFundAmount] = useState("");
   
   const [profile, setProfile] = useState({
@@ -29,7 +31,7 @@ function SettingsPageContent() {
   });
 
   const handleUpdateProfile = async () => {
-    setIsUpdating(true);
+    setIsUpdatingProfile(true);
     try {
       // Only send fields backend expects
       await apiJson("PATCH", "/api/user/profile", {
@@ -47,7 +49,7 @@ function SettingsPageContent() {
         variant: "destructive",
       });
     } finally {
-      setIsUpdating(false);
+      setIsUpdatingProfile(false);
     }
   };
 
@@ -62,7 +64,7 @@ function SettingsPageContent() {
       return;
     }
 
-    setIsUpdating(true);
+    setIsAddingFunds(true);
     try {
       await apiJson("POST", "/api/account/deposit", {
         amount: fundAmount,
@@ -84,7 +86,7 @@ function SettingsPageContent() {
         variant: "destructive",
       });
     } finally {
-      setIsUpdating(false);
+      setIsAddingFunds(false);
     }
   };
 
@@ -107,7 +109,7 @@ function SettingsPageContent() {
       return;
     }
 
-    setIsUpdating(true);
+    setIsChangingPassword(true);
     try {
       await apiJson("PATCH", "/api/user/password", {
         currentPassword: passwords.currentPassword,
@@ -126,7 +128,7 @@ function SettingsPageContent() {
         variant: "destructive",
       });
     } finally {
-      setIsUpdating(false);
+      setIsChangingPassword(false);
     }
   };
 
@@ -174,11 +176,11 @@ function SettingsPageContent() {
               </div>
               <Button
                 onClick={handleAddFunds}
-                disabled={isUpdating || !fundAmount}
+                disabled={isAddingFunds || !fundAmount}
                 className="w-full rounded-full"
                 data-testid="button-add-funds"
               >
-                {isUpdating ? "Processing..." : "Add Funds"}
+                {isAddingFunds ? "Processing..." : "Add Funds"}
               </Button>
               <p className="text-xs text-muted-foreground">
                 Note: This is a demo. Real Stripe integration would be required for production.
@@ -223,11 +225,11 @@ function SettingsPageContent() {
               </div>
               <Button
                 onClick={handleUpdateProfile}
-                disabled={isUpdating}
+                disabled={isUpdatingProfile}
                 className="w-full rounded-full"
                 data-testid="button-save-profile"
               >
-                {isUpdating ? "Saving..." : "Save Changes"}
+                {isUpdatingProfile ? "Saving..." : "Save Changes"}
               </Button>
             </CardContent>
           </Card>
@@ -311,12 +313,12 @@ function SettingsPageContent() {
               </div>
               <Button
                 onClick={handleChangePassword}
-                disabled={isUpdating || !passwords.currentPassword || !passwords.newPassword}
+                disabled={isChangingPassword || !passwords.currentPassword || !passwords.newPassword}
                 variant="outline"
                 className="w-full rounded-full"
                 data-testid="button-change-password"
               >
-                {isUpdating ? "Changing..." : "Change Password"}
+                {isChangingPassword ? "Changing..." : "Change Password"}
               </Button>
             </CardContent>
           </Card>
