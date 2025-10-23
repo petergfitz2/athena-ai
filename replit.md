@@ -25,7 +25,7 @@ The backend is developed with Node.js and Express, written in TypeScript, managi
 - **Adaptive Intelligence System**: Real-time analysis of user conversation patterns (message length, technical terms, question depth, urgency, response timing) to dynamically adjust AI response depth, temperature, and token limits. It also provides intelligent, non-intrusive mode suggestions based on user interaction patterns.
 - **Portfolio Management**: Features for managing holdings, viewing portfolio summaries, and a watchlist with real-time quotes.
 - **Real-time Updates**: WebSocket integration for live market data and other dynamic content.
-- **Authentication**: Secure user authentication using Passport.js with sessions.
+- **Authentication**: Secure user authentication using Passport.js with PostgreSQL-persisted sessions (using connect-pg-simple) to prevent logout on server restart.
 - **UI/UX Decisions**: Focus on a luxury minimal aesthetic, generous spacing, desktop-first design with responsive grids, and reusable glassmorphism components.
 
 ## External Dependencies

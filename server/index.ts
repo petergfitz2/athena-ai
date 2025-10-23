@@ -1,5 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
 import { registerRoutes } from "./routes";
 import { setupAuth } from "./auth";
 import { setupVite, serveStatic, log } from "./vite";
@@ -19,9 +21,20 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Session middleware
+// Setup PostgreSQL session store
+const PgStore = connectPgSimple(session);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+// Session middleware with PostgreSQL store
 app.use(
   session({
+    store: new PgStore({
+      pool: pgPool,
+      createTableIfMissing: true,
+      tableName: 'session',
+    }),
     secret: process.env.SESSION_SECRET || "athena-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
@@ -29,6 +42,7 @@ app.use(
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'lax',
     },
   })
 );
