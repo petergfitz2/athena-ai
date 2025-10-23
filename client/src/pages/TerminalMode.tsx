@@ -7,9 +7,11 @@ import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
+import NewsDetailModal from "@/components/NewsDetailModal";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown, Activity, LayoutDashboard } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
+import type { NewsArticle } from "@shared/schema";
 
 interface Holding {
   id: string;
@@ -26,6 +28,9 @@ function TerminalModeContent() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [modeReady, setModeReady] = useState(false);
   const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId, modeReady);
+  
+  const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
+  const [newsModalOpen, setNewsModalOpen] = useState(false);
 
   useEffect(() => {
     setMode("terminal");
@@ -50,6 +55,15 @@ function TerminalModeContent() {
   const { data: holdings = [] } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
   });
+
+  const { data: news = [] } = useQuery<NewsArticle[]>({
+    queryKey: ["/api/market/news"],
+  });
+
+  const handleNewsClick = (article: NewsArticle) => {
+    setSelectedNews(article);
+    setNewsModalOpen(true);
+  };
 
   const getMockPrice = (symbol: string) => {
     const prices: Record<string, number> = {
@@ -251,39 +265,58 @@ function TerminalModeContent() {
         {/* News & Intelligence Panel */}
         <div className="glass rounded-[20px] p-4 overflow-auto">
           <h2 className="text-lg font-light text-foreground mb-4">Intelligence</h2>
-          <div className="space-y-3">
-            <div className="pb-3 border-b border-white/5">
-              <p className="text-xs text-primary mb-1">13F Filing</p>
-              <p className="text-sm text-foreground mb-1">
-                15 hedge funds initiated NVDA positions
-              </p>
-              <p className="text-xs text-muted-foreground">2 hours ago</p>
-            </div>
+          {news.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No news available</p>
+          ) : (
+            <div className="space-y-3">
+              {news.slice(0, 6).map((article, index) => {
+                const timeAgo = new Date(article.publishedAt).toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
 
-            <div className="pb-3 border-b border-white/5">
-              <p className="text-xs text-accent mb-1">Insider Transaction</p>
-              <p className="text-sm text-foreground mb-1">
-                AAPL CEO purchased $2M in shares
-              </p>
-              <p className="text-xs text-muted-foreground">5 hours ago</p>
-            </div>
+                const sentimentColor = article.sentimentLabel?.toLowerCase().includes('bull') || article.sentimentLabel?.toLowerCase().includes('positive')
+                  ? 'text-success'
+                  : article.sentimentLabel?.toLowerCase().includes('bear') || article.sentimentLabel?.toLowerCase().includes('negative')
+                  ? 'text-destructive'
+                  : 'text-warning';
 
-            <div className="pb-3 border-b border-white/5">
-              <p className="text-xs text-warning mb-1">Earnings</p>
-              <p className="text-sm text-foreground mb-1">
-                MSFT Q4 earnings beat estimates
-              </p>
-              <p className="text-xs text-muted-foreground">1 day ago</p>
+                return (
+                  <div
+                    key={article.id}
+                    className={`pb-3 cursor-pointer hover-elevate active-elevate-2 rounded-[16px] p-2 -m-2 transition-all ${
+                      index < news.length - 1 ? 'border-b border-white/5' : ''
+                    }`}
+                    onClick={() => handleNewsClick(article)}
+                    data-testid={`news-item-${article.id}`}
+                  >
+                    {article.sentimentLabel && (
+                      <p className={`text-xs mb-1 font-medium ${sentimentColor}`}>
+                        {article.sentimentLabel}
+                      </p>
+                    )}
+                    <p className="text-sm text-foreground mb-1 line-clamp-2">
+                      {article.title}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">{timeAgo}</p>
+                      {article.tickers && article.tickers.length > 0 && (
+                        <div className="flex gap-1">
+                          {article.tickers.slice(0, 2).map(ticker => (
+                            <span key={ticker} className="text-xs text-primary">
+                              {ticker}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-            <div className="pb-3">
-              <p className="text-xs text-muted-foreground mb-1">Market News</p>
-              <p className="text-sm text-foreground mb-1">
-                Fed holds rates steady, signals patience
-              </p>
-              <p className="text-xs text-muted-foreground">2 days ago</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -302,6 +335,16 @@ function TerminalModeContent() {
           onDismiss={dismissSuggestion}
         />
       )}
+
+      {/* News Detail Modal */}
+      <NewsDetailModal
+        article={selectedNews}
+        open={newsModalOpen}
+        onClose={() => {
+          setNewsModalOpen(false);
+          setSelectedNews(null);
+        }}
+      />
     </div>
   );
 }

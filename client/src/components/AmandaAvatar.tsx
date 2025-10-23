@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import amandaImage from "@assets/generated_images/Professional_AI_assistant_avatar_Amanda_7849a892.png";
+import amandaImage from "@assets/stock_images/professional_busines_b0be43f5.jpg";
 
 interface AmandaAvatarProps {
   size?: "small" | "medium" | "large" | "full";
@@ -28,10 +28,10 @@ export default function AmandaAvatar({
   }, [isSpeaking]);
 
   const sizeClasses = {
-    small: "w-16 h-16",
-    medium: "w-32 h-32",
-    large: "w-48 h-48 lg:w-64 lg:h-64",
-    full: "w-full h-full max-w-md mx-auto aspect-square",
+    small: "w-16 h-20",
+    medium: "w-32 h-40",
+    large: "w-48 h-60 lg:w-64 lg:h-80",
+    full: "w-full h-full max-w-sm mx-auto aspect-[3/4]",
   };
 
   return (
@@ -40,35 +40,35 @@ export default function AmandaAvatar({
       style={{ transform: `scale(${breatheScale})` }}
       data-testid="amanda-avatar"
     >
-      {/* Outer glow ring when listening */}
+      {/* Outer glow when listening */}
       {isListening && (
-        <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
+        <div className="absolute inset-0 rounded-[28px] bg-primary/10 animate-pulse" />
       )}
       
       {/* Speaking indicator */}
       {isSpeaking && (
-        <div className="absolute inset-0 rounded-full border-4 border-primary/50 animate-ping" />
+        <div className="absolute inset-0 rounded-[28px] border-2 border-primary/40 animate-pulse" />
       )}
       
-      {/* Avatar container */}
-      <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-primary/30 shadow-2xl">
-        {/* Photorealistic Amanda avatar */}
+      {/* Avatar container - portrait style */}
+      <div className="relative w-full h-full rounded-[28px] overflow-hidden border border-white/10 shadow-2xl bg-gradient-to-br from-black via-black to-primary/5">
+        {/* Sophisticated Amanda portrait */}
         <img 
           src={amandaImage} 
           alt="Amanda - Your AI Investment Assistant" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover grayscale"
         />
 
-        {/* Voice activity visualization */}
+        {/* Voice activity visualization - minimal */}
         {(isListening || isSpeaking) && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
-            {[...Array(5)].map((_, i) => (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="w-1 bg-primary rounded-full animate-pulse"
+                className="w-0.5 bg-primary/60 rounded-full animate-pulse"
                 style={{
-                  height: `${Math.random() * 20 + 10}px`,
-                  animationDelay: `${i * 100}ms`,
+                  height: `${Math.random() * 16 + 8}px`,
+                  animationDelay: `${i * 150}ms`,
                 }}
               />
             ))}
