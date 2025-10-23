@@ -235,31 +235,35 @@ export default function InvestmentSimulator() {
                   <CardContent>
                     <div className="relative h-64 flex items-center justify-center">
                       <svg viewBox="0 0 200 200" className="w-full h-full">
-                        {strategyAssets.reduce((acc, asset, index) => {
-                          const startAngle = acc;
-                          const angle = (asset.allocation / 100) * 360;
-                          const endAngle = startAngle + angle;
-                          const largeArcFlag = angle > 180 ? 1 : 0;
-                          
-                          const colors = ["hsl(258 90% 66%)", "hsl(280 85% 40%)", "hsl(240 80% 45%)", "hsl(200 75% 40%)"];
-                          const color = colors[index % colors.length];
-                          
-                          const startX = 100 + 80 * Math.cos((startAngle - 90) * Math.PI / 180);
-                          const startY = 100 + 80 * Math.sin((startAngle - 90) * Math.PI / 180);
-                          const endX = 100 + 80 * Math.cos((endAngle - 90) * Math.PI / 180);
-                          const endY = 100 + 80 * Math.sin((endAngle - 90) * Math.PI / 180);
-                          
-                          return (
-                            <g key={asset.symbol}>
-                              <path
-                                d={`M 100 100 L ${startX} ${startY} A 80 80 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
-                                fill={color}
-                                opacity="0.8"
-                                className="hover:opacity-100 transition-opacity"
-                              />
-                            </g>
-                          );
-                        }, 0)}
+                        {(() => {
+                          let cumulativeAngle = 0;
+                          return strategyAssets.map((asset, index) => {
+                            const startAngle = cumulativeAngle;
+                            const angle = (asset.allocation / 100) * 360;
+                            const endAngle = startAngle + angle;
+                            cumulativeAngle = endAngle;
+                            const largeArcFlag = angle > 180 ? 1 : 0;
+                            
+                            const colors = ["hsl(258 90% 66%)", "hsl(280 85% 40%)", "hsl(240 80% 45%)", "hsl(200 75% 40%)"];
+                            const color = colors[index % colors.length];
+                            
+                            const startX = 100 + 80 * Math.cos((startAngle - 90) * Math.PI / 180);
+                            const startY = 100 + 80 * Math.sin((startAngle - 90) * Math.PI / 180);
+                            const endX = 100 + 80 * Math.cos((endAngle - 90) * Math.PI / 180);
+                            const endY = 100 + 80 * Math.sin((endAngle - 90) * Math.PI / 180);
+                            
+                            return (
+                              <g key={asset.symbol}>
+                                <path
+                                  d={`M 100 100 L ${startX} ${startY} A 80 80 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
+                                  fill={color}
+                                  opacity="0.8"
+                                  className="hover:opacity-100 transition-opacity"
+                                />
+                              </g>
+                            );
+                          });
+                        })()}
                       </svg>
                     </div>
                     <div className="grid grid-cols-2 gap-2 mt-4">
