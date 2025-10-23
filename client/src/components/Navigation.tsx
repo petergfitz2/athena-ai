@@ -147,18 +147,18 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           : "bg-black border-white/10"
       }`}
     >
-      <div className="w-full pl-4 pr-6 sm:pr-10 lg:pr-16">
+      <div className="w-full pl-3 pr-6">
         <div className="flex items-center justify-between h-16">
-          {/* Left Side - Logo and Navigation Links */}
+          {/* All Navigation Elements - Left Aligned */}
           <div className="flex items-center gap-4 h-full">
-            {/* Logo - aligned with consistent height */}
-            <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
+            {/* Logo */}
+            <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
               <span className="text-xl font-bold tracking-tight text-foreground whitespace-nowrap leading-none">
                 Athena AI Investing
               </span>
             </Link>
 
-            {/* Desktop Navigation Links - consistent height */}
+            {/* Desktop Navigation Links */}
             <div className="hidden md:flex items-center gap-2 h-full">
               {navLinks.map((link) => {
               const Icon = link.icon;
@@ -187,10 +187,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               );
             })}
             </div>
-          </div>
 
-          {/* Right Side Actions - aligned height */}
-          <div className="hidden md:flex items-center gap-3 h-full">
+            {/* Divider */}
+            <div className="hidden md:block h-6 w-px bg-white/10 mx-2"></div>
+
             {/* Mode Switcher Dropdown - consistent height */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -353,19 +353,20 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             </DropdownMenu>
           </div>
 
-          {/* Mobile Menu Button */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden rounded-full hover-elevate active-elevate-2"
-                data-testid="button-mobile-menu"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
+          {/* Mobile Menu Button - positioned on the right for mobile */}
+          <div className="ml-auto md:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden rounded-full hover-elevate active-elevate-2"
+                  data-testid="button-mobile-menu"
+                >
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
               <SheetHeader>
                 <SheetTitle className="text-foreground">Navigation</SheetTitle>
                 <SheetDescription className="text-muted-foreground">
@@ -484,6 +485,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
       </div>
       
