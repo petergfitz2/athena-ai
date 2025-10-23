@@ -6,6 +6,7 @@ import { passport } from "./auth";
 import bcrypt from "bcrypt";
 import { insertUserSchema, insertHoldingSchema, insertTradeSchema } from "@shared/schema";
 import { generateAIResponse, generateTradeSuggestions } from "./openai";
+import { processVoiceInput } from "./voice";
 import { z } from "zod";
 
 // Middleware to require authentication
@@ -355,6 +356,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Trade suggestions error:", error);
       res.status(500).json({ error: "Failed to generate trade suggestions" });
+    }
+  });
+
+  // Voice Chat endpoint
+  app.post("/api/voice/chat", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { audio } = req.body;
+
+      if (!audio) {
+        return res.status(400).json({ error: "Audio is required" });
+      }
+
+      // Get user's holdings for context
+      const holdings = await storage.getUserHoldings(user.id);
+
+      // Process voice input
+      const result = await processVoiceInput(audio, user.id, holdings);
+
+      res.json(result);
+    } catch (error) {
+      console.error("Voice chat error:", error);
+      res.status(500).json({ error: "Failed to process voice input" });
     }
   });
 

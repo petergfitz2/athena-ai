@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { ProtectedRoute } from "@/lib/auth";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
 import AmandaAvatar from "@/components/AmandaAvatar";
 import ChatMessage from "@/components/ChatMessage";
+import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Mic, Send, X, MessageCircle } from "lucide-react";
@@ -19,6 +21,8 @@ type Message = {
 
 function HybridModeContent() {
   const { toast } = useToast();
+  useKeyboardShortcuts();
+  
   const [chatExpanded, setChatExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
@@ -76,7 +80,10 @@ function HybridModeContent() {
         {/* Header with View Selector */}
         <div className="border-b border-white/10 px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-extralight text-foreground">Athena</h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-extralight text-foreground">Athena</h1>
+              <ModeSwitcherMenu />
+            </div>
             <div className="flex gap-2">
               <Button
                 variant={view === "dashboard" ? "default" : "ghost"}

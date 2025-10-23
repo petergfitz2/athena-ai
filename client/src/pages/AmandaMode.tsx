@@ -3,8 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { ProtectedRoute } from "@/lib/auth";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useVoice } from "@/hooks/useVoice";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import AmandaAvatar from "@/components/AmandaAvatar";
 import ChatMessage from "@/components/ChatMessage";
+import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import { Button } from "@/components/ui/button";
 import { Mic, Send, Square } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,10 +29,38 @@ function AmandaModeContent() {
   }]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useKeyboardShortcuts();
+
+  const { status: voiceStatus, transcript, isRecording, startRecording, stopRecording } = useVoice({
+    onTranscript: (text) => {
+      const userMessage: Message = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: text,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, userMessage]);
+    },
+    onResponse: (text) => {
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: text,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -66,10 +97,6 @@ function AmandaModeContent() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      
-      // Simulate speaking
-      setIsSpeaking(true);
-      setTimeout(() => setIsSpeaking(false), 2000);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -83,12 +110,11 @@ function AmandaModeContent() {
   };
 
   const handleVoiceInput = () => {
-    setIsListening(!isListening);
-    // Voice functionality will be implemented with OpenAI Realtime API
-    toast({
-      title: "Voice Input",
-      description: "Voice integration coming soon with OpenAI Realtime API",
-    });
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -100,12 +126,20 @@ function AmandaModeContent() {
 
   return (
     <div className="h-screen bg-black flex flex-col">
+      {/* Top Header with Mode Switcher */}
+      <div className="flex-shrink-0 px-6 py-3 flex items-center justify-between border-b border-white/10">
+        <ModeSwitcherMenu />
+        <p className="text-xs text-muted-foreground">
+          Press Space or Cmd+K to talk
+        </p>
+      </div>
+
       {/* Amanda Avatar - Top Third */}
       <div className="flex-shrink-0 p-6 lg:p-12 flex items-center justify-center bg-gradient-to-b from-black via-primary/5 to-transparent">
         <AmandaAvatar 
           size="full" 
-          isListening={isListening}
-          isSpeaking={isSpeaking}
+          isListening={isRecording || voiceStatus === "listening"}
+          isSpeaking={voiceStatus === "speaking"}
         />
       </div>
 
@@ -152,11 +186,11 @@ function AmandaModeContent() {
               size="icon"
               onClick={handleVoiceInput}
               className={`rounded-full w-12 h-12 flex-shrink-0 ${
-                isListening ? "bg-destructive hover:bg-destructive/90" : "bg-primary hover:bg-primary/90"
+                isRecording ? "bg-destructive hover:bg-destructive/90" : "bg-primary hover:bg-primary/90"
               }`}
               data-testid="button-voice-input"
             >
-              {isListening ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </Button>
 
             {/* Text Input */}

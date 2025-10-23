@@ -19,10 +19,10 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  // Redirect to dashboard if already logged in
+  // Redirect to mode selector if already logged in
   useEffect(() => {
     if (user) {
-      setLocation("/dashboard");
+      setLocation("/select-mode");
     }
   }, [user, setLocation]);
 

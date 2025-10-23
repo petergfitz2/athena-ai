@@ -17,8 +17,18 @@ Athena provides a conversational interface for investment advice and portfolio m
 
 ## Features
 
-### Phase 1 (Current) - Luxury Hybrid MVP ✅ COMPLETE
+### Phase 1 (Current) - Three Adaptive Interface Modes 🚧 IN PROGRESS
 - ✅ User authentication (username/password)
+- ✅ **Three Interface Modes:**
+  - ✅ **Amanda Mode**: Full-screen conversational UI with photorealistic AI avatar (voice-first)
+  - ✅ **Hybrid Mode**: Dashboard + floating mini Amanda (desktop trading)
+  - ✅ **Terminal Mode**: Multi-panel institutional interface (professional analysis)
+- ✅ Mode switching context with persistent user preference
+- ✅ Voice integration (OpenAI Whisper + TTS):
+  - ✅ Push-to-talk recording (Space key or Cmd/Ctrl+K)
+  - ✅ Audio transcription via Whisper API
+  - ✅ Voice synthesis from Amanda using TTS (nova voice)
+  - ✅ Integrated with portfolio context
 - ✅ Conversational AI chat interface with portfolio context
 - ✅ Portfolio view with holdings management
   - ✅ Add holding modal with validation
@@ -29,13 +39,15 @@ Athena provides a conversational interface for investment advice and portfolio m
 - ✅ Real-time WebSocket support
 - ✅ Luxury design system (pure black, purple accents, glassmorphism)
 - ✅ Desktop-optimized responsive design
+- 🚧 Navigation improvements (keyboard shortcuts, mode switching)
+- 🚧 Mode onboarding/tutorial
 
 ### Phase 2 (Planned)
-- Voice input/output (OpenAI Realtime API)
 - Real-time market data integration
 - SEC filing analysis (13F, Form 4)
 - Advanced analytics (Sharpe ratio, correlation, risk metrics)
 - Trade execution via brokerage API
+- Enhanced voice features (OpenAI Realtime API for <800ms latency)
 
 ## Database Schema
 
@@ -68,6 +80,7 @@ Athena provides a conversational interface for investment advice and portfolio m
 
 ### AI Chat
 - `POST /api/chat` - Send message and get AI response
+- `POST /api/voice/chat` - Process voice input (transcription + AI response + TTS)
 - `GET /api/ai/trade-suggestions` - Generate AI trade suggestions
 
 ### Conversations
@@ -77,13 +90,30 @@ Athena provides a conversational interface for investment advice and portfolio m
 
 ## Recent Changes (October 23, 2025)
 
-### Phase 1 MVP Features Completed
-1. **AddHoldingModal Component**: Users can add stocks to portfolio with symbol, quantity, and average cost
-2. **WatchlistCard Component**: Dashboard watchlist with real-time price updates and add/remove functionality
-3. **QuickActionButtons Component**: Chat quick actions for common queries (portfolio, market, returns, trades)
-4. **Bug Fix**: Fixed ChatPage new conversation flow that was disabling input after clicking "+ New Chat"
-
-All features tested end-to-end with Playwright and confirmed working in production.
+### Major Architecture Update: Three Interface Modes
+1. **ModeContext & ModeSelector**: Context provider for managing interface mode (Amanda/Hybrid/Terminal) with localStorage persistence
+2. **Amanda Mode** (`/amanda`): Full-screen conversational interface
+   - Photorealistic AI avatar (top third) with listening/speaking animations
+   - Chat messages (middle section)
+   - Voice + text input (bottom)
+   - Push-to-talk with Space or Cmd/Ctrl+K
+3. **Hybrid Mode** (`/hybrid`): Dashboard + floating mini Amanda
+   - Main dashboard area with portfolio/watchlist views
+   - Floating Amanda avatar (bottom-right corner)
+   - Expandable chat panel (slides from right)
+   - Best of both worlds for desktop trading
+4. **Terminal Mode** (`/terminal`): Multi-panel professional interface
+   - 4-panel grid layout (markets, portfolio, analysis, intelligence)
+   - Institutional-grade analytics display
+   - Voice available via keyboard shortcut
+5. **Voice Integration** (all modes):
+   - `useVoice` hook for push-to-talk functionality
+   - OpenAI Whisper API for transcription
+   - OpenAI TTS API for Amanda's voice (nova model)
+   - Backend `/api/voice/chat` endpoint
+   - Integrated with portfolio context for personalized responses
+6. **Updated Navigation**: App.tsx restructured with ModeProvider, route updates to `/amanda`, `/hybrid`, `/terminal`
+7. **Auth Flow**: Redirects to `/select-mode` after login for mode selection
 
 ## Design System
 

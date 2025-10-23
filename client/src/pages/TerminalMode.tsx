@@ -1,5 +1,7 @@
 import { ProtectedRoute } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
 
 interface Holding {
@@ -10,6 +12,8 @@ interface Holding {
 }
 
 function TerminalModeContent() {
+  useKeyboardShortcuts();
+  
   const { data: holdings = [] } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
   });
@@ -43,7 +47,10 @@ function TerminalModeContent() {
       {/* Header - Compact */}
       <div className="flex-shrink-0 border-b border-white/10 px-6 py-3">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-extralight text-foreground">Terminal</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-extralight text-foreground">Terminal</h1>
+            <ModeSwitcherMenu />
+          </div>
           <div className="flex items-center gap-6">
             <div className="text-right">
               <p className="text-xs text-muted-foreground">Portfolio</p>
