@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import PortfolioChart from "@/components/PortfolioChart";
 import SectorAllocationChart, { type SectorData } from "@/components/SectorAllocationChart";
+import Navigation from "@/components/Navigation";
 
 function DashboardPageContent() {
   const { user } = useAuth();
@@ -54,6 +55,7 @@ function DashboardPageContent() {
 
   return (
     <div className="min-h-screen bg-black text-foreground">
+      <Navigation />
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">

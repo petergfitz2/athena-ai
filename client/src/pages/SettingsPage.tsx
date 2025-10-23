@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { apiJson } from "@/lib/queryClient";
 import { DollarSign, User, Bell, Lock } from "lucide-react";
+import Navigation from "@/components/Navigation";
 
 function SettingsPageContent() {
   const { user } = useAuth();
@@ -79,6 +80,7 @@ function SettingsPageContent() {
 
   return (
     <div className="min-h-screen bg-black text-foreground">
+      <Navigation />
       <div className="max-w-[1200px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">

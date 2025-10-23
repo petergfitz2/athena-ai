@@ -7,6 +7,7 @@ import { ProtectedRoute } from "@/lib/auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { MarketQuote } from "@shared/schema";
+import Navigation from "@/components/Navigation";
 
 interface WatchlistItem {
   id: string;
@@ -89,28 +90,36 @@ function WatchlistPageContent() {
 
   if (watchlistLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <p className="text-muted-foreground">Loading watchlist...</p>
+      <div className="min-h-screen bg-black">
+        <Navigation />
+        <div className="flex items-center justify-center pt-24">
+          <p className="text-muted-foreground">Loading watchlist...</p>
+        </div>
       </div>
     );
   }
 
   if (watchlistError) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-4">Failed to load watchlist</p>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/watchlist"] })} className="rounded-full">
-            Retry
-          </Button>
+      <div className="min-h-screen bg-black">
+        <Navigation />
+        <div className="flex items-center justify-center pt-24">
+          <div className="text-center">
+            <p className="text-destructive mb-4">Failed to load watchlist</p>
+            <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/watchlist"] })} className="rounded-full">
+              Retry
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
-      <div className="max-w-[1600px] mx-auto">
+    <div className="min-h-screen bg-black">
+      <Navigation />
+      <div className="px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+        <div className="max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between gap-6 mb-12">
           <div>
@@ -296,6 +305,7 @@ function WatchlistPageContent() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

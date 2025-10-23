@@ -21,20 +21,27 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Setup PostgreSQL session store
-const PgStore = connectPgSimple(session);
-const pgPool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+// Setup session store (PostgreSQL if DATABASE_URL available, otherwise in-memory)
+let sessionStore;
+if (process.env.DATABASE_URL) {
+  const PgStore = connectPgSimple(session);
+  const pgPool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL,
+  });
+  sessionStore = new PgStore({
+    pool: pgPool,
+    createTableIfMissing: true,
+    tableName: 'session',
+  });
+  log('Using PostgreSQL session store');
+} else {
+  log('WARNING: DATABASE_URL not found, using in-memory session store (sessions will not persist across restarts)');
+}
 
-// Session middleware with PostgreSQL store
+// Session middleware
 app.use(
   session({
-    store: new PgStore({
-      pool: pgPool,
-      createTableIfMissing: true,
-      tableName: 'session',
-    }),
+    ...(sessionStore && { store: sessionStore }),
     secret: process.env.SESSION_SECRET || "athena-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,

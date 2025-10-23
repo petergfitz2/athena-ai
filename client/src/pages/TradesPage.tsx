@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { Check, X, TrendingUp, TrendingDown, Clock } from "lucide-react";
 import type { Trade } from "@shared/schema";
+import Navigation from "@/components/Navigation";
 
 function TradesPageContent() {
   const { toast } = useToast();
@@ -96,6 +97,7 @@ function TradesPageContent() {
 
   return (
     <div className="min-h-screen bg-black text-foreground">
+      <Navigation />
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">

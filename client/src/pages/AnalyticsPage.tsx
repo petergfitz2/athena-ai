@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, AlertTriangle, Activity, BarChart3, Network, Zap } from "lucide-react";
 import { ProtectedRoute } from "@/lib/auth";
 import RiskInsights from "@/components/RiskInsights";
+import Navigation from "@/components/Navigation";
 
 interface CorrelationData {
   pairs: Array<{
@@ -56,7 +57,8 @@ function AnalyticsPageContent() {
   const isLoading = loadingCorr || loadingFactors || loadingRegime || loadingStress;
 
   return (
-    <div className="h-screen overflow-auto bg-background">
+    <div className="min-h-screen bg-black">
+      <Navigation />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="space-y-2">
