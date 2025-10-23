@@ -12,7 +12,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function DemoModeBanner() {
+interface DemoModeBannerProps {
+  inline?: boolean;
+}
+
+export default function DemoModeBanner({ inline = false }: DemoModeBannerProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [balance] = useState(100000); // Demo balance
@@ -35,6 +39,24 @@ export default function DemoModeBanner() {
     localStorage.removeItem("athena_demo_banner_dismissed");
   };
 
+  // Inline mode for header integration
+  if (inline) {
+    if (isDismissed) {
+      return null; // Don't show anything when dismissed in inline mode
+    }
+    
+    return (
+      <Badge 
+        className="rounded-full px-3 py-1 bg-gradient-to-r from-primary to-purple-600 border-0 text-white font-medium"
+        data-testid="badge-demo-inline"
+      >
+        <Zap className="w-3 h-3 mr-1" />
+        <span className="text-xs font-medium">Demo Mode</span>
+      </Badge>
+    );
+  }
+
+  // Fixed position mode (original behavior)
   // Show restore button if fully dismissed
   if (isDismissed) {
     return (

@@ -403,9 +403,6 @@ export default function CommandCenter() {
         {/* Quick Start Guide */}
         <QuickStartGuide />
         
-        {/* Demo Mode Banner */}
-        <DemoModeBanner />
-        
         {/* Keyboard Shortcuts Guide */}
         <KeyboardShortcutsGuide />
         
@@ -429,6 +426,7 @@ export default function CommandCenter() {
               </div>
             
             <div className="flex items-center gap-3">
+              <DemoModeBanner inline />
               <Button
                 onClick={isRecording ? stopRecording : startRecording}
                 variant={isRecording ? "destructive" : "default"}
