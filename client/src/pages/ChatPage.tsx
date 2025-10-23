@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardHeader from "@/components/DashboardHeader";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
-import { useLocation } from "wouter";
+import { ProtectedRoute, useAuth } from "@/lib/auth";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 type Message = {
   id: number;
@@ -11,8 +13,9 @@ type Message = {
   timestamp: string;
 };
 
-export default function ChatPage() {
-  const [, setLocation] = useLocation();
+function ChatPageContent() {
+  const { logout } = useAuth();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -23,7 +26,7 @@ export default function ChatPage() {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     const newMessage: Message = {
       id: messages.length + 1,
       role: "user",
@@ -34,21 +37,32 @@ export default function ChatPage() {
     setMessages([...messages, newMessage]);
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const response = await apiRequest("POST", "/api/chat", { message: content });
+      const data = await response.json();
+
       const aiResponse: Message = {
         id: messages.length + 2,
         role: "assistant",
-        content: "Based on current market conditions, I'd recommend a diversified approach. Would you like me to analyze specific stocks or discuss portfolio strategy?",
+        content: data.response,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
+      
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
     <div className="min-h-screen bg-black flex flex-col">
-      <DashboardHeader onLogout={() => setLocation('/')} />
+      <DashboardHeader onLogout={logout} />
 
       <main className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto px-4 py-8">
@@ -66,8 +80,8 @@ export default function ChatPage() {
                 <div className="rounded-[28px] bg-white/5 border border-white/10 px-6 py-4">
                   <div className="flex gap-2">
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-75" />
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-150" />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
                   </div>
                 </div>
               </div>
@@ -82,5 +96,13 @@ export default function ChatPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <ProtectedRoute>
+      <ChatPageContent />
+    </ProtectedRoute>
   );
 }

@@ -1,4 +1,4 @@
-import { db } from "@db";
+import { db } from "./db";
 import { 
   users, holdings, conversations, messages, trades, watchlist,
   type User, type InsertUser, 

@@ -1,11 +1,68 @@
+import { useQuery } from "@tanstack/react-query";
 import DashboardHeader from "@/components/DashboardHeader";
 import MarketDataTile from "@/components/MarketDataTile";
 import TradeSuggestion from "@/components/TradeSuggestion";
 import GlassCard from "@/components/GlassCard";
-import { useLocation } from "wouter";
+import { ProtectedRoute, useAuth } from "@/lib/auth";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
-export default function DashboardPage() {
-  const [, setLocation] = useLocation();
+interface Trade {
+  id: string;
+  symbol: string;
+  type: 'buy' | 'sell';
+  quantity: string;
+  price: string;
+  reasoning: string | null;
+  confidence: string | null;
+  status: string;
+}
+
+function DashboardPageContent() {
+  const { logout } = useAuth();
+  const { toast } = useToast();
+
+  const { data: pendingTrades = [] } = useQuery<Trade[]>({
+    queryKey: ["/api/trades/pending"],
+  });
+
+  const handleApprove = async (tradeId: string) => {
+    try {
+      await apiRequest("PATCH", `/api/trades/${tradeId}/status`, { status: "approved" });
+      
+      toast({
+        title: "Trade Approved",
+        description: "The trade has been approved successfully.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/trades/pending"] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to approve trade",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDecline = async (tradeId: string) => {
+    try {
+      await apiRequest("PATCH", `/api/trades/${tradeId}/status`, { status: "rejected" });
+      
+      toast({
+        title: "Trade Declined",
+        description: "The trade has been declined.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/trades/pending"] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to decline trade",
+        variant: "destructive",
+      });
+    }
+  };
 
   const marketData = [
     { symbol: "S&P 500", name: "Index", price: 4532.76, change: 12.45, changePercent: 0.28 },
@@ -16,7 +73,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-black">
-      <DashboardHeader onLogout={() => setLocation('/')} />
+      <DashboardHeader onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
@@ -33,47 +90,35 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="mb-8">
-          <GlassCard>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Portfolio Value</p>
-                <p className="text-5xl font-extralight text-foreground">$52,921</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Today's P&L</p>
-                <p className="text-3xl font-light text-primary">+$1,297</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Total Return</p>
-                <p className="text-3xl font-light text-primary">+12.4%</p>
-              </div>
+        {pendingTrades.length > 0 && (
+          <div>
+            <h3 className="text-2xl font-light text-foreground mb-4">AI Trade Suggestions</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {pendingTrades.map((trade) => (
+                <TradeSuggestion
+                  key={trade.id}
+                  symbol={trade.symbol}
+                  action={trade.type.toUpperCase() as "BUY" | "SELL"}
+                  shares={parseFloat(trade.quantity)}
+                  price={parseFloat(trade.price)}
+                  reasoning={trade.reasoning || "AI-generated trade suggestion"}
+                  confidence={parseFloat(trade.confidence || "75")}
+                  onApprove={() => handleApprove(trade.id)}
+                  onDecline={() => handleDecline(trade.id)}
+                />
+              ))}
             </div>
-          </GlassCard>
-        </div>
-
-        <div>
-          <h3 className="text-2xl font-light text-foreground mb-4">AI Trade Suggestions</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <TradeSuggestion
-              symbol="NVDA"
-              action="BUY"
-              shares={10}
-              price={495.32}
-              reasoning="NVIDIA shows strong momentum in AI chip market with recent data center growth. Technical indicators suggest upward trend with support at $480."
-              confidence={87}
-            />
-            <TradeSuggestion
-              symbol="META"
-              action="BUY"
-              shares={15}
-              price={342.56}
-              reasoning="Meta's VR division showing promising revenue growth. Stock undervalued compared to peers with strong ad revenue fundamentals."
-              confidence={78}
-            />
           </div>
-        </div>
+        )}
       </main>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardPageContent />
+    </ProtectedRoute>
   );
 }

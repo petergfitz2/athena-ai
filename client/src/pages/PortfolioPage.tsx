@@ -1,75 +1,70 @@
+import { useQuery } from "@tanstack/react-query";
 import DashboardHeader from "@/components/DashboardHeader";
 import PortfolioCard from "@/components/PortfolioCard";
 import GlassCard from "@/components/GlassCard";
-import { useLocation } from "wouter";
+import { ProtectedRoute, useAuth } from "@/lib/auth";
 
-export default function PortfolioPage() {
-  const [, setLocation] = useLocation();
+interface Holding {
+  id: string;
+  symbol: string;
+  quantity: string;
+  averageCost: string;
+}
 
-  const holdings = [
-    {
-      symbol: "AAPL",
-      name: "Apple Inc.",
-      shares: 50,
-      currentPrice: 178.32,
-      totalValue: 8916,
-      change: 245.50,
-      changePercent: 2.83,
-    },
-    {
-      symbol: "MSFT",
-      name: "Microsoft Corp.",
-      shares: 40,
-      currentPrice: 378.91,
-      totalValue: 15156,
-      change: 412.30,
-      changePercent: 2.79,
-    },
-    {
-      symbol: "TSLA",
-      name: "Tesla Inc.",
-      shares: 25,
-      currentPrice: 242.84,
-      totalValue: 6071,
-      change: -125.30,
-      changePercent: -2.02,
-    },
-    {
-      symbol: "NVDA",
-      name: "NVIDIA Corp.",
-      shares: 30,
-      currentPrice: 495.32,
-      totalValue: 14860,
-      change: 723.45,
-      changePercent: 5.12,
-    },
-    {
-      symbol: "GOOGL",
-      name: "Alphabet Inc.",
-      shares: 35,
-      currentPrice: 141.80,
-      totalValue: 4963,
-      change: 87.20,
-      changePercent: 1.79,
-    },
-    {
-      symbol: "AMZN",
-      name: "Amazon.com Inc.",
-      shares: 20,
-      currentPrice: 152.74,
-      totalValue: 3055,
-      change: -45.80,
-      changePercent: -1.48,
-    },
-  ];
+function PortfolioPageContent() {
+  const { logout } = useAuth();
 
-  const totalValue = holdings.reduce((sum, h) => sum + h.totalValue, 0);
-  const totalChange = holdings.reduce((sum, h) => sum + h.change, 0);
-  const totalChangePercent = (totalChange / (totalValue - totalChange)) * 100;
+  const { data: holdings = [], isLoading } = useQuery<Holding[]>({
+    queryKey: ["/api/holdings"],
+  });
+
+  // Mock current prices - in a real app, this would come from a market data API
+  const getMockPrice = (symbol: string) => {
+    const prices: Record<string, number> = {
+      AAPL: 178.32,
+      MSFT: 378.91,
+      TSLA: 242.84,
+      NVDA: 495.32,
+      GOOGL: 141.80,
+      AMZN: 152.74,
+    };
+    return prices[symbol] || 100;
+  };
+
+  const calculateMetrics = () => {
+    if (!holdings.length) return { totalValue: 0, totalChange: 0, totalChangePercent: 0 };
+
+    let totalValue = 0;
+    let totalCost = 0;
+
+    holdings.forEach((h) => {
+      const currentPrice = getMockPrice(h.symbol);
+      const quantity = parseFloat(h.quantity);
+      const avgCost = parseFloat(h.averageCost);
+      
+      totalValue += currentPrice * quantity;
+      totalCost += avgCost * quantity;
+    });
+
+    const totalChange = totalValue - totalCost;
+    const totalChangePercent = (totalChange / totalCost) * 100;
+
+    return { totalValue, totalChange, totalChangePercent };
+  };
+
+  const { totalValue, totalChange, totalChangePercent } = calculateMetrics();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-foreground">Loading portfolio...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">
-      <DashboardHeader onLogout={() => setLocation('/')} />
+      <DashboardHeader onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
@@ -82,11 +77,11 @@ export default function PortfolioPage() {
             <div>
               <p className="text-sm text-muted-foreground mb-2">Total Value</p>
               <p className="text-5xl font-extralight text-foreground">
-                ${totalValue.toLocaleString()}
+                ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Today's Change</p>
+              <p className="text-sm text-muted-foreground mb-2">Total Change</p>
               <p className={`text-3xl font-light ${totalChange >= 0 ? 'text-primary' : 'text-destructive'}`}>
                 {totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}
               </p>
@@ -100,12 +95,47 @@ export default function PortfolioPage() {
           </div>
         </GlassCard>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {holdings.map((holding) => (
-            <PortfolioCard key={holding.symbol} {...holding} />
-          ))}
-        </div>
+        {holdings.length === 0 ? (
+          <GlassCard>
+            <div className="text-center py-12">
+              <p className="text-foreground text-xl mb-2">No holdings yet</p>
+              <p className="text-muted-foreground">Start by talking to Athena about investment opportunities</p>
+            </div>
+          </GlassCard>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {holdings.map((holding) => {
+              const currentPrice = getMockPrice(holding.symbol);
+              const quantity = parseFloat(holding.quantity);
+              const avgCost = parseFloat(holding.averageCost);
+              const totalValue = currentPrice * quantity;
+              const change = (currentPrice - avgCost) * quantity;
+              const changePercent = ((currentPrice - avgCost) / avgCost) * 100;
+
+              return (
+                <PortfolioCard
+                  key={holding.id}
+                  symbol={holding.symbol}
+                  name={`${holding.symbol} Inc.`}
+                  shares={quantity}
+                  currentPrice={currentPrice}
+                  totalValue={totalValue}
+                  change={change}
+                  changePercent={changePercent}
+                />
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
+  );
+}
+
+export default function PortfolioPage() {
+  return (
+    <ProtectedRoute>
+      <PortfolioPageContent />
+    </ProtectedRoute>
   );
 }

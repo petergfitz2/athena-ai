@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { passport } from "./auth";
 import bcrypt from "bcrypt";
 import { insertUserSchema, insertHoldingSchema, insertTradeSchema } from "@shared/schema";
+import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { z } from "zod";
 
 // Middleware to require authentication
@@ -283,6 +284,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to remove from watchlist" });
+    }
+  });
+
+  // AI Chat endpoint
+  app.post("/api/chat", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { message, conversationId } = req.body;
+
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      // Get user's holdings for context
+      const holdings = await storage.getUserHoldings(user.id);
+
+      // Generate AI response
+      const aiResponse = await generateAIResponse(message, {
+        userId: user.id,
+        holdings,
+      });
+
+      // Save messages if conversation ID provided
+      if (conversationId) {
+        await storage.createMessage({
+          conversationId,
+          role: "user",
+          content: message,
+        });
+        await storage.createMessage({
+          conversationId,
+          role: "assistant",
+          content: aiResponse,
+        });
+      }
+
+      res.json({ response: aiResponse });
+    } catch (error) {
+      console.error("Chat error:", error);
+      res.status(500).json({ error: "Failed to generate response" });
+    }
+  });
+
+  // AI Trade Suggestions endpoint
+  app.get("/api/ai/trade-suggestions", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const holdings = await storage.getUserHoldings(user.id);
+      
+      const suggestions = await generateTradeSuggestions(user.id, holdings);
+      
+      // Save suggestions as pending trades
+      const savedTrades = await Promise.all(
+        suggestions.map((s) =>
+          storage.createTrade({
+            userId: user.id,
+            symbol: s.symbol,
+            type: s.action.toLowerCase() as 'buy' | 'sell',
+            quantity: s.quantity.toString(),
+            price: s.price.toString(),
+            reasoning: s.reasoning,
+            confidence: s.confidence.toString(),
+            status: 'pending',
+          })
+        )
+      );
+
+      res.json(savedTrades);
+    } catch (error) {
+      console.error("Trade suggestions error:", error);
+      res.status(500).json({ error: "Failed to generate trade suggestions" });
     }
   });
 
