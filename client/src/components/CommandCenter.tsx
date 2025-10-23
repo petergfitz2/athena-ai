@@ -15,10 +15,12 @@ import WelcomeTutorial from "@/components/WelcomeTutorial";
 import QuickStartGuide from "@/components/QuickStartGuide";
 import DemoModeBanner from "@/components/DemoModeBanner";
 import KeyboardShortcutsGuide from "@/components/KeyboardShortcutsGuide";
+import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import AnimatedCounter, { formatCurrency, formatPercent } from "@/components/AnimatedCounter";
 import { LoadingMessage, MarketDataSkeleton, PortfolioSkeleton } from "@/components/LoadingSkeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -49,7 +51,8 @@ import {
   X,
   Square,
   Trophy,
-  Users
+  Users,
+  Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -92,6 +95,14 @@ export default function CommandCenter() {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [expandedView, setExpandedView] = useState(localStorage.getItem('athena_expanded_view') === 'true');
+  
+  // Trade modal state
+  const [tradeModalOpen, setTradeModalOpen] = useState(false);
+  const [tradeAction, setTradeAction] = useState<"buy" | "sell">("buy");
+  const [prefilledSymbol, setPrefilledSymbol] = useState<string>("");
+  
+  // Ticker search state
+  const [tickerSearch, setTickerSearch] = useState("");
 
   // Greeting based on time
   const getGreeting = () => {
@@ -228,6 +239,54 @@ export default function CommandCenter() {
     change: Math.random() * 10 - 5,
     value: parseFloat(h.quantity) * 100 * (1 + Math.random() * 0.1),
   }));
+  
+  // Handle opening trade modal with prefilled data
+  const handleOpenTradeModal = (action: "buy" | "sell", symbol?: string) => {
+    setTradeAction(action);
+    setPrefilledSymbol(symbol || "");
+    setTradeModalOpen(true);
+  };
+  
+  // Handle ticker search
+  const handleTickerSearch = (searchTerm: string) => {
+    const term = searchTerm.trim().toUpperCase();
+    if (term.length === 0) return;
+    
+    // Common stock mappings for company names
+    const companyMappings: Record<string, string> = {
+      "APPLE": "AAPL",
+      "GOOGLE": "GOOGL",
+      "MICROSOFT": "MSFT",
+      "AMAZON": "AMZN",
+      "TESLA": "TSLA",
+      "META": "META",
+      "FACEBOOK": "META",
+      "NVIDIA": "NVDA",
+      "NETFLIX": "NFLX",
+      "DISNEY": "DIS",
+    };
+    
+    // Check if it's a company name
+    const mappedTicker = companyMappings[term];
+    if (mappedTicker) {
+      handleOpenTradeModal("buy", mappedTicker);
+      setTickerSearch("");
+      return;
+    }
+    
+    // If it looks like a ticker symbol (1-5 uppercase letters), open trade modal
+    if (term.length >= 1 && term.length <= 5 && /^[A-Z]+$/.test(term)) {
+      handleOpenTradeModal("buy", term);
+      setTickerSearch("");
+    } else if (term.length > 5) {
+      // Show a toast for invalid input
+      toast({
+        title: "Invalid ticker",
+        description: "Please enter a valid ticker symbol (1-5 letters) or company name",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <TooltipProvider>
@@ -477,6 +536,26 @@ export default function CommandCenter() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Ticker Search Bar */}
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search Stocks (e.g., AAPL, GOOGL)"
+                    value={tickerSearch}
+                    onChange={(e) => setTickerSearch(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleTickerSearch(tickerSearch);
+                      }
+                    }}
+                    className="pl-10 rounded-full bg-white/5 border-white/20 text-foreground placeholder:text-white/30 h-10 focus:border-primary/50 focus:bg-white/8"
+                    data-testid="input-ticker-search"
+                  />
+                </div>
+              </div>
+              
               <div className="space-y-3">
                 {holdings.slice(0, 5).map((holding) => {
                   const currentPrice = 100 * (1 + Math.random() * 0.2);
@@ -495,7 +574,13 @@ export default function CommandCenter() {
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium">{holding.symbol}</p>
+                          <p 
+                            className="font-medium cursor-pointer hover:text-primary transition-colors"
+                            onClick={() => handleOpenTradeModal("buy", holding.symbol)}
+                            data-testid={`ticker-${holding.symbol}`}
+                          >
+                            {holding.symbol}
+                          </p>
                           <p className="text-xs text-muted-foreground">{quantity} shares</p>
                         </div>
                       </div>
@@ -516,10 +601,22 @@ export default function CommandCenter() {
                       </div>
                       
                       <div className="flex gap-2 ml-4">
-                        <Button size="sm" variant="ghost" className="rounded-full h-8 px-3">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="rounded-full h-8 px-3"
+                          onClick={() => handleOpenTradeModal("buy", holding.symbol)}
+                          data-testid={`button-buy-${holding.symbol}`}
+                        >
                           Buy
                         </Button>
-                        <Button size="sm" variant="ghost" className="rounded-full h-8 px-3">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="rounded-full h-8 px-3"
+                          onClick={() => handleOpenTradeModal("sell", holding.symbol)}
+                          data-testid={`button-sell-${holding.symbol}`}
+                        >
                           Sell
                         </Button>
                       </div>
@@ -636,6 +733,14 @@ export default function CommandCenter() {
           </div>
         </div>
       </div>
+      
+      {/* Execute Trade Modal */}
+      <ExecuteTradeModal
+        open={tradeModalOpen}
+        onOpenChange={setTradeModalOpen}
+        action={tradeAction}
+        prefilledSymbol={prefilledSymbol}
+      />
     </div>
     </TooltipProvider>
   );
