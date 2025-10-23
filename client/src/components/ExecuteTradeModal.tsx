@@ -92,9 +92,20 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
     enabled: !!selectedSymbol,
   });
 
+  // Get portfolio summary for account balance
+  const { data: portfolioSummary } = useQuery<{
+    totalValue: number;
+    cashBalance: number;
+    totalGainLoss: number;
+    totalGainLossPercent: number;
+  }>({
+    queryKey: ["/api/portfolio/summary"],
+    enabled: open, // Only fetch when modal is open
+  });
+
   const quantity = parseFloat(form.watch("quantity") || "0");
   const estimatedCost = quote && quantity ? quote.price * quantity : 0;
-  const accountBalance = (user as any)?.accountBalance ? parseFloat((user as any).accountBalance) : 0;
+  const accountBalance = portfolioSummary?.cashBalance || 0;
 
   const handleSymbolSearch = () => {
     if (searchSymbol.trim()) {
