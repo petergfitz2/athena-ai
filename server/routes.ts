@@ -239,6 +239,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Execute trade (buy/sell with order types)
+  app.post("/api/trades/execute", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const schema = z.object({
+        symbol: z.string().min(1).max(10),
+        action: z.enum(['buy', 'sell']),
+        quantity: z.number().positive(),
+        orderType: z.enum(['market', 'limit', 'stop', 'stop_limit']),
+        limitPrice: z.number().optional(),
+        stopPrice: z.number().optional(),
+        timeInForce: z.enum(['day', 'gtc', 'ioc', 'fok']),
+      });
+
+      const data = schema.parse(req.body);
+
+      // Get current quote for the symbol
+      const quote = await getQuote(data.symbol.toUpperCase());
+      if (!quote) {
+        return res.status(404).json({ error: `Quote not found for ${data.symbol}` });
+      }
+
+      // Determine execution price based on order type
+      let executionPrice = quote.price;
+      if (data.orderType === 'limit' && data.limitPrice) {
+        executionPrice = data.limitPrice;
+      }
+
+      const totalCost = executionPrice * data.quantity;
+
+      // Get user's current balance
+      const currentUser = await storage.getUser(user.id);
+      if (!currentUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const accountBalance = parseFloat(currentUser.accountBalance || "0");
+
+      // For buy orders, check sufficient funds
+      if (data.action === 'buy') {
+        if (totalCost > accountBalance) {
+          return res.status(400).json({ 
+            error: `Insufficient funds. Need $${totalCost.toFixed(2)}, have $${accountBalance.toFixed(2)}` 
+          });
+        }
+
+        // Deduct from balance
+        await storage.updateUserBalance(user.id, (accountBalance - totalCost).toString());
+      }
+
+      // For sell orders, verify user has the holding
+      if (data.action === 'sell') {
+        const holdings = await storage.getUserHoldings(user.id);
+        const holding = holdings.find(h => h.symbol === data.symbol.toUpperCase());
+        
+        if (!holding) {
+          return res.status(400).json({ error: `You don't own any shares of ${data.symbol}` });
+        }
+
+        const currentQuantity = parseFloat(holding.quantity);
+        if (currentQuantity < data.quantity) {
+          return res.status(400).json({ 
+            error: `Insufficient shares. You have ${currentQuantity}, trying to sell ${data.quantity}` 
+          });
+        }
+
+        // Add proceeds to balance
+        await storage.updateUserBalance(user.id, (accountBalance + totalCost).toString());
+      }
+
+      // Create the trade record
+      const trade = await storage.createTrade({
+        userId: user.id,
+        symbol: data.symbol.toUpperCase(),
+        type: data.action,
+        quantity: data.quantity.toString(),
+        price: executionPrice.toString(),
+        status: 'executed', // For market orders, execute immediately
+        orderType: data.orderType,
+        timeInForce: data.timeInForce,
+      });
+
+      // Update or create holding
+      const holdings = await storage.getUserHoldings(user.id);
+      const existingHolding = holdings.find(h => h.symbol === data.symbol.toUpperCase());
+
+      if (data.action === 'buy') {
+        if (existingHolding) {
+          // Update existing holding
+          const currentQuantity = parseFloat(existingHolding.quantity);
+          const currentCost = parseFloat(existingHolding.averageCost);
+          const newQuantity = currentQuantity + data.quantity;
+          const newAverageCost = ((currentQuantity * currentCost) + (data.quantity * executionPrice)) / newQuantity;
+
+          await storage.updateHolding(existingHolding.id, {
+            quantity: newQuantity.toString(),
+            averageCost: newAverageCost.toString(),
+          });
+        } else {
+          // Create new holding
+          await storage.createHolding({
+            userId: user.id,
+            symbol: data.symbol.toUpperCase(),
+            quantity: data.quantity.toString(),
+            averageCost: executionPrice.toString(),
+          });
+        }
+      } else if (data.action === 'sell' && existingHolding) {
+        const currentQuantity = parseFloat(existingHolding.quantity);
+        const newQuantity = currentQuantity - data.quantity;
+
+        if (newQuantity <= 0) {
+          // Remove holding entirely
+          await storage.deleteHolding(existingHolding.id);
+        } else {
+          // Update quantity
+          await storage.updateHolding(existingHolding.id, {
+            quantity: newQuantity.toString(),
+          });
+        }
+      }
+
+      res.json({
+        success: true,
+        trade,
+        message: `Successfully ${data.action === 'buy' ? 'bought' : 'sold'} ${data.quantity} shares of ${data.symbol.toUpperCase()} at $${executionPrice.toFixed(2)}`,
+      });
+    } catch (error: any) {
+      console.error("Trade execution error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: error.message || "Failed to execute trade" });
+    }
+  });
+
   // Conversation routes
   app.get("/api/conversations", requireAuth, async (req, res) => {
     try {

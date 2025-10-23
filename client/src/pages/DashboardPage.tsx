@@ -3,18 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth, ProtectedRoute } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, Plus, ArrowUpRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon } from "lucide-react";
 import type { PortfolioSummary, Holding, MarketQuote } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import AddHoldingModal from "@/components/AddHoldingModal";
+import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import PortfolioChart from "@/components/PortfolioChart";
 import SectorAllocationChart, { type SectorData } from "@/components/SectorAllocationChart";
 
 function DashboardPageContent() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [showSellModal, setShowSellModal] = useState(false);
 
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
@@ -163,14 +164,25 @@ function DashboardPageContent() {
                     Your current positions
                   </CardDescription>
                 </div>
-                <Button 
-                  onClick={() => setShowAddModal(true)}
-                  className="gap-2 rounded-full"
-                  data-testid="button-add-holding"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Position
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => setShowBuyModal(true)}
+                    className="gap-2 rounded-full bg-success hover:bg-success/90"
+                    data-testid="button-buy-stock"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    Buy Stock
+                  </Button>
+                  <Button 
+                    onClick={() => setShowSellModal(true)}
+                    variant="outline"
+                    className="gap-2 rounded-full"
+                    data-testid="button-sell-stock"
+                  >
+                    <SellIcon className="w-4 h-4" />
+                    Sell Stock
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {!holdings || holdings.length === 0 ? (
@@ -179,13 +191,13 @@ function DashboardPageContent() {
                       No holdings yet. Start building your portfolio.
                     </p>
                     <Button 
-                      onClick={() => setShowAddModal(true)}
-                      variant="outline" 
-                      className="gap-2 rounded-full"
-                      data-testid="button-add-first-holding"
+                      onClick={() => setShowBuyModal(true)}
+                      variant="default" 
+                      className="gap-2 rounded-full bg-success hover:bg-success/90"
+                      data-testid="button-buy-first-stock"
                     >
-                      <Plus className="w-4 h-4" />
-                      Add Your First Position
+                      <ShoppingCart className="w-4 h-4" />
+                      Buy Your First Stock
                     </Button>
                   </div>
                 ) : (
@@ -306,8 +318,9 @@ function DashboardPageContent() {
         )}
       </div>
       
-      {/* Add Holding Modal */}
-      <AddHoldingModal open={showAddModal} onOpenChange={setShowAddModal} />
+      {/* Trade Execution Modals */}
+      <ExecuteTradeModal open={showBuyModal} onOpenChange={setShowBuyModal} action="buy" />
+      <ExecuteTradeModal open={showSellModal} onOpenChange={setShowSellModal} action="sell" />
     </div>
   );
 }
