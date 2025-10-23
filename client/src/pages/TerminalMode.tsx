@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -6,7 +7,8 @@ import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
-import { TrendingUp, TrendingDown, Activity } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, TrendingDown, Activity, LayoutDashboard } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 
 interface Holding {
@@ -18,6 +20,7 @@ interface Holding {
 
 function TerminalModeContent() {
   const { setMode } = useMode();
+  const [, setLocation] = useLocation();
   useKeyboardShortcuts();
   
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -80,6 +83,15 @@ function TerminalModeContent() {
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-extralight text-foreground">Terminal</h1>
             <ModeSwitcherMenu />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/dashboard")}
+              className="rounded-full"
+              data-testid="button-dashboard"
+            >
+              <LayoutDashboard className="w-5 h-5" />
+            </Button>
           </div>
           <div className="flex items-center gap-6">
             <div className="text-right">

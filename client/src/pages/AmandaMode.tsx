@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +13,7 @@ import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
-import { Mic, Send, Square } from "lucide-react";
+import { Mic, Send, Square, LayoutDashboard } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 type Message = {
@@ -25,6 +26,7 @@ type Message = {
 function AmandaModeContent() {
   const { toast } = useToast();
   const { setMode } = useMode();
+  const [, setLocation] = useLocation();
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
@@ -164,9 +166,20 @@ function AmandaModeContent() {
       {/* Top Header with Mode Switcher */}
       <div className="flex-shrink-0 px-6 py-3 flex items-center justify-between border-b border-white/10">
         <ModeSwitcherMenu />
-        <p className="text-xs text-muted-foreground">
-          Press Space or Cmd+K to talk
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-xs text-muted-foreground">
+            Press Space or Cmd+K to talk
+          </p>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/dashboard")}
+            className="rounded-full"
+            data-testid="button-dashboard"
+          >
+            <LayoutDashboard className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
       {/* Amanda Avatar - Top Third */}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { ProtectedRoute } from "@/lib/auth";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMode } from "@/contexts/ModeContext";
@@ -11,7 +12,7 @@ import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, X, MessageCircle } from "lucide-react";
+import { Mic, Send, X, MessageCircle, LayoutDashboard } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,6 +26,7 @@ type Message = {
 function HybridModeContent() {
   const { toast } = useToast();
   const { setMode } = useMode();
+  const [, setLocation] = useLocation();
   useKeyboardShortcuts();
   
   const [chatExpanded, setChatExpanded] = useState(false);
@@ -118,6 +120,15 @@ function HybridModeContent() {
             <div className="flex items-center gap-4">
               <h1 className="text-3xl font-extralight text-foreground">Athena</h1>
               <ModeSwitcherMenu />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/dashboard")}
+                className="rounded-full"
+                data-testid="button-dashboard"
+              >
+                <LayoutDashboard className="w-5 h-5" />
+              </Button>
             </div>
             <div className="flex gap-2">
               <Button
