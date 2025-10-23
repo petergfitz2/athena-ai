@@ -43,10 +43,10 @@ export function AppSidebar() {
         <SidebarGroup>
           <div className="px-8 py-12">
             <h1 className="text-3xl font-extralight text-foreground tracking-wide">
-              Athena
+              Athena AI Investing
             </h1>
             <p className="text-xs text-muted-foreground mt-2 font-light">
-              AI Investment Platform
+              Luxury Investment Platform
             </p>
           </div>
           

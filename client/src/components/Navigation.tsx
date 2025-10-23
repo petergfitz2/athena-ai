@@ -146,19 +146,18 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
     >
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/command-center" className="flex items-center gap-3 hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
-            </div>
-            <span className="text-xl font-light tracking-tight text-foreground">
-              Athena
-            </span>
-          </Link>
+          {/* Left Side - Logo and Navigation Links */}
+          <div className="flex items-center gap-8">
+            {/* Logo */}
+            <Link href="/" className="flex items-center hover-elevate active-elevate-2 px-3 py-2 rounded-lg transition-colors" data-testid="link-logo">
+              <span className="text-xl font-light tracking-tight text-foreground">
+                Athena AI Investing
+              </span>
+            </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-2">
-            {navLinks.map((link) => {
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex items-center gap-2">
+              {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
               return (
@@ -184,6 +183,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 </Tooltip>
               );
             })}
+            </div>
           </div>
 
           {/* Right Side Actions */}
@@ -473,82 +473,6 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </div>
             </SheetContent>
           </Sheet>
-
-          {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-3 rounded-full hover-elevate active-elevate-2"
-                data-testid="button-user-menu"
-              >
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                    {getUserInitials()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden lg:block text-sm font-light">
-                  {user?.username}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56 bg-card border-white/10 rounded-[20px]"
-            >
-              <DropdownMenuLabel className="font-light">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">{user?.username}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Manage your account
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem
-                onClick={() => setLocation("/tutorials")}
-                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
-                data-testid="menu-item-tutorials"
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Tutorials
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setLocation("/faq")}
-                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
-                data-testid="menu-item-faq"
-              >
-                <FileQuestion className="w-4 h-4 mr-2" />
-                FAQ
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setLocation("/help")}
-                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
-                data-testid="menu-item-help"
-              >
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Help Center
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem
-                onClick={() => setLocation("/settings")}
-                className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
-                data-testid="menu-item-settings"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="cursor-pointer text-destructive focus:text-destructive hover-elevate active-elevate-2 rounded-lg"
-                data-testid="menu-item-logout"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
     </nav>

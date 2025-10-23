@@ -260,8 +260,8 @@ export default function CommandCenter() {
                     {getGreeting()}
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
-                    <marketStatus.icon className="w-3 h-3" />
-                    <span className={cn("text-sm", marketStatus.color)}>
+                    <marketStatus.icon className="w-4 h-4" />
+                    <span className={cn("text-base font-medium", marketStatus.color)}>
                       {marketStatus.text}
                     </span>
                   </div>
