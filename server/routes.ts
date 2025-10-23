@@ -942,7 +942,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Verify current password
-      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      const isValid = await bcrypt.compare(currentPassword, user.password);
       if (!isValid) {
         return res.status(400).json({ error: "Current password is incorrect" });
       }

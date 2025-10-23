@@ -47,9 +47,10 @@ interface ExecuteTradeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   action: "buy" | "sell";
+  prefilledSymbol?: string;
 }
 
-export default function ExecuteTradeModal({ open, onOpenChange, action }: ExecuteTradeModalProps) {
+export default function ExecuteTradeModal({ open, onOpenChange, action, prefilledSymbol }: ExecuteTradeModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,6 +68,15 @@ export default function ExecuteTradeModal({ open, onOpenChange, action }: Execut
       stopPrice: "",
     },
   });
+
+  // Pre-fill symbol if provided
+  useEffect(() => {
+    if (prefilledSymbol && open) {
+      setSearchSymbol(prefilledSymbol);
+      setSelectedSymbol(prefilledSymbol);
+      form.setValue("symbol", prefilledSymbol);
+    }
+  }, [prefilledSymbol, open, form]);
 
   const orderType = form.watch("orderType");
 

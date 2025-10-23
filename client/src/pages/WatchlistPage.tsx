@@ -304,14 +304,12 @@ function WatchlistPageContent() {
       </div>
 
       {/* Buy Modal */}
-      {buyModalSymbol && (
-        <ExecuteTradeModal
-          isOpen={true}
-          onClose={() => setBuyModalSymbol(null)}
-          mode="buy"
-          prefilledSymbol={buyModalSymbol}
-        />
-      )}
+      <ExecuteTradeModal
+        open={!!buyModalSymbol}
+        onOpenChange={(open) => !open && setBuyModalSymbol(null)}
+        action="buy"
+        prefilledSymbol={buyModalSymbol || undefined}
+      />
     </div>
   );
 }

@@ -90,7 +90,7 @@ export class DbStorage implements IStorage {
 
   async updateUserPassword(id: string, passwordHash: string): Promise<User | undefined> {
     const result = await db.update(users)
-      .set({ passwordHash })
+      .set({ password: passwordHash })
       .where(eq(users.id, id))
       .returning();
     return result[0];
