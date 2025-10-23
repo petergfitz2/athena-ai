@@ -48,8 +48,8 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      sameSite: 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days for better mobile persistence
+      sameSite: 'lax', // 'lax' is better for mobile browsers than 'strict'
     },
   })
 );

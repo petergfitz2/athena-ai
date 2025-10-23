@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
@@ -182,6 +183,9 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
           <DialogDescription className="text-base text-white/60 font-light">
             Execute a {action} order on the market
           </DialogDescription>
+          <Badge variant="outline" className="w-fit mx-auto bg-primary/10 border-primary/30">
+            Demo Trade - No Real Money
+          </Badge>
         </DialogHeader>
 
         {/* Stock Search */}

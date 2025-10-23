@@ -5,6 +5,8 @@ import { ProtectedRoute } from "@/lib/auth";
 import AddHoldingModal from "@/components/AddHoldingModal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
+import Navigation from "@/components/Navigation";
 
 interface Holding {
   id: string;
@@ -65,8 +67,11 @@ function PortfolioPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
-      <div className="max-w-[1600px] mx-auto space-y-12 lg:space-y-16">
+    <div className="min-h-screen bg-black">
+      <Navigation />
+      <FloatingAthenaOrb />
+      <div className="px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+        <div className="max-w-[1600px] mx-auto space-y-12 lg:space-y-16">
         {/* Header */}
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
@@ -156,6 +161,7 @@ function PortfolioPageContent() {
             </div>
           </div>
         )}
+        </div>
       </div>
       
       <AddHoldingModal open={showAddModal} onOpenChange={setShowAddModal} />

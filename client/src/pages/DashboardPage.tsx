@@ -3,8 +3,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth, ProtectedRoute } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon, Sparkles, Wallet } from "lucide-react";
-import type { PortfolioSummary, Holding, MarketQuote } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, TrendingDown as SellIcon, Sparkles, Wallet, BookOpen, MessageCircle, Newspaper, AlertCircle, HelpCircle } from "lucide-react";
+import type { PortfolioSummary, Holding, MarketQuote, NewsArticle } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
@@ -12,6 +13,8 @@ import PortfolioChart from "@/components/PortfolioChart";
 import SectorAllocationChart, { type SectorData } from "@/components/SectorAllocationChart";
 import Navigation from "@/components/Navigation";
 import { useLocation } from "wouter";
+import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
+import NewsDetailModal from "@/components/NewsDetailModal";
 
 function DashboardPageContent() {
   const { user } = useAuth();
@@ -19,6 +22,7 @@ function DashboardPageContent() {
   const [, setLocation] = useLocation();
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState(false);
+  const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsArticle | null>(null);
 
   const generateSuggestions = useMutation({
     mutationFn: async () => {
@@ -68,6 +72,10 @@ function DashboardPageContent() {
     queryKey: ['/api/portfolio/sectors'],
   });
 
+  const { data: newsData = [] } = useQuery<NewsArticle[]>({
+    queryKey: ['/api/market/news'],
+  });
+
   const isLoading = summaryLoading || holdingsLoading;
 
   const formatCurrency = (value: number) => {
@@ -86,21 +94,86 @@ function DashboardPageContent() {
   return (
     <div className="min-h-screen bg-black text-foreground">
       <Navigation />
+      <FloatingAthenaOrb />
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+        {/* Demo Mode Banner */}
+        <div className="mb-8 p-4 rounded-[20px] bg-gradient-to-r from-primary/10 to-purple-600/10 border border-primary/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Badge className="bg-primary text-white border-0 px-3 py-1">
+                DEMO MODE
+              </Badge>
+              <p className="text-sm font-light text-foreground">
+                Virtual Trading Environment - Practice without real money
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-full"
+              onClick={() => setLocation("/help")}
+            >
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Learn More
+            </Button>
+          </div>
+        </div>
+
+        {/* Welcome Section for New Users */}
+        {(!holdings || holdings.length === 0) && (
+          <Card className="mb-8 bg-gradient-to-br from-primary/5 to-transparent border-primary/20 rounded-[28px]">
+            <CardHeader>
+              <CardTitle className="text-3xl font-light">Welcome to Your Demo Portfolio, {user?.fullName || user?.username}!</CardTitle>
+              <CardDescription className="text-base mt-2">
+                This is a sandbox environment with virtual funds. Perfect for learning and practicing.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <MessageCircle className="w-5 h-5 text-primary mt-1" />
+                  <div>
+                    <p className="font-medium text-sm">Ask Athena AI</p>
+                    <p className="text-xs text-muted-foreground">Get personalized stock suggestions</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Wallet className="w-5 h-5 text-primary mt-1" />
+                  <div>
+                    <p className="font-medium text-sm">$100,000 Virtual Cash</p>
+                    <p className="text-xs text-muted-foreground">Practice trading risk-free</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Newspaper className="w-5 h-5 text-primary mt-1" />
+                  <div>
+                    <p className="font-medium text-sm">Real-Time News</p>
+                    <p className="text-xs text-muted-foreground">Stay updated with market trends</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button onClick={() => setShowBuyModal(true)} className="rounded-full">
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Make Your First Trade
+                </Button>
+                <Button variant="outline" onClick={() => setLocation("/tutorials")} className="rounded-full">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  View Tutorials
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight mb-4">
-            Portfolio
+            Portfolio Overview
           </h1>
           <p className="text-lg text-muted-foreground font-light">
-            Your investment overview and performance
+            Your investment performance and market insights
           </p>
-          <div className="mt-4 p-3 rounded-[20px] bg-primary/5 border border-primary/20 max-w-3xl">
-            <p className="text-xs text-primary/80 leading-relaxed">
-              <strong className="text-primary">Demo Market Data:</strong> Stock prices and market indices are simulated for testing. 
-              Real-time data from Alpha Vantage will be available once API key is configured.
-            </p>
-          </div>
         </div>
 
         {isLoading ? (
@@ -442,6 +515,87 @@ function DashboardPageContent() {
               </CardContent>
             </Card>
 
+            {/* Market News Section */}
+            <Card className="bg-card border-white/10 rounded-[28px] mb-12">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-4xl font-extralight flex items-center gap-3">
+                      <Newspaper className="w-8 h-8 text-primary" />
+                      Market News
+                    </CardTitle>
+                    <CardDescription className="mt-2 text-muted-foreground font-light">
+                      Latest updates and market intelligence
+                    </CardDescription>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="rounded-full"
+                    onClick={() => setLocation("/watchlist")}
+                  >
+                    View All News
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {newsData && newsData.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {newsData.slice(0, 6).map((article) => {
+                      const getSentimentColor = (label?: string) => {
+                        if (!label) return "text-muted-foreground";
+                        const normalized = label.toLowerCase();
+                        if (normalized.includes("bullish") || normalized.includes("positive")) return "text-success";
+                        if (normalized.includes("bearish") || normalized.includes("negative")) return "text-destructive";
+                        return "text-warning";
+                      };
+
+                      return (
+                        <div
+                          key={article.id}
+                          className="p-4 rounded-[20px] bg-white/5 hover-elevate cursor-pointer transition-all"
+                          onClick={() => setSelectedNewsArticle(article)}
+                          data-testid={`news-article-${article.id}`}
+                        >
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            {article.sentimentLabel && (
+                              <Badge className={`${getSentimentColor(article.sentimentLabel)} bg-transparent border-current px-2 py-0.5 text-xs`}>
+                                {article.sentimentLabel}
+                              </Badge>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(article.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                          <h4 className="font-medium text-sm mb-2 line-clamp-2">{article.title}</h4>
+                          {article.summary && (
+                            <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{article.summary}</p>
+                          )}
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs text-muted-foreground">{article.source}</p>
+                            {article.tickers && article.tickers.length > 0 && (
+                              <div className="flex gap-1">
+                                {article.tickers.slice(0, 3).map(ticker => (
+                                  <Badge key={ticker} variant="outline" className="text-xs px-2 py-0">
+                                    {ticker}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Newspaper className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground">No market news available</p>
+                    <p className="text-xs text-muted-foreground mt-1">Check back later for updates</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Top Holdings */}
             {summary?.topHoldings && summary.topHoldings.length > 0 && (
               <Card className="bg-card border-white/10 rounded-[28px]">
@@ -494,6 +648,13 @@ function DashboardPageContent() {
       {/* Trade Execution Modals */}
       <ExecuteTradeModal open={showBuyModal} onOpenChange={setShowBuyModal} action="buy" />
       <ExecuteTradeModal open={showSellModal} onOpenChange={setShowSellModal} action="sell" />
+      
+      {/* News Detail Modal */}
+      <NewsDetailModal 
+        article={selectedNewsArticle} 
+        open={!!selectedNewsArticle} 
+        onClose={() => setSelectedNewsArticle(null)} 
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, Activity, BarChart3, Network, 
 import { ProtectedRoute } from "@/lib/auth";
 import RiskInsights from "@/components/RiskInsights";
 import Navigation from "@/components/Navigation";
+import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 
 interface CorrelationData {
   pairs: Array<{
@@ -59,6 +60,7 @@ function AnalyticsPageContent() {
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
+      <FloatingAthenaOrb />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="space-y-2">
