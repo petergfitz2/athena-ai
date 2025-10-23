@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ProtectedRoute } from "@/lib/auth";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import DashboardPage from "@/pages/DashboardPage";
 import PortfolioPage from "@/pages/PortfolioPage";
@@ -23,6 +24,7 @@ type Message = {
 
 function HybridModeContent() {
   const { toast } = useToast();
+  const { setMode } = useMode();
   useKeyboardShortcuts();
   
   const [chatExpanded, setChatExpanded] = useState(false);
@@ -38,8 +40,14 @@ function HybridModeContent() {
   
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [lastMessageTime, setLastMessageTime] = useState<number | null>(null);
+  const [modeReady, setModeReady] = useState(false);
   
-  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId);
+  const { suggestion, shouldShow, dismissSuggestion} = useModeSuggestion(conversationId, modeReady);
+
+  useEffect(() => {
+    setMode("hybrid");
+    setModeReady(true);
+  }, [setMode]);
 
   useEffect(() => {
     const initConversation = async () => {

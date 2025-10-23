@@ -44,6 +44,28 @@ Athena provides a conversational interface for investment advice and portfolio m
 - ✅ Logout functionality via mode switcher menu
 - ✅ E2E testing passed (registration, mode selection, chat, mode persistence, logout)
 
+### Phase 1.5 (Complete) ✅ - Adaptive Intelligence System
+- ✅ **Conversation Context Analysis**:
+  - ✅ Real-time analysis of user conversation patterns (message length, technical terms, question depth, urgency keywords, response timing)
+  - ✅ Weighted scoring system (hurried/analytical/conversational) with exponential decay favoring recent messages
+  - ✅ Per-conversation tracking with database persistence
+- ✅ **Adaptive AI Prompting**:
+  - ✅ AI response depth automatically adjusts based on detected user context
+  - ✅ Temperature and token limits adapt to user state
+  - ✅ Hurried mode: concise, direct answers
+  - ✅ Analytical mode: detailed, data-rich responses
+  - ✅ Conversational mode: balanced, friendly tone
+- ✅ **Intelligent Mode Suggestions**:
+  - ✅ System detects when user would benefit from different interface mode
+  - ✅ Non-intrusive bottom-right suggestion cards with explanatory reasoning
+  - ✅ One-click mode switching with smooth transitions
+  - ✅ Toast notifications for mode change feedback
+  - ✅ Per-conversation dismissal state (suggestions don't repeat)
+- ✅ **Cross-Mode Integration**:
+  - ✅ All three modes (Amanda/Hybrid/Terminal) track conversation context
+  - ✅ Mode suggestions appear dynamically based on usage patterns
+  - ✅ Consistent UX across all interface modes
+
 ### Phase 2 (Planned)
 - Real-time market data integration
 - SEC filing analysis (13F, Form 4)
@@ -59,6 +81,8 @@ Athena provides a conversational interface for investment advice and portfolio m
 - `messages`: Individual chat messages
 - `trades`: Trade history and pending suggestions
 - `watchlist`: Watched stocks
+- `conversation_analysis`: Aggregated conversation metrics and scores (hurried/analytical/conversational)
+- `message_metrics`: Per-message analysis metrics (length, technical terms, question depth, urgency signals, response time)
 
 ## API Endpoints
 
@@ -89,6 +113,8 @@ Athena provides a conversational interface for investment advice and portfolio m
 - `GET /api/conversations` - Get user conversations
 - `POST /api/conversations` - Create conversation
 - `GET /api/conversations/:id/messages` - Get conversation messages
+- `GET /api/context/:id` - Get conversation analysis (scores, metrics)
+- `GET /api/context/:id/suggestion` - Get mode suggestion based on conversation context
 
 ## Recent Changes (October 23, 2025)
 
@@ -121,6 +147,33 @@ Athena provides a conversational interface for investment advice and portfolio m
    - Fixed post-auth redirect (now goes to `/select-mode` instead of `/dashboard`)
    - Added logout button to ModeSwitcherMenu
 9. **E2E Testing**: Comprehensive test passed covering registration, mode selection, chat functionality, mode switching (via menu and keyboard shortcuts), mode persistence, and logout
+
+### Phase 1.5 Completion: Adaptive Intelligence System ✅ (October 23, 2025)
+1. **Conversation Context Analyzer** (`server/conversationAnalyzer.ts`):
+   - Real-time analysis engine for conversation patterns
+   - Tracks message length, technical terms, question depth, urgency keywords, response timing
+   - Exponential decay weighting (recent messages weighted 4x higher)
+   - Calculates hurried/analytical/conversational scores
+   - Database persistence via `conversation_analysis` and `message_metrics` tables
+   
+2. **Adaptive AI Prompting** (`server/openai.ts`):
+   - AI responses automatically adjust based on detected context
+   - Hurried mode: Concise responses, higher temperature (0.8), reduced tokens (300)
+   - Analytical mode: Detailed responses, lower temperature (0.4), expanded tokens (800)
+   - Conversational mode: Balanced responses, moderate temperature (0.7), standard tokens (500)
+   
+3. **Intelligent Mode Suggestions**:
+   - Backend API (`/api/context/:id/suggestion`) recommends optimal interface mode
+   - Frontend hooks (`useConversationContext`, `useModeSuggestion`) manage state and polling
+   - `ModeSuggestion` component: Bottom-right glassmorphism card with explanation
+   - Smooth mode transitions with toast notifications
+   - Per-conversation dismissal prevents repeated prompts
+   
+4. **Cross-Mode Integration**:
+   - All three modes (Amanda/Hybrid/Terminal) create dedicated conversations on mount
+   - ConversationId and lastMessageTime sent with each chat message
+   - Mode suggestions appear dynamically across all modes
+   - Consistent UX pattern across the platform
 
 ## Design System
 

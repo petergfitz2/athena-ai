@@ -5,6 +5,7 @@ import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useVoice } from "@/hooks/useVoice";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import AmandaAvatar from "@/components/AmandaAvatar";
 import ChatMessage from "@/components/ChatMessage";
@@ -23,6 +24,7 @@ type Message = {
 
 function AmandaModeContent() {
   const { toast } = useToast();
+  const { setMode } = useMode();
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
@@ -33,10 +35,17 @@ function AmandaModeContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [lastMessageTime, setLastMessageTime] = useState<number>(Date.now());
+  const [modeReady, setModeReady] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useKeyboardShortcuts();
+
+  // Set current mode
+  useEffect(() => {
+    setMode("amanda");
+    setModeReady(true);
+  }, [setMode]);
 
   // Create conversation on mount
   const createConversation = useMutation({
@@ -52,8 +61,8 @@ function AmandaModeContent() {
     createConversation.mutate();
   }, []);
 
-  // Mode suggestion hook
-  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId, true);
+  // Mode suggestion hook (only enable after mode is synchronized)
+  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId, modeReady);
 
   const { status: voiceStatus, transcript, isRecording, startRecording, stopRecording } = useVoice({
     onTranscript: (text) => {

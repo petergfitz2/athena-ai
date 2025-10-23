@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ProtectedRoute } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
@@ -16,10 +17,17 @@ interface Holding {
 }
 
 function TerminalModeContent() {
+  const { setMode } = useMode();
   useKeyboardShortcuts();
   
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId);
+  const [modeReady, setModeReady] = useState(false);
+  const { suggestion, shouldShow, dismissSuggestion } = useModeSuggestion(conversationId, modeReady);
+
+  useEffect(() => {
+    setMode("terminal");
+    setModeReady(true);
+  }, [setMode]);
 
   useEffect(() => {
     const initConversation = async () => {
