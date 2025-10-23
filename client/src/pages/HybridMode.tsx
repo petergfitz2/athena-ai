@@ -34,6 +34,7 @@ function HybridModeContent() {
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   useKeyboardShortcuts();
   
   const [messages, setMessages] = useState<Message[]>([{
@@ -86,6 +87,8 @@ function HybridModeContent() {
 
           setMessages(prev => [...prev, assistantMessage]);
           setLastMessageTime(Date.now());
+          // Keep focus on the input field after voice response
+          textareaRef.current?.focus();
         } catch (error: any) {
           toast({
             title: "Error",
@@ -95,6 +98,8 @@ function HybridModeContent() {
           setMessages(prev => prev.filter(m => m.id !== userMessage.id));
         } finally {
           setIsLoading(false);
+          // Keep focus on the input field even after error
+          textareaRef.current?.focus();
         }
       }, 100);
     },
@@ -152,6 +157,11 @@ function HybridModeContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Auto-focus textarea on mount
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
+
   useEffect(() => {
     setMode("hybrid");
     setModeReady(true);
@@ -205,6 +215,8 @@ function HybridModeContent() {
 
       setMessages(prev => [...prev, assistantMessage]);
       setLastMessageTime(Date.now());
+      // Keep focus on the input field after receiving response
+      textareaRef.current?.focus();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -214,6 +226,8 @@ function HybridModeContent() {
       setMessages(prev => prev.filter(m => m.id !== userMessage.id));
     } finally {
       setIsLoading(false);
+      // Keep focus on the input field even after error
+      textareaRef.current?.focus();
     }
   };
 
@@ -475,6 +489,7 @@ function HybridModeContent() {
               <div className="flex gap-2">
                 <div className="flex-1 relative">
                   <Textarea
+                    ref={textareaRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
