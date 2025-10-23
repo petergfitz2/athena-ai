@@ -576,6 +576,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/market/quotes-batch", async (req, res) => {
+    try {
+      const symbolsParam = req.query.symbols as string;
+      if (!symbolsParam) {
+        return res.status(400).json({ error: "symbols parameter required" });
+      }
+      
+      const symbols = symbolsParam.split(',').map(s => s.trim().toUpperCase());
+      const quotes = await getBatchQuotes(symbols);
+      
+      res.json(Object.fromEntries(quotes));
+    } catch (error) {
+      console.error("Batch quotes error:", error);
+      res.status(500).json({ error: "Failed to fetch quotes" });
+    }
+  });
+
   app.get("/api/market/news", async (req, res) => {
     try {
       const ticker = req.query.ticker as string | undefined;

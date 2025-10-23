@@ -66,12 +66,18 @@ Athena provides a conversational interface for investment advice and portfolio m
   - ✅ Mode suggestions appear dynamically based on usage patterns
   - ✅ Consistent UX across all interface modes
 
-### Phase 2 (Planned)
-- Real-time market data integration
-- SEC filing analysis (13F, Form 4)
-- Advanced analytics (Sharpe ratio, correlation, risk metrics)
-- Trade execution via brokerage API
-- Enhanced voice features (OpenAI Realtime API for <800ms latency)
+### Phase 2 (In Progress) 🔄
+- ✅ Dashboard page with portfolio KPIs and holdings table
+- ✅ Global navigation (dashboard button in all mode headers)
+- ✅ Interactive News/Intelligence system with clickable articles
+- ✅ Watchlist page with add/remove stocks and real-time quotes
+- ✅ Sophisticated Amanda avatar (black & white portrait style)
+- 🔄 Real-time market data integration (Alpha Vantage ready, awaiting API key)
+- ⏳ Trade execution workflow (buy/sell orders, approval system)
+- ⏳ Account settings page (profile, password, add funds via Stripe)
+- ⏳ Advanced analytics (Sharpe ratio, beta, volatility calculations)
+- ⏳ Performance charts (portfolio value over time)
+- ⏳ Enhanced voice features (OpenAI Realtime API for <800ms latency)
 
 ## Database Schema
 
@@ -97,6 +103,19 @@ Athena provides a conversational interface for investment advice and portfolio m
 - `POST /api/holdings` - Create holding
 - `PATCH /api/holdings/:id` - Update holding
 - `DELETE /api/holdings/:id` - Delete holding
+- `GET /api/portfolio/summary` - Get portfolio summary with KPIs
+
+### Watchlist
+- `GET /api/watchlist` - Get user watchlist
+- `POST /api/watchlist` - Add stock to watchlist
+- `DELETE /api/watchlist/:id` - Remove from watchlist
+
+### Market Data
+- `GET /api/market/indices` - Get major market indices (S&P 500, NASDAQ, Dow)
+- `GET /api/market/quote/:symbol` - Get quote for single symbol
+- `GET /api/market/quotes` - Get quotes for user's holdings
+- `GET /api/market/quotes-batch?symbols=` - Get quotes for multiple symbols
+- `GET /api/market/news` - Get market news with AI sentiment analysis
 
 ### Trading
 - `GET /api/trades` - Get all trades
@@ -117,6 +136,41 @@ Athena provides a conversational interface for investment advice and portfolio m
 - `GET /api/context/:id/suggestion` - Get mode suggestion based on conversation context
 
 ## Recent Changes (October 23, 2025)
+
+### Latest Updates: Enhanced Functionality & UX ✨
+1. **Amanda Avatar Redesign**:
+   - Replaced generated avatar with sophisticated stock photo
+   - Black & white grayscale aesthetic for luxury feel
+   - Portrait-style (3:4 aspect ratio) instead of circular
+   - Minimal voice indicators, rounded-[28px] borders
+
+2. **Interactive News/Intelligence System**:
+   - Created NewsDetailModal component with full article details
+   - Terminal Mode news panel now clickable
+   - Shows sentiment analysis (bullish/bearish/neutral)
+   - Displays related tickers, timestamps, article images
+   - "Read Full Article" external link button
+   - Mock data service ready for Alpha Vantage integration
+
+3. **Watchlist Page** (`/watchlist`):
+   - Add/remove stocks functionality
+   - Real-time quotes with 1-minute refresh
+   - Price change indicators (green/red)
+   - Quick actions: Buy, View Details
+   - Empty state with call-to-action
+   - Responsive grid layout
+
+4. **Dashboard Navigation**:
+   - Added dashboard icon button to all mode headers (Amanda, Hybrid, Terminal)
+   - Consistent LayoutDashboard icon with proper data-testids
+   - One-click navigation from any interface mode
+
+5. **API Enhancements**:
+   - Added `/api/market/quotes-batch` for multi-symbol quotes
+   - Enhanced `/api/market/news` with sentiment analysis
+   - Created `newsService.ts` with caching (ready for Alpha Vantage)
+
+## Recent Changes (October 23, 2025) - Phase 1
 
 ### Phase 1 Completion: Three Interface Modes ✅
 1. **ModeContext & ModeSelector**: Context provider for managing interface mode (Amanda/Hybrid/Terminal) with localStorage persistence

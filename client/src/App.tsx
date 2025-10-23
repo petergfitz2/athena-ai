@@ -10,13 +10,13 @@ import AmandaMode from "@/pages/AmandaMode";
 import HybridMode from "@/pages/HybridMode";
 import TerminalMode from "@/pages/TerminalMode";
 import DashboardPage from "@/pages/DashboardPage";
+import WatchlistPage from "@/pages/WatchlistPage";
 import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
 
 function ModeSelectorPage() {
   const { user } = useAuth();
   const { currentMode } = useMode();
-  const [, setLocation] = useLocation();
 
   if (!user) {
     return <Redirect to="/" />;
@@ -24,7 +24,7 @@ function ModeSelectorPage() {
 
   // Auto-redirect to saved mode
   if (currentMode) {
-    setLocation(`/${currentMode}`);
+    return <Redirect to={`/${currentMode}`} />;
   }
 
   return (
@@ -50,6 +50,7 @@ function Router() {
       <Route path="/" component={AuthPage} />
       <Route path="/select-mode" component={ModeSelectorPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/watchlist" component={WatchlistPage} />
       <Route path="/amanda" component={AmandaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />
