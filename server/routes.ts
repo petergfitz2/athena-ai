@@ -4,10 +4,11 @@ import { WebSocketServer } from "ws";
 import { storage } from "./storage";
 import { passport } from "./auth";
 import bcrypt from "bcrypt";
-import { insertUserSchema, insertHoldingSchema, insertTradeSchema } from "@shared/schema";
+import { insertUserSchema, insertHoldingSchema, insertTradeSchema, type PortfolioSummary } from "@shared/schema";
 import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { processVoiceInput } from "./voice";
 import { ConversationAnalyzer } from "./conversationAnalyzer";
+import { getMarketIndices, getQuote, getBatchQuotes, getNews } from "./services/marketService";
 import { z } from "zod";
 
 // Middleware to require authentication
@@ -20,12 +21,12 @@ function requireAuth(req: any, res: any, next: any) {
 
 // Helper function to generate mode change reason
 function getModeChangeReason(
-  analysis: { hurriedScore: string; analyticalScore: string; conversationalScore: string; recommendedMode: string | null },
+  analysis: { hurriedScore: number | string; analyticalScore: number | string; conversationalScore: number | string; recommendedMode: string | null },
   currentMode: string
 ): string {
-  const hurried = Number(analysis.hurriedScore);
-  const analytical = Number(analysis.analyticalScore);
-  const conversational = Number(analysis.conversationalScore);
+  const hurried = typeof analysis.hurriedScore === 'number' ? analysis.hurriedScore : Number(analysis.hurriedScore);
+  const analytical = typeof analysis.analyticalScore === 'number' ? analysis.analyticalScore : Number(analysis.analyticalScore);
+  const conversational = typeof analysis.conversationalScore === 'number' ? analysis.conversationalScore : Number(analysis.conversationalScore);
 
   // Handle null recommended mode
   if (!analysis.recommendedMode) {
@@ -530,6 +531,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Mode suggestion error:", error);
       res.status(500).json({ error: "Failed to generate mode suggestion" });
+    }
+  });
+
+  // Market data routes
+  app.get("/api/market/indices", async (_req, res) => {
+    try {
+      const indices = await getMarketIndices();
+      res.json(indices);
+    } catch (error) {
+      console.error("Market indices error:", error);
+      res.status(500).json({ error: "Failed to fetch market indices" });
+    }
+  });
+
+  app.get("/api/market/quote/:symbol", async (req, res) => {
+    try {
+      const { symbol } = req.params;
+      const quote = await getQuote(symbol);
+      
+      if (!quote) {
+        return res.status(404).json({ error: "Quote not found" });
+      }
+      
+      res.json(quote);
+    } catch (error) {
+      console.error("Quote error:", error);
+      res.status(500).json({ error: "Failed to fetch quote" });
+    }
+  });
+
+  app.get("/api/market/quotes", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const holdings = await storage.getHoldingsByUserId(user.id);
+      const symbols = holdings.map(h => h.symbol);
+      
+      const quotes = await getBatchQuotes(symbols);
+      
+      res.json(Object.fromEntries(quotes));
+    } catch (error) {
+      console.error("Batch quotes error:", error);
+      res.status(500).json({ error: "Failed to fetch quotes" });
+    }
+  });
+
+  app.get("/api/market/news", async (req, res) => {
+    try {
+      const ticker = req.query.ticker as string | undefined;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      const news = await getNews(ticker, limit);
+      res.json(news);
+    } catch (error) {
+      console.error("News error:", error);
+      res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  // Portfolio summary route
+  app.get("/api/portfolio/summary", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const holdings = await storage.getHoldingsByUserId(user.id);
+      
+      if (holdings.length === 0) {
+        return res.json({
+          totalValue: 0,
+          totalCost: 0,
+          totalGain: 0,
+          totalGainPercent: 0,
+          cashBalance: Number(user.accountBalance || 0),
+          holdingsCount: 0,
+        } as PortfolioSummary);
+      }
+
+      const symbols = holdings.map(h => h.symbol);
+      const quotes = await getBatchQuotes(symbols);
+      
+      let totalValue = 0;
+      let totalCost = 0;
+      const topHoldings: { symbol: string; value: number; percentOfPortfolio: number }[] = [];
+      
+      holdings.forEach(holding => {
+        const quote = quotes.get(holding.symbol);
+        if (quote) {
+          const value = Number(holding.quantity) * quote.price;
+          const cost = Number(holding.quantity) * Number(holding.averageCost);
+          totalValue += value;
+          totalCost += cost;
+          
+          topHoldings.push({
+            symbol: holding.symbol,
+            value,
+            percentOfPortfolio: 0, // Will calculate after totalValue is known
+          });
+        }
+      });
+      
+      // Calculate percentages
+      topHoldings.forEach(h => {
+        h.percentOfPortfolio = (h.value / totalValue) * 100;
+      });
+      
+      // Sort by value and take top 5
+      topHoldings.sort((a, b) => b.value - a.value);
+      const top5 = topHoldings.slice(0, 5);
+      
+      const totalGain = totalValue - totalCost;
+      const totalGainPercent = totalCost > 0 ? (totalGain / totalCost) * 100 : 0;
+      
+      const summary: PortfolioSummary = {
+        totalValue,
+        totalCost,
+        totalGain,
+        totalGainPercent,
+        cashBalance: Number(user.accountBalance || 0),
+        holdingsCount: holdings.length,
+        topHoldings: top5,
+      };
+      
+      res.json(summary);
+    } catch (error) {
+      console.error("Portfolio summary error:", error);
+      res.status(500).json({ error: "Failed to fetch portfolio summary" });
     }
   });
 

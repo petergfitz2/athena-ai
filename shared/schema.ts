@@ -228,3 +228,69 @@ export const insertConversationAnalysisSchema = createInsertSchema(conversationA
 
 export type InsertConversationAnalysis = z.infer<typeof insertConversationAnalysisSchema>;
 export type ConversationAnalysis = typeof conversationAnalysis.$inferSelect;
+
+// Market quote data (for real-time pricing)
+export const MarketQuoteSchema = z.object({
+  symbol: z.string(),
+  price: z.number(),
+  change: z.number(),
+  changePercent: z.number(),
+  volume: z.number().optional(),
+  marketCap: z.number().optional(),
+  pe: z.number().optional(),
+  high: z.number().optional(),
+  low: z.number().optional(),
+  open: z.number().optional(),
+  previousClose: z.number().optional(),
+  timestamp: z.number(),
+});
+
+export type MarketQuote = z.infer<typeof MarketQuoteSchema>;
+
+// Market index data
+export const MarketIndexSchema = z.object({
+  symbol: z.string(), // "^GSPC", "^IXIC", "^DJI"
+  name: z.string(), // "S&P 500", "NASDAQ", "Dow Jones"
+  price: z.number(),
+  change: z.number(),
+  changePercent: z.number(),
+  timestamp: z.number(),
+});
+
+export type MarketIndex = z.infer<typeof MarketIndexSchema>;
+
+// News article data
+export const NewsArticleSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  summary: z.string().optional(),
+  url: z.string(),
+  source: z.string(),
+  publishedAt: z.string(),
+  imageUrl: z.string().optional(),
+  tickers: z.array(z.string()).optional(),
+  sentimentScore: z.number().optional(),
+  sentimentLabel: z.string().optional(),
+});
+
+export type NewsArticle = z.infer<typeof NewsArticleSchema>;
+
+// Portfolio summary (calculated aggregates)
+export const PortfolioSummarySchema = z.object({
+  totalValue: z.number(),
+  totalCost: z.number(),
+  totalGain: z.number(),
+  totalGainPercent: z.number(),
+  dayGain: z.number().optional(),
+  dayGainPercent: z.number().optional(),
+  cashBalance: z.number(),
+  holdingsCount: z.number(),
+  topHoldings: z.array(z.object({
+    symbol: z.string(),
+    value: z.number(),
+    percentOfPortfolio: z.number(),
+  })).optional(),
+  sectorAllocation: z.record(z.number()).optional(),
+});
+
+export type PortfolioSummary = z.infer<typeof PortfolioSummarySchema>;

@@ -9,6 +9,7 @@ import AuthPage from "@/pages/AuthPage";
 import AmandaMode from "@/pages/AmandaMode";
 import HybridMode from "@/pages/HybridMode";
 import TerminalMode from "@/pages/TerminalMode";
+import DashboardPage from "@/pages/DashboardPage";
 import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
 
@@ -48,6 +49,7 @@ function Router() {
     <Switch>
       <Route path="/" component={AuthPage} />
       <Route path="/select-mode" component={ModeSelectorPage} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route path="/amanda" component={AmandaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />
