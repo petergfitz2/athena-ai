@@ -10,7 +10,7 @@ import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
 import AthenaOrb from "@/components/AthenaOrb";
 import ChatMessage from "@/components/ChatMessage";
-import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
+import UnifiedHeader from "@/components/UnifiedHeader";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Mic, Send, Square, LayoutDashboard, List, Settings, BarChart3 } from "lucide-react";
@@ -163,70 +163,47 @@ function AmandaModeContent() {
 
   return (
     <div className="h-screen bg-black flex flex-col">
-      {/* Top Header with Mode Switcher */}
-      <div className="flex-shrink-0 px-6 py-3 flex items-center justify-between border-b border-white/10">
-        <ModeSwitcherMenu />
-        <div className="flex items-center gap-2">
-          <p className="text-xs text-muted-foreground">
-            {isRecording ? "Release to send..." : "Press Space or Cmd+K to talk"}
-          </p>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/dashboard")}
-            className="rounded-full"
-            data-testid="button-dashboard"
-          >
-            <LayoutDashboard className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/analytics")}
-            className="rounded-full"
-            data-testid="button-analytics"
-          >
-            <BarChart3 className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/trades")}
-            className="rounded-full"
-            data-testid="button-trades"
-          >
-            <List className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/settings")}
-            className="rounded-full"
-            data-testid="button-settings"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
+      {/* Unified Header */}
+      <UnifiedHeader showModeSwitcher={true} transparentBg={false} />
 
-      {/* Main Chat Container with Split Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Side - Avatar Video Area */}
-        <div className="w-[420px] flex-shrink-0 bg-gradient-to-br from-primary/10 via-black to-black border-r border-white/10 flex flex-col">
-          {/* Amanda Avatar - Video Call Style */}
-          <div className="flex-1 flex items-center justify-center p-8">
+      {/* Main Chat Container with Split Layout - Responsive */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden mt-16">
+        {/* Left Side - Avatar Video Area - Responsive width */}
+        <div className="w-full lg:w-[420px] flex-shrink-0 bg-gradient-to-br from-primary/10 via-black to-black lg:border-r border-b lg:border-b-0 border-white/10 flex flex-col">
+          {/* Athena Avatar - Video Call Style - Responsive */}
+          <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 min-h-[300px] lg:min-h-[400px]">
             <div className="relative flex flex-col items-center">
-              <AthenaOrb 
-                size="full" 
-                isListening={isRecording || voiceStatus === "listening"}
-                isSpeaking={voiceStatus === "speaking"}
-                isTyping={isLoading}
-                showStatus={false}
-              />
-              {/* Athena Text */}
-              <div className="mt-8 text-center">
-                <h1 className="text-6xl font-extralight text-foreground tracking-wider mb-2">Athena</h1>
-                <div className="px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md inline-block">
+              <div className="hidden lg:block">
+                <AthenaOrb 
+                  size="full" 
+                  isListening={isRecording || voiceStatus === "listening"}
+                  isSpeaking={voiceStatus === "speaking"}
+                  isTyping={isLoading}
+                  showStatus={false}
+                />
+              </div>
+              <div className="hidden sm:block lg:hidden">
+                <AthenaOrb 
+                  size="large" 
+                  isListening={isRecording || voiceStatus === "listening"}
+                  isSpeaking={voiceStatus === "speaking"}
+                  isTyping={isLoading}
+                  showStatus={false}
+                />
+              </div>
+              <div className="block sm:hidden">
+                <AthenaOrb 
+                  size="medium" 
+                  isListening={isRecording || voiceStatus === "listening"}
+                  isSpeaking={voiceStatus === "speaking"}
+                  isTyping={isLoading}
+                  showStatus={false}
+                />
+              </div>
+              {/* Athena Text - Responsive sizes */}
+              <div className="mt-4 sm:mt-6 lg:mt-8 text-center">
+                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extralight text-foreground tracking-wider mb-2">Athena</h1>
+                <div className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md inline-block">
                   {isRecording || voiceStatus === "listening" ? (
                     <p className="text-sm text-primary font-light animate-pulse">Listening to you...</p>
                   ) : voiceStatus === "speaking" ? (
@@ -243,8 +220,8 @@ function AmandaModeContent() {
             </div>
           </div>
 
-          {/* Portfolio Quick Stats */}
-          <div className="p-6">
+          {/* Portfolio Quick Stats - Hidden on mobile to save space */}
+          <div className="hidden lg:block p-6">
             <div className="glass rounded-[28px] p-5 space-y-4">
               <div className="text-center">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Portfolio</p>
@@ -266,9 +243,9 @@ function AmandaModeContent() {
 
         {/* Right Side - Conversation Area */}
         <div className="flex-1 flex flex-col">
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-8 py-6" data-testid="amanda-messages">
-            <div className="max-w-3xl mx-auto space-y-6">
+          {/* Messages Area - Responsive padding */}
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-testid="amanda-messages">
+            <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
               {messages.map((message) => (
                 <ChatMessage key={message.id} {...message} />
               ))}
@@ -286,10 +263,10 @@ function AmandaModeContent() {
             </div>
           </div>
 
-          {/* Input Area */}
-          <div className="flex-shrink-0 p-6 border-t border-white/10 bg-black/50 backdrop-blur-sm">
+          {/* Input Area - Responsive padding and fixed mobile positioning */}
+          <div className="flex-shrink-0 p-4 sm:p-6 border-t border-white/10 bg-black/50 backdrop-blur-sm">
             <div className="max-w-3xl mx-auto">
-              <div className="glass rounded-[28px] p-4 flex items-end gap-3">
+              <div className="glass rounded-[28px] p-3 sm:p-4 flex items-end gap-2 sm:gap-3">
                 {/* Voice Input Button */}
                 <Button
                   size="icon"
@@ -309,7 +286,7 @@ function AmandaModeContent() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your message or press the mic to speak..."
-                  className="flex-1 min-h-[48px] max-h-32 resize-none rounded-[20px] bg-transparent border-0 focus-visible:ring-0 text-foreground placeholder:text-muted-foreground/50"
+                  className="flex-1 min-h-[48px] max-h-32 resize-none rounded-[20px] bg-white/5 border-0 focus-visible:ring-0 text-foreground placeholder:text-white/40 px-4"
                   disabled={isLoading}
                   data-testid="input-amanda-message"
                 />
