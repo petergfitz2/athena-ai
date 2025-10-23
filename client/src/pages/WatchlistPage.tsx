@@ -186,7 +186,7 @@ function WatchlistPageContent() {
 
         {/* Add Stock Form */}
         {isAddingStock && (
-          <div className="glass rounded-[28px] p-8 mb-8">
+          <div className="glass rounded-[28px] p-8 mb-8 border border-white/10">
             <h3 className="text-xl font-light text-foreground mb-4">Add to Watchlist</h3>
             <div className="flex gap-4">
               <Input
@@ -223,7 +223,7 @@ function WatchlistPageContent() {
 
         {/* Watchlist Grid */}
         {watchlist.length === 0 ? (
-          <div className="glass rounded-[28px] p-16 text-center">
+          <div className="glass rounded-[28px] p-16 border border-white/10 text-center">
             <Eye className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-2xl font-light text-foreground mb-2">Your Watchlist is Empty</h3>
             <p className="text-muted-foreground mb-6">
@@ -247,7 +247,7 @@ function WatchlistPageContent() {
               return (
                 <div
                   key={item.id}
-                  className={`glass rounded-[28px] p-8 hover-elevate transition-all ${
+                  className={`glass rounded-[28px] p-8 border border-white/10 hover-elevate transition-all ${
                     updatedSymbols.has(item.symbol) ? 'animate-data-glow' : ''
                   }`}
                   data-testid={`watchlist-item-${item.symbol}`}
@@ -328,10 +328,10 @@ function WatchlistPageContent() {
                   {/* Quick Actions */}
                   <div className="flex gap-2">
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={() => setBuyModalSymbol(item.symbol)}
-                      className="rounded-full flex-1 gap-2"
+                      className="rounded-full flex-1 gap-2 font-medium"
                       data-testid={`button-buy-${item.symbol}`}
                     >
                       <ShoppingCart className="w-4 h-4" />
