@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth, ProtectedRoute } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,10 +7,12 @@ import { TrendingUp, TrendingDown, Plus, ArrowUpRight } from "lucide-react";
 import type { PortfolioSummary, Holding, MarketQuote } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import AddHoldingModal from "@/components/AddHoldingModal";
 
 function DashboardPageContent() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
@@ -136,6 +139,7 @@ function DashboardPageContent() {
                   </CardDescription>
                 </div>
                 <Button 
+                  onClick={() => setShowAddModal(true)}
                   className="gap-2 rounded-full"
                   data-testid="button-add-holding"
                 >
@@ -150,6 +154,7 @@ function DashboardPageContent() {
                       No holdings yet. Start building your portfolio.
                     </p>
                     <Button 
+                      onClick={() => setShowAddModal(true)}
                       variant="outline" 
                       className="gap-2 rounded-full"
                       data-testid="button-add-first-holding"
@@ -275,6 +280,9 @@ function DashboardPageContent() {
           </>
         )}
       </div>
+      
+      {/* Add Holding Modal */}
+      <AddHoldingModal open={showAddModal} onOpenChange={setShowAddModal} />
     </div>
   );
 }

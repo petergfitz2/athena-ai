@@ -68,8 +68,9 @@ export default function AddHoldingModal({ open, onOpenChange }: AddHoldingModalP
       form.reset();
       onOpenChange(false);
       
-      // Refresh holdings data
+      // Refresh holdings and portfolio summary data
       queryClient.invalidateQueries({ queryKey: ["/api/holdings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/portfolio/summary"] });
     } catch (error: any) {
       toast({
         title: "Error",
