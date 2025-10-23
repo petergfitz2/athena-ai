@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await res.json();
     setUser(data);
-    setLocation("/dashboard");
+    setLocation("/select-mode");
   }
 
   async function register(username: string, email: string, password: string, fullName?: string) {
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await res.json();
     setUser(data);
-    setLocation("/dashboard");
+    setLocation("/select-mode");
   }
 
   async function logout() {

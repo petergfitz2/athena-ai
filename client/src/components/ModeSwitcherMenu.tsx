@@ -1,4 +1,5 @@
 import { useMode } from "@/contexts/ModeContext";
+import { useAuth } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Layout, MessageCircle, Grid3x3, ChevronDown } from "lucide-react";
+import { Layout, MessageCircle, Grid3x3, ChevronDown, LogOut } from "lucide-react";
 
 const MODES = [
   {
@@ -37,11 +38,16 @@ const MODES = [
 
 export default function ModeSwitcherMenu() {
   const { currentMode, setMode } = useMode();
+  const { logout } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleModeChange = (modeId: "amanda" | "hybrid" | "terminal") => {
     setMode(modeId);
     setLocation(`/${modeId}`);
+  };
+
+  const handleLogout = async () => {
+    await logout();
   };
 
   const currentModeData = MODES.find((m) => m.id === currentMode) || MODES[0];
@@ -95,6 +101,17 @@ export default function ModeSwitcherMenu() {
             </DropdownMenuItem>
           );
         })}
+        <DropdownMenuSeparator className="bg-white/5" />
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="cursor-pointer text-destructive focus:text-destructive"
+          data-testid="menu-item-logout"
+        >
+          <div className="flex items-center gap-3 w-full">
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm font-medium">Logout</span>
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
