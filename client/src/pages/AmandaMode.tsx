@@ -87,8 +87,8 @@ function AmandaModeContent() {
     },
     onError: (error) => {
       toast({
-        title: "Voice Error",
-        description: error.message,
+        title: "Voice Input Error",
+        description: error.message || "Could not process voice. Please check your microphone permissions or use text input.",
         variant: "destructive",
       });
     },
@@ -168,7 +168,7 @@ function AmandaModeContent() {
         <ModeSwitcherMenu />
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">
-            Press Space or Cmd+K to talk
+            {isRecording ? "Release to send..." : "Press Space or Cmd+K to talk"}
           </p>
           <Button
             variant="ghost"

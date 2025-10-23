@@ -180,11 +180,15 @@ function SettingsPageContent() {
                 className="w-full rounded-full"
                 data-testid="button-add-funds"
               >
-                {isAddingFunds ? "Processing..." : "Add Funds"}
+                {isAddingFunds ? "Processing..." : "Add Funds (Demo)"}
               </Button>
-              <p className="text-xs text-muted-foreground">
-                Note: This is a demo. Real Stripe integration would be required for production.
-              </p>
+              <div className="p-3 rounded-[20px] bg-primary/5 border border-primary/20">
+                <p className="text-xs text-primary/80 leading-relaxed">
+                  <strong className="text-primary">Demo Mode:</strong> Funds are added instantly for testing. 
+                  Stripe payment integration is ready but awaiting API keys to enable real credit card, 
+                  debit card, and ACH bank transfers.
+                </p>
+              </div>
             </CardContent>
           </Card>
 

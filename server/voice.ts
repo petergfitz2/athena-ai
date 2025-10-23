@@ -53,35 +53,51 @@ async function transcribeAudio(audioBase64: string): Promise<string> {
     // Convert base64 to buffer
     const audioBuffer = Buffer.from(audioBase64, 'base64');
     
-    // Create a File-like object for OpenAI
-    const audioFile = new File([audioBuffer], 'audio.webm', { type: 'audio/webm' });
+    // OpenAI SDK expects a Blob-like object with stream() method
+    const blob = new Blob([audioBuffer], { type: 'audio/webm' });
+    
+    // Convert to File with proper format
+    const audioFile = new File([blob], 'audio.webm', { type: 'audio/webm' });
 
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
       model: "whisper-1",
+      language: "en", // Specify English for better accuracy
     });
 
+    if (!transcription || !transcription.text) {
+      throw new Error("No transcription received from Whisper");
+    }
+
     return transcription.text;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Whisper transcription error:", error);
-    throw new Error("Failed to transcribe audio");
+    console.error("Error details:", error.response?.data || error.message);
+    throw new Error(`Voice transcription failed: ${error.message || "Unknown error"}`);
   }
 }
 
 async function generateSpeech(text: string): Promise<string> {
   try {
+    // Truncate very long responses for TTS
+    const textToSpeak = text.length > 500 
+      ? text.substring(0, 497) + "..." 
+      : text;
+
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",
       voice: "nova", // Professional female voice for Amanda
-      input: text,
+      input: textToSpeak,
       speed: 1.0,
     });
 
     // Convert to buffer then base64
     const buffer = Buffer.from(await mp3.arrayBuffer());
     return buffer.toString('base64');
-  } catch (error) {
+  } catch (error: any) {
     console.error("TTS generation error:", error);
-    throw new Error("Failed to generate speech");
+    console.error("Error details:", error.response?.data || error.message);
+    // Don't throw - just return empty string if TTS fails (text response still works)
+    return "";
   }
 }

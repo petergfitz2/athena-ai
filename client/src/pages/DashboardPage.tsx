@@ -95,6 +95,12 @@ function DashboardPageContent() {
           <p className="text-lg text-muted-foreground font-light">
             Your investment overview and performance
           </p>
+          <div className="mt-4 p-3 rounded-[20px] bg-primary/5 border border-primary/20 max-w-3xl">
+            <p className="text-xs text-primary/80 leading-relaxed">
+              <strong className="text-primary">Demo Market Data:</strong> Stock prices and market indices are simulated for testing. 
+              Real-time data from Alpha Vantage will be available once API key is configured.
+            </p>
+          </div>
         </div>
 
         {isLoading ? (
