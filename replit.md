@@ -138,11 +138,14 @@ Athena provides a conversational interface for investment advice and portfolio m
 ## Recent Changes (October 23, 2025)
 
 ### Latest Updates: Enhanced Functionality & UX ✨
-1. **Amanda Avatar Redesign**:
-   - Replaced generated avatar with sophisticated stock photo
-   - Black & white grayscale aesthetic for luxury feel
-   - Portrait-style (3:4 aspect ratio) instead of circular
-   - Minimal voice indicators, rounded-[28px] borders
+1. **Amanda Avatar - Professional Businesswoman**:
+   - AI-generated professional corporate portrait
+   - Black & white aesthetic matching reference design
+   - Professional businesswoman in black blazer over white blouse
+   - Portrait-style (3:4 aspect ratio) with luxury borders (rounded-[28px])
+   - Grayscale filter, elegant delicate jewelry, center-parted hair
+   - Sophisticated, modern corporate headshot style
+   - Minimal voice indicators during listening/speaking states
 
 2. **Interactive News/Intelligence System**:
    - Created NewsDetailModal component with full article details
