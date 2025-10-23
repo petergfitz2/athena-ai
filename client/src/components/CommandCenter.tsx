@@ -333,6 +333,23 @@ export default function CommandCenter() {
     setTradeModalOpen(true);
   };
   
+  // Common greetings and conversational words that should NOT be treated as tickers
+  const COMMON_GREETINGS = new Set([
+    'HI', 'HELLO', 'HEY', 'BYE', 'GOODBYE', 
+    'THANKS', 'THX', 'OK', 'OKAY', 'YES', 'NO', 
+    'YEP', 'NOPE', 'SURE', 'MAYBE', 'PLEASE',
+    'SORRY', 'WOW', 'OH', 'AH', 'UM', 'UH',
+    'COOL', 'NICE', 'GREAT', 'GOOD', 'BAD',
+    'UP', 'DOWN', 'IN', 'OUT', 'ON', 'OFF',
+    'GO', 'STOP', 'WAIT', 'RUN', 'HELP',
+    'ASK', 'TELL', 'SHOW', 'SEE', 'LOOK'
+  ]);
+
+  // Function to check if a term is a greeting or common word
+  const isGreetingOrCommonWord = (term: string): boolean => {
+    return COMMON_GREETINGS.has(term.toUpperCase());
+  };
+  
   // Handle ticker search - also send to AI
   const handleTickerSearch = async (searchTerm: string) => {
     const term = searchTerm.trim().toUpperCase();
@@ -356,7 +373,18 @@ export default function CommandCenter() {
     const mappedTicker = companyMappings[term];
     const finalTicker = mappedTicker || term;
     
-    // If it looks like a valid ticker or company name
+    // First check if it's a common greeting or conversational word - these should go to AI chat
+    if (isGreetingOrCommonWord(term) && !mappedTicker) {
+      // Send to AI chat instead of treating as ticker
+      if (!sidebarOpen) {
+        setSidebarOpen(true);
+      }
+      handleSendMessage(searchTerm);
+      setTickerSearch("");
+      return;
+    }
+    
+    // If it looks like a valid ticker or company name (but NOT a greeting)
     if (mappedTicker || (term.length >= 1 && term.length <= 5 && /^[A-Z]+$/.test(term))) {
       // Open trade modal
       handleOpenTradeModal("buy", finalTicker);
@@ -476,7 +504,14 @@ export default function CommandCenter() {
                 if (e.key === "Enter" && searchInput.trim()) {
                   // Check if it looks like a ticker
                   const trimmed = searchInput.trim().toUpperCase();
-                  if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
+                  // First check if it's a common greeting - send to chat
+                  if (isGreetingOrCommonWord(trimmed)) {
+                    // Send to AI chat
+                    if (!sidebarOpen) setSidebarOpen(true);
+                    handleSendMessage(searchInput);
+                    setSearchInput("");
+                  } else if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
+                    // It's a ticker pattern and NOT a greeting
                     handleTickerSearch(trimmed);
                     setSearchInput("");
                   } else {
@@ -499,7 +534,12 @@ export default function CommandCenter() {
                 onClick={() => {
                   if (searchInput.trim()) {
                     const trimmed = searchInput.trim().toUpperCase();
-                    if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
+                    // First check if it's a common greeting - send to chat
+                    if (isGreetingOrCommonWord(trimmed)) {
+                      if (!sidebarOpen) setSidebarOpen(true);
+                      handleSendMessage(searchInput);
+                    } else if (trimmed.length <= 5 && /^[A-Z]+$/.test(trimmed)) {
+                      // It's a ticker pattern and NOT a greeting
                       handleTickerSearch(trimmed);
                     } else {
                       if (!sidebarOpen) setSidebarOpen(true);
