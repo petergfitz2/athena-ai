@@ -23,6 +23,11 @@ function SettingsPageContent() {
     pushNotifications: false,
   });
 
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+  });
+
   const handleUpdateProfile = async () => {
     setIsUpdating(true);
     try {
@@ -76,6 +81,48 @@ function SettingsPageContent() {
       toast({
         title: "Error",
         description: error.message || "Failed to process deposit",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!passwords.currentPassword || !passwords.newPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all password fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwords.newPassword.length < 6) {
+      toast({
+        title: "Invalid Password",
+        description: "New password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      await apiJson("PATCH", "/api/user/password", {
+        currentPassword: passwords.currentPassword,
+        newPassword: passwords.newPassword,
+      });
+      
+      toast({
+        title: "Password Changed",
+        description: "Your password has been updated successfully",
+      });
+      setPasswords({ currentPassword: "", newPassword: "" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to change password",
         variant: "destructive",
       });
     } finally {
@@ -243,6 +290,8 @@ function SettingsPageContent() {
                 <Input
                   id="currentPassword"
                   type="password"
+                  value={passwords.currentPassword}
+                  onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
                   placeholder="••••••••"
                   className="rounded-[28px] bg-white/5 border-white/10 text-foreground mt-2"
                   data-testid="input-current-password"
@@ -253,17 +302,21 @@ function SettingsPageContent() {
                 <Input
                   id="newPassword"
                   type="password"
+                  value={passwords.newPassword}
+                  onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                   placeholder="••••••••"
                   className="rounded-[28px] bg-white/5 border-white/10 text-foreground mt-2"
                   data-testid="input-new-password"
                 />
               </div>
               <Button
+                onClick={handleChangePassword}
+                disabled={isUpdating || !passwords.currentPassword || !passwords.newPassword}
                 variant="outline"
                 className="w-full rounded-full"
                 data-testid="button-change-password"
               >
-                Change Password
+                {isUpdating ? "Changing..." : "Change Password"}
               </Button>
             </CardContent>
           </Card>

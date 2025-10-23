@@ -8,6 +8,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { MarketQuote } from "@shared/schema";
 import Navigation from "@/components/Navigation";
+import ExecuteTradeModal from "@/components/ExecuteTradeModal";
+import { useLocation } from "wouter";
 
 interface WatchlistItem {
   id: string;
@@ -19,6 +21,7 @@ function WatchlistPageContent() {
   const { toast } = useToast();
   const [newSymbol, setNewSymbol] = useState("");
   const [isAddingStock, setIsAddingStock] = useState(false);
+  const [buyModalSymbol, setBuyModalSymbol] = useState<string | null>(null);
 
   // Fetch watchlist
   const { data: watchlist = [], isLoading: watchlistLoading, error: watchlistError } = useQuery<WatchlistItem[]>({
@@ -284,19 +287,12 @@ function WatchlistPageContent() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => setBuyModalSymbol(item.symbol)}
                       className="rounded-full flex-1 gap-2"
                       data-testid={`button-buy-${item.symbol}`}
                     >
                       <ShoppingCart className="w-4 h-4" />
                       Buy
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full flex-1"
-                      data-testid={`button-details-${item.symbol}`}
-                    >
-                      Details
                     </Button>
                   </div>
                 </div>
@@ -305,7 +301,17 @@ function WatchlistPageContent() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+
+      {/* Buy Modal */}
+      {buyModalSymbol && (
+        <ExecuteTradeModal
+          isOpen={true}
+          onClose={() => setBuyModalSymbol(null)}
+          mode="buy"
+          prefilledSymbol={buyModalSymbol}
+        />
+      )}
     </div>
   );
 }
