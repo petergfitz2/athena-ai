@@ -564,7 +564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/market/quotes", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const holdings = await storage.getHoldingsByUserId(user.id);
+      const holdings = await storage.getUserHoldings(user.id);
       const symbols = holdings.map(h => h.symbol);
       
       const quotes = await getBatchQuotes(symbols);
@@ -610,7 +610,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/portfolio/summary", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const holdings = await storage.getHoldingsByUserId(user.id);
+      const holdings = await storage.getUserHoldings(user.id);
       
       if (holdings.length === 0) {
         return res.json({

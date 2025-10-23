@@ -3,20 +3,22 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 export type InterfaceMode = "amanda" | "hybrid" | "terminal";
 
 interface ModeContextType {
-  currentMode: InterfaceMode;
+  currentMode: InterfaceMode | null;
   setMode: (mode: InterfaceMode) => void;
 }
 
 const ModeContext = createContext<ModeContextType | undefined>(undefined);
 
 export function ModeProvider({ children }: { children: ReactNode }) {
-  const [currentMode, setCurrentMode] = useState<InterfaceMode>(() => {
+  const [currentMode, setCurrentMode] = useState<InterfaceMode | null>(() => {
     const saved = localStorage.getItem("athena-interface-mode");
-    return (saved as InterfaceMode) || "hybrid";
+    return (saved as InterfaceMode) || null;
   });
 
   useEffect(() => {
-    localStorage.setItem("athena-interface-mode", currentMode);
+    if (currentMode) {
+      localStorage.setItem("athena-interface-mode", currentMode);
+    }
   }, [currentMode]);
 
   const setMode = (mode: InterfaceMode) => {

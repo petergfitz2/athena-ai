@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import amandaImage from "@assets/stock_images/professional_busines_b0be43f5.jpg";
+import amandaImage from "@assets/stock_images/elegant_mature_busin_6e49cd06.jpg";
 
 interface AmandaAvatarProps {
   size?: "small" | "medium" | "large" | "full";
