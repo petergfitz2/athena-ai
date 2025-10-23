@@ -6,7 +6,7 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useVoice } from "@/hooks/useVoice";
 import { useMode } from "@/contexts/ModeContext";
 import { useModeSuggestion } from "@/hooks/useConversationContext";
-import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
+import UnifiedHeader from "@/components/UnifiedHeader";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import NewsDetailModal from "@/components/NewsDetailModal";
 import ChatMessage from "@/components/ChatMessage";
@@ -179,59 +179,21 @@ function TerminalModeContent() {
 
   return (
     <div className="h-screen bg-black overflow-hidden flex flex-col">
-      {/* Header - Compact */}
-      <div className="flex-shrink-0 border-b border-white/10 px-6 py-3">
+      {/* Unified Header */}
+      <UnifiedHeader showModeSwitcher={true} transparentBg={false} />
+
+      {/* Portfolio Stats Bar - Responsive */}
+      <div className="flex-shrink-0 border-b border-white/10 px-4 sm:px-6 py-2 sm:py-3 mt-16">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-extralight text-foreground">Terminal</h1>
-            <ModeSwitcherMenu />
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/dashboard")}
-                className="rounded-full"
-                data-testid="button-dashboard"
-              >
-                <LayoutDashboard className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/analytics")}
-                className="rounded-full"
-                data-testid="button-analytics"
-              >
-                <BarChart3 className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/trades")}
-                className="rounded-full"
-                data-testid="button-trades"
-              >
-                <List className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/settings")}
-                className="rounded-full"
-                data-testid="button-settings"
-              >
-                <Settings className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-extralight text-foreground">Terminal</h1>
+          <div className="flex items-center gap-3 sm:gap-6">
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Portfolio</p>
-              <p className="text-lg font-light text-foreground">${portfolioValue.toLocaleString()}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Portfolio</p>
+              <p className="text-sm sm:text-lg font-light text-foreground">${portfolioValue.toLocaleString()}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Today</p>
-              <p className={`text-lg font-light ${dailyChange >= 0 ? 'text-success' : 'text-destructive'}`}>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Today</p>
+              <p className={`text-sm sm:text-lg font-light ${dailyChange >= 0 ? 'text-success' : 'text-destructive'}`}>
                 {dailyChange >= 0 ? '+' : ''}{dailyChangePercent}%
               </p>
             </div>
@@ -239,8 +201,8 @@ function TerminalModeContent() {
         </div>
       </div>
 
-      {/* Multi-Panel Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 overflow-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
+      {/* Multi-Panel Layout - Responsive grid */}
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4 overflow-auto">
         {/* Markets Panel */}
         <div className="glass rounded-[20px] p-4 overflow-auto">
           <h2 className="text-lg font-light text-foreground mb-4 flex items-center gap-2">
@@ -480,7 +442,7 @@ function TerminalModeContent() {
                 }
               }}
               placeholder="Any good buying opportunities?"
-              className="flex-1 h-10 rounded-full bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground"
+              className="flex-1 h-10 rounded-full bg-white/10 border-white/20 text-foreground placeholder:text-white/40 px-4"
               disabled={isLoading}
               data-testid="input-terminal-message"
             />
