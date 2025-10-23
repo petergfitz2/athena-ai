@@ -10,7 +10,14 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   fullName: text("full_name"),
+  accountBalance: decimal("account_balance", { precision: 18, scale: 2 }).notNull().default('0'),
+  profileImageUrl: text("profile_image_url"),
+  phoneNumber: text("phone_number"),
+  preferredMode: text("preferred_mode").default('amanda'),
+  emailNotifications: boolean("email_notifications").notNull().default(true),
+  pushNotifications: boolean("push_notifications").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -20,8 +27,55 @@ export const insertUserSchema = createInsertSchema(users).pick({
   fullName: true,
 });
 
+export const updateUserProfileSchema = z.object({
+  fullName: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  preferredMode: z.string().optional(),
+  emailNotifications: z.boolean().optional(),
+  pushNotifications: z.boolean().optional(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
 export type User = typeof users.$inferSelect;
+
+// Password reset tokens
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
+// Account transactions (deposits, withdrawals)
+export const accountTransactions = pgTable("account_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: text("type").notNull(), // 'deposit', 'withdrawal', 'trade_buy', 'trade_sell'
+  amount: decimal("amount", { precision: 18, scale: 2 }).notNull(),
+  status: text("status").notNull().default('pending'), // 'pending', 'completed', 'failed'
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertAccountTransactionSchema = createInsertSchema(accountTransactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertAccountTransaction = z.infer<typeof insertAccountTransactionSchema>;
+export type AccountTransaction = typeof accountTransactions.$inferSelect;
 
 // Portfolio holdings
 export const holdings = pgTable("holdings", {
