@@ -8,12 +8,19 @@ import { useVoice } from "@/hooks/useVoice";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
+import WelcomeTutorial from "@/components/WelcomeTutorial";
+import QuickStartGuide from "@/components/QuickStartGuide";
+import DemoModeBanner from "@/components/DemoModeBanner";
+import KeyboardShortcutsGuide from "@/components/KeyboardShortcutsGuide";
+import AnimatedCounter, { formatCurrency, formatPercent } from "@/components/AnimatedCounter";
+import { LoadingMessage, MarketDataSkeleton, PortfolioSkeleton } from "@/components/LoadingSkeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -220,25 +227,38 @@ export default function CommandCenter() {
   }));
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Header with Avatar and Greeting */}
-      <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-[1600px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
-              <div>
-                <h1 className="text-2xl font-extralight text-foreground">
-                  {getGreeting()}
-                </h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <marketStatus.icon className="w-3 h-3" />
-                  <span className={cn("text-sm", marketStatus.color)}>
-                    {marketStatus.text}
-                  </span>
+    <TooltipProvider>
+      <div className="min-h-screen bg-black">
+        {/* Welcome Tutorial */}
+        <WelcomeTutorial />
+        
+        {/* Quick Start Guide */}
+        <QuickStartGuide />
+        
+        {/* Demo Mode Banner */}
+        <DemoModeBanner />
+        
+        {/* Keyboard Shortcuts Guide */}
+        <KeyboardShortcutsGuide />
+        
+        {/* Header with Avatar and Greeting */}
+        <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10">
+          <div className="max-w-[1600px] mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
+                <div>
+                  <h1 className="text-2xl font-extralight text-foreground">
+                    {getGreeting()}
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1">
+                    <marketStatus.icon className="w-3 h-3" />
+                    <span className={cn("text-sm", marketStatus.color)}>
+                      {marketStatus.text}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
             
             <div className="flex items-center gap-3">
               <Button
@@ -292,7 +312,11 @@ export default function CommandCenter() {
             <CardContent className="space-y-4">
               <div>
                 <p className="text-3xl font-extralight text-foreground">
-                  ${portfolioSummary?.totalValue.toLocaleString() || "0"}
+                  <AnimatedCounter 
+                    value={portfolioSummary?.totalValue || 0} 
+                    formatValue={formatCurrency}
+                    duration={1500}
+                  />
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   {(portfolioSummary?.dayGainPercent || 0) >= 0 ? (
@@ -605,5 +629,6 @@ export default function CommandCenter() {
         </div>
       </div>
     </div>
+    </TooltipProvider>
   );
 }

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ModeProvider, useMode } from "@/contexts/ModeContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthPage from "@/pages/AuthPage";
 import CommandCenter from "@/components/CommandCenter";
 import PortfolioPage from "@/pages/PortfolioPage";
@@ -80,18 +81,20 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ModeProvider>
-          <TooltipProvider>
-            <div className="dark">
-              <Toaster />
-              <Router />
-            </div>
-          </TooltipProvider>
-        </ModeProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ModeProvider>
+            <TooltipProvider>
+              <div className="dark">
+                <Toaster />
+                <Router />
+              </div>
+            </TooltipProvider>
+          </ModeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
