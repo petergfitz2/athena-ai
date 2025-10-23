@@ -59,16 +59,33 @@ export default function AmandaAvatar({
           className="w-full h-full object-cover grayscale"
         />
 
-        {/* Voice activity visualization - minimal */}
+        {/* Voice activity visualization - enhanced waveform */}
         {(isListening || isSpeaking) && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-end gap-1.5">
+            {[...Array(7)].map((_, i) => (
+              <div
+                key={i}
+                className={`w-1 bg-gradient-to-t from-primary to-primary/30 rounded-full transition-all ${
+                  isSpeaking ? 'animate-waveform' : 'animate-waveform-fast'
+                }`}
+                style={{
+                  animationDelay: `${i * 100}ms`,
+                  minHeight: '4px',
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Thinking indicator */}
+        {isTyping && !isListening && !isSpeaking && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1">
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="w-0.5 bg-primary/60 rounded-full animate-pulse"
+                className="w-2 h-2 bg-primary rounded-full animate-thinking"
                 style={{
-                  height: `${Math.random() * 16 + 8}px`,
-                  animationDelay: `${i * 150}ms`,
+                  animationDelay: `${i * 0.2}s`,
                 }}
               />
             ))}
