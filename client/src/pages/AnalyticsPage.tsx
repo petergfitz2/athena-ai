@@ -8,7 +8,6 @@ import RiskInsights from "@/components/RiskInsights";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
-import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 
 interface CorrelationData {
   pairs: Array<{
@@ -63,7 +62,6 @@ function AnalyticsPageContent() {
     <div className="min-h-screen bg-black">
       <Navigation />
       <NavigationBreadcrumbs />
-      <FloatingAthenaOrb />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div>

@@ -12,7 +12,6 @@ import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import { useLocation } from "wouter";
-import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 
 interface WatchlistItem {
   id: string;
@@ -158,7 +157,6 @@ function WatchlistPageContent() {
     <div className="min-h-screen bg-black">
       <Navigation />
       <NavigationBreadcrumbs />
-      <FloatingAthenaOrb />
       <div className="px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         <div className="max-w-[1600px] mx-auto">
         {/* Header */}

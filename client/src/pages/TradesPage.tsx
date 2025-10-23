@@ -11,7 +11,6 @@ import type { Trade } from "@shared/schema";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
-import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 
 function TradesPageContent() {
   const { toast } = useToast();
@@ -129,7 +128,6 @@ function TradesPageContent() {
     <div className="min-h-screen bg-black text-foreground">
       <Navigation />
       <NavigationBreadcrumbs />
-      <FloatingAthenaOrb />
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         {/* Header */}
         <div className="mb-12">
