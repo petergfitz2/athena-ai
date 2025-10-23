@@ -190,7 +190,7 @@ function HybridModeContent() {
       <NavigationBreadcrumbs />
 
       {/* Main Container - Responsive */}
-      <div className={`flex-1 mt-16 flex flex-col lg:flex-row transition-all duration-300 ${chatExpanded ? 'lg:mr-[450px]' : 'mr-0'}`}>
+      <div className={`flex-1 flex flex-col lg:flex-row transition-all duration-300 ${chatExpanded ? 'lg:mr-[450px]' : 'mr-0'}`}>
         {/* Sub Header with View Selector - Mobile responsive */}
         <div className="w-full border-b border-white/10 px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">

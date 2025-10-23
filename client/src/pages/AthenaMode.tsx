@@ -24,7 +24,7 @@ type Message = {
   timestamp: string;
 };
 
-function AmandaModeContent() {
+function AthenaModeContent() {
   const { toast } = useToast();
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
@@ -46,7 +46,7 @@ function AmandaModeContent() {
 
   // Set current mode
   useEffect(() => {
-    setMode("amanda");
+    setMode("athena");
     setModeReady(true);
   }, [setMode]);
 
@@ -372,10 +372,10 @@ function AmandaModeContent() {
   );
 }
 
-export default function AmandaMode() {
+export default function AthenaMode() {
   return (
     <ProtectedRoute>
-      <AmandaModeContent />
+      <AthenaModeContent />
     </ProtectedRoute>
   );
 }

@@ -62,15 +62,15 @@ const faqCategories = [
     questions: [
       {
         q: "What are the three interface modes?",
-        a: "Amanda Mode is voice-first for quick updates, Hybrid Mode combines dashboard trading with AI assistance, and Terminal Mode offers multi-panel institutional analysis. Switch between them using Cmd/Ctrl + 1/2/3.",
+        a: "Athena Mode is voice-first for quick updates, Hybrid Mode combines dashboard trading with AI assistance, and Terminal Mode offers multi-panel institutional analysis. Switch between them using Cmd/Ctrl + 1/2/3.",
       },
       {
         q: "How does the AI assistance work?",
-        a: "Amanda uses GPT-4 to provide investment advice, answer questions, and generate trade suggestions. She has access to your portfolio context and real-time market data to provide personalized insights.",
+        a: "Athena uses GPT-4 to provide investment advice, answer questions, and generate trade suggestions. She has access to your portfolio context and real-time market data to provide personalized insights.",
       },
       {
         q: "What is the Adaptive Intelligence System?",
-        a: "The platform analyzes your conversation patterns and suggests the optimal interface mode. Quick questions trigger Amanda Mode recommendations, while deep analysis prompts suggest Terminal Mode.",
+        a: "The platform analyzes your conversation patterns and suggests the optimal interface mode. Quick questions trigger Athena Mode recommendations, while deep analysis prompts suggest Terminal Mode.",
       },
       {
         q: "Can I use voice commands?",

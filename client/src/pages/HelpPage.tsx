@@ -32,9 +32,9 @@ const helpResources = [
   },
   {
     icon: MessageCircle,
-    title: "Ask Amanda",
+    title: "Ask Athena",
     description: "Get instant answers from our AI assistant",
-    link: "/amanda",
+    link: "/athena",
     cta: "Chat Now",
   },
 ];
@@ -207,7 +207,7 @@ function HelpContent() {
                   Understanding the Three Interface Modes
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Learn when to use Amanda, Hybrid, and Terminal modes
+                  Learn when to use Athena, Hybrid, and Terminal modes
                 </p>
               </div>
             </Link>
@@ -217,7 +217,7 @@ function HelpContent() {
                   Using AI Trade Suggestions
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Get personalized investment recommendations from Amanda
+                  Get personalized investment recommendations from Athena
                 </p>
               </div>
             </Link>

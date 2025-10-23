@@ -29,7 +29,7 @@ const tutorials = [
       {
         title: "Using Voice Commands",
         duration: "4 min",
-        description: "Control your portfolio using natural language with Amanda",
+        description: "Control your portfolio using natural language with Athena",
         topics: ["Voice trading", "Portfolio queries", "Market insights"],
       },
     ],

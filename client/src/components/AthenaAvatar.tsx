@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import amandaImage from "@assets/generated_images/Professional_businesswoman_corporate_portrait_7db86b86.png";
 
-interface AmandaAvatarProps {
+interface AthenaAvatarProps {
   size?: "small" | "medium" | "large" | "full";
   isListening?: boolean;
   isSpeaking?: boolean;
   isTyping?: boolean;
 }
 
-export default function AmandaAvatar({ 
+export default function AthenaAvatar({ 
   size = "large", 
   isListening = false,
   isSpeaking = false,
   isTyping = false
-}: AmandaAvatarProps) {
+}: AthenaAvatarProps) {
   const [breatheScale, setBreatheScale] = useState(1);
 
   // Subtle breathing animation
@@ -38,7 +38,7 @@ export default function AmandaAvatar({
     <div 
       className={`relative ${sizeClasses[size]} transition-transform duration-1000`}
       style={{ transform: `scale(${breatheScale})` }}
-      data-testid="amanda-avatar"
+      data-testid="athena-avatar"
     >
       {/* Outer glow when listening */}
       {isListening && (
@@ -52,10 +52,10 @@ export default function AmandaAvatar({
       
       {/* Avatar container - portrait style */}
       <div className="relative w-full h-full rounded-[28px] overflow-hidden border border-white/10 shadow-2xl bg-gradient-to-br from-black via-black to-primary/5">
-        {/* Sophisticated Amanda portrait */}
+        {/* Sophisticated Athena portrait */}
         <img 
           src={amandaImage} 
-          alt="Amanda - Your AI Investment Assistant" 
+          alt="Athena - Your AI Investment Assistant" 
           className="w-full h-full object-cover grayscale"
         />
 
@@ -98,7 +98,7 @@ export default function AmandaAvatar({
         <div className="mt-6 text-center">
           {isSpeaking && (
             <p className="text-accent font-light text-lg">
-              Amanda is speaking...
+              Athena is speaking...
             </p>
           )}
           {isListening && !isSpeaking && (

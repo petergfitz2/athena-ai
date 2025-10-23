@@ -6,20 +6,20 @@ import { X, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ModeSuggestionProps {
-  recommendedMode: "amanda" | "hybrid" | "terminal";
+  recommendedMode: "athena" | "hybrid" | "terminal";
   reason: string;
   onDismiss: () => void;
 }
 
 const MODE_LABELS = {
-  amanda: "Amanda Mode",
+  athena: "Athena Mode",
   hybrid: "Hybrid Mode",
   terminal: "Terminal Mode",
 };
 
 const MODE_DESCRIPTIONS = {
-  amanda: "Voice-first conversational interface for quick updates",
-  hybrid: "Desktop trading with portfolio dashboard and Amanda assistant",
+  athena: "Voice-first conversational interface for quick updates",
+  hybrid: "Desktop trading with portfolio dashboard and Athena assistant",
   terminal: "Multi-panel institutional analysis for deep research",
 };
 

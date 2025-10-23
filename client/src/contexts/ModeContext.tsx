@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-export type InterfaceMode = "amanda" | "hybrid" | "terminal";
+export type InterfaceMode = "athena" | "hybrid" | "terminal";
 
 interface ModeContextType {
   currentMode: InterfaceMode | null;

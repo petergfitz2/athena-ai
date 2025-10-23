@@ -26,7 +26,7 @@ export default function NavigationBreadcrumbs() {
       "/trades": "Trades",
       "/analytics": "Analytics",
       "/settings": "Settings",
-      "/amanda": "Amanda Mode",
+      "/athena": "Athena Mode",
       "/hybrid": "Hybrid Mode",
       "/terminal": "Terminal Mode",
       "/tutorials": "Tutorials",
@@ -41,7 +41,7 @@ export default function NavigationBreadcrumbs() {
     const breadcrumbs: BreadcrumbRoute[] = [];
 
     // Always start with Dashboard or Mode as root
-    if (["/amanda", "/hybrid", "/terminal"].includes(location)) {
+    if (["/athena", "/hybrid", "/terminal"].includes(location)) {
       breadcrumbs.push({ label: getPageTitle(location) });
     } else {
       // Add Dashboard as home

@@ -134,7 +134,7 @@ export function useVoice({ onTranscript, onResponse, onError }: UseVoiceOptions 
     }
   };
 
-  // Play audio response from Amanda
+  // Play audio response from Athena
   const playAudioResponse = async (audioBase64: string) => {
     try {
       setStatus("speaking");

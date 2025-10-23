@@ -4,8 +4,8 @@ import { MessageCircle, LayoutDashboard, Terminal } from "lucide-react";
 
 const modes: { value: InterfaceMode; label: string; icon: any; description: string }[] = [
   {
-    value: "amanda",
-    label: "Amanda",
+    value: "athena",
+    label: "Athena",
     icon: MessageCircle,
     description: "Voice-first conversational interface",
   },
@@ -13,7 +13,7 @@ const modes: { value: InterfaceMode; label: string; icon: any; description: stri
     value: "hybrid",
     label: "Hybrid",
     icon: LayoutDashboard,
-    description: "Dashboard + Mini Amanda",
+    description: "Dashboard + Mini Athena",
   },
   {
     value: "terminal",

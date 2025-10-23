@@ -197,7 +197,7 @@ function TradesPageContent() {
               <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground font-light mb-2">No {filter === "all" ? "" : filter} trades</p>
               <p className="text-sm text-muted-foreground">
-                Ask Amanda for trade suggestions to get started
+                Ask Athena for trade suggestions to get started
               </p>
             </CardContent>
           </Card>

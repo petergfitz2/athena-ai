@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ModeProvider, useMode } from "@/contexts/ModeContext";
 import AuthPage from "@/pages/AuthPage";
-import AmandaMode from "@/pages/AmandaMode";
+import AthenaMode from "@/pages/AthenaMode";
 import HybridMode from "@/pages/HybridMode";
 import TerminalMode from "@/pages/TerminalMode";
 import DashboardPage from "@/pages/DashboardPage";
@@ -60,7 +60,7 @@ function Router() {
       <Route path="/settings" component={SettingsPage} />
       <Route path="/trades" component={TradesPage} />
       <Route path="/analytics" component={AnalyticsPage} />
-      <Route path="/amanda" component={AmandaMode} />
+      <Route path="/athena" component={AthenaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />
       <Route path="/tutorials" component={TutorialsPage} />

@@ -316,15 +316,15 @@ export class ConversationAnalyzer {
     hurriedScore: number,
     analyticalScore: number,
     conversationalScore: number
-  ): 'amanda' | 'hybrid' | 'terminal' {
+  ): 'athena' | 'hybrid' | 'terminal' {
     // Terminal mode for high analytical needs
     if (analyticalScore > 60 && analyticalScore > hurriedScore && analyticalScore > conversationalScore) {
       return 'terminal';
     }
 
-    // Amanda mode for conversational or hurried contexts
+    // Athena mode for conversational or hurried contexts
     if (conversationalScore > 50 || hurriedScore > 50) {
-      return 'amanda';
+      return 'athena';
     }
 
     // Hybrid as balanced default

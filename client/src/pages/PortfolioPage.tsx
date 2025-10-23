@@ -4,11 +4,12 @@ import PortfolioCard from "@/components/PortfolioCard";
 import { ProtectedRoute } from "@/lib/auth";
 import AddHoldingModal from "@/components/AddHoldingModal";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, MessageCircle, ShoppingCart } from "lucide-react";
 import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
+import type { PortfolioSummary } from "@shared/schema";
 
 interface Holding {
   id: string;
@@ -20,9 +21,15 @@ interface Holding {
 function PortfolioPageContent() {
   const [showAddModal, setShowAddModal] = useState(false);
   
-  const { data: holdings = [], isLoading } = useQuery<Holding[]>({
+  const { data: holdings = [], isLoading: holdingsLoading } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
   });
+
+  const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
+    queryKey: ['/api/portfolio/summary'],
+  });
+
+  const isLoading = holdingsLoading || summaryLoading;
 
   // Mock current prices - in a real app, this would come from a market data API
   const getMockPrice = (symbol: string) => {
@@ -37,28 +44,18 @@ function PortfolioPageContent() {
     return prices[symbol] || 100;
   };
 
-  const calculateMetrics = () => {
-    if (!holdings.length) return { totalValue: 0, totalChange: 0, totalChangePercent: 0 };
+  // Use summary API data if available, otherwise fallback to calculated values
+  const totalValue = summary?.totalValue || 0;
+  const totalGain = summary?.totalGain || 0;
+  const totalGainPercent = summary?.totalGainPercent || 0;
 
-    let totalValue = 0;
-    let totalCost = 0;
-
-    holdings.forEach((h) => {
-      const currentPrice = getMockPrice(h.symbol);
-      const quantity = parseFloat(h.quantity);
-      const avgCost = parseFloat(h.averageCost);
-      
-      totalValue += currentPrice * quantity;
-      totalCost += avgCost * quantity;
-    });
-
-    const totalChange = totalValue - totalCost;
-    const totalChangePercent = totalCost > 0 ? (totalChange / totalCost) * 100 : 0;
-
-    return { totalValue, totalChange, totalChangePercent };
+  // Handle chat with Athena
+  const handleChatWithAthena = () => {
+    const orbButton = document.querySelector('[data-testid="button-floating-athena"]') as HTMLElement;
+    if (orbButton) {
+      orbButton.click();
+    }
   };
-
-  const { totalValue, totalChange, totalChangePercent } = calculateMetrics();
 
   if (isLoading) {
     return (
@@ -113,18 +110,18 @@ function PortfolioPageContent() {
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-4 font-light uppercase tracking-wider">
-                Total Change
+                Total Gain
               </p>
-              <p className={`text-3xl md:text-4xl lg:text-5xl font-extralight ${totalChange >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                {totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}
+              <p className={`text-3xl md:text-4xl lg:text-5xl font-extralight ${totalGain >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                {totalGain >= 0 ? '+' : ''}${Math.abs(totalGain).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-4 font-light uppercase tracking-wider">
                 Performance
               </p>
-              <p className={`text-3xl md:text-4xl lg:text-5xl font-extralight ${totalChangePercent >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                {totalChangePercent >= 0 ? '+' : ''}{totalChangePercent.toFixed(2)}%
+              <p className={`text-3xl md:text-4xl lg:text-5xl font-extralight ${totalGainPercent >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                {totalGainPercent >= 0 ? '+' : ''}{totalGainPercent.toFixed(2)}%
               </p>
             </div>
           </div>
@@ -134,10 +131,31 @@ function PortfolioPageContent() {
         {holdings.length === 0 ? (
           <div className="glass rounded-[28px] p-12 md:p-16 lg:p-20">
             <div className="text-center">
-              <p className="text-foreground text-2xl md:text-3xl font-extralight mb-4">No holdings yet</p>
-              <p className="text-muted-foreground font-light text-base md:text-lg">
-                Start by talking to Athena about investment opportunities
+              <p className="text-foreground text-2xl md:text-3xl font-extralight mb-4">Your portfolio is ready to grow</p>
+              <p className="text-muted-foreground font-light text-base md:text-lg mb-8">
+                Start building your investment portfolio with Athena's guidance
               </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={handleChatWithAthena}
+                  size="lg"
+                  className="rounded-full bg-primary hover:bg-primary/90 px-8"
+                  data-testid="button-portfolio-chat"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Chat with Athena
+                </Button>
+                <Button
+                  onClick={() => setShowAddModal(true)}
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full px-8"
+                  data-testid="button-portfolio-start"
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Start Investing
+                </Button>
+              </div>
             </div>
           </div>
         ) : (

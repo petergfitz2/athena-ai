@@ -14,8 +14,8 @@ import { Layout, MessageCircle, Grid3x3, ChevronDown, LogOut } from "lucide-reac
 
 const MODES = [
   {
-    id: "amanda" as const,
-    name: "Amanda Mode",
+    id: "athena" as const,
+    name: "Athena Mode",
     description: "Voice-first conversational",
     icon: MessageCircle,
     shortcut: "⌘1",
@@ -23,7 +23,7 @@ const MODES = [
   {
     id: "hybrid" as const,
     name: "Hybrid Mode",
-    description: "Dashboard + Amanda",
+    description: "Dashboard + Athena",
     icon: Layout,
     shortcut: "⌘2",
   },
@@ -41,7 +41,7 @@ export default function ModeSwitcherMenu() {
   const { logout } = useAuth();
   const [, setLocation] = useLocation();
 
-  const handleModeChange = (modeId: "amanda" | "hybrid" | "terminal") => {
+  const handleModeChange = (modeId: "athena" | "hybrid" | "terminal") => {
     setMode(modeId);
     setLocation(`/${modeId}`);
   };

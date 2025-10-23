@@ -37,11 +37,11 @@ function getModeChangeReason(
     return `You're diving deep into analysis (analytical score: ${analytical.toFixed(0)}). Terminal Mode offers multi-panel analytics perfect for this level of detail.`;
   }
   
-  if (analysis.recommendedMode === 'amanda' && currentMode !== 'amanda') {
+  if (analysis.recommendedMode === 'athena' && currentMode !== 'athena') {
     if (hurried > 50) {
-      return `You seem to be looking for quick answers (hurried score: ${hurried.toFixed(0)}). Amanda Mode provides a faster, more conversational experience.`;
+      return `You seem to be looking for quick answers (hurried score: ${hurried.toFixed(0)}). Athena Mode provides a faster, more conversational experience.`;
     }
-    return `Let's make this more personal (conversational score: ${conversational.toFixed(0)}). Amanda Mode offers a natural conversation flow.`;
+    return `Let's make this more personal (conversational score: ${conversational.toFixed(0)}). Athena Mode offers a natural conversation flow.`;
   }
   
   if (analysis.recommendedMode === 'hybrid' && currentMode !== 'hybrid') {
