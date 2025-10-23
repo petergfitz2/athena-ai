@@ -315,7 +315,7 @@ export default function CommandCenter() {
               <div className="flex items-center gap-4">
                 <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 <div>
-                  <h1 className="text-2xl font-extralight text-foreground">
+                  <h1 className="text-2xl font-light text-foreground">
                     {getGreeting()}
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
@@ -378,7 +378,7 @@ export default function CommandCenter() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-3xl font-extralight text-foreground">
+                <p className="text-3xl font-light text-foreground">
                   <AnimatedCounter 
                     value={portfolioSummary?.totalValue || 0} 
                     formatValue={formatCurrency}
@@ -474,16 +474,27 @@ export default function CommandCenter() {
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
                 {quickActions.map((action) => (
-                  <Button
-                    key={action.label}
-                    onClick={action.action}
-                    variant="outline"
-                    className="rounded-[16px] h-20 flex flex-col gap-2 hover-elevate active-elevate-2"
-                    data-testid={`button-quick-${action.label.toLowerCase()}`}
-                  >
-                    <action.icon className={cn("w-6 h-6", action.color)} />
-                    <span className="text-sm">{action.label}</span>
-                  </Button>
+                  <Tooltip key={action.label}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={action.action}
+                        variant="outline"
+                        className="rounded-[16px] h-20 flex flex-col gap-2 hover-elevate active-elevate-2"
+                        data-testid={`button-quick-${action.label.toLowerCase()}`}
+                      >
+                        <action.icon className={cn("w-6 h-6", action.color)} />
+                        <span className="text-sm font-medium">{action.label}</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">
+                        {action.label === "Simulator" && "Practice trading with virtual money"}
+                        {action.label === "Social" && "Connect with other traders"}
+                        {action.label === "Rewards" && "View your achievements and badges"}
+                        {action.label === "X-Ray" && "Analyze your portfolio health"}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
             </CardContent>
@@ -499,7 +510,17 @@ export default function CommandCenter() {
             </CardHeader>
             <CardContent className="space-y-3">
               {news.slice(0, 3).map((article) => (
-                <div key={article.id} className="pb-3 border-b border-white/5 last:border-0">
+                <div 
+                  key={article.id} 
+                  className="pb-3 border-b border-white/5 last:border-0 cursor-pointer hover-elevate rounded-lg p-2 -m-2 transition-all"
+                  onClick={() => {
+                    toast({
+                      title: article.title,
+                      description: `${article.summary || "Loading full article..."}`,
+                    });
+                  }}
+                  data-testid={`news-item-${article.id}`}
+                >
                   <p className="text-sm font-medium text-foreground line-clamp-2">
                     {article.title}
                   </p>

@@ -166,10 +166,10 @@ function WatchlistPageContent() {
           </div>
           <div className="flex items-center justify-between gap-6">
             <div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground mb-2">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-foreground mb-2">
                 Watchlist
               </h1>
-              <p className="text-muted-foreground font-light">
+              <p className="text-muted-foreground font-normal">
                 Monitor stocks you're interested in
               </p>
             </div>
@@ -254,7 +254,7 @@ function WatchlistPageContent() {
                 >
                   {/* Header with symbol and remove button */}
                   <div className="flex items-start justify-between gap-4 mb-6">
-                    <div>
+                    <div className="cursor-pointer hover-elevate" onClick={() => setBuyModalSymbol(item.symbol)}>
                       <h3 className="text-3xl font-light text-foreground mb-1">
                         {item.symbol}
                       </h3>
@@ -279,7 +279,7 @@ function WatchlistPageContent() {
                   {/* Price & Change */}
                   {quote ? (
                     <div className="mb-6">
-                      <p className="text-4xl font-light text-foreground mb-2">
+                      <p className="text-4xl font-normal text-foreground mb-2">
                         ${quote.price.toFixed(2)}
                       </p>
                       <div className={`flex items-center gap-2 ${isPositive ? 'text-success' : 'text-destructive'}`}>
@@ -288,7 +288,7 @@ function WatchlistPageContent() {
                         ) : (
                           <TrendingDown className="w-5 h-5" />
                         )}
-                        <span className="text-lg font-light">
+                        <span className="text-lg font-medium">
                           {isPositive ? '+' : ''}{quote.change.toFixed(2)} ({isPositive ? '+' : ''}{quote.changePercent.toFixed(2)}%)
                         </span>
                       </div>
@@ -303,21 +303,21 @@ function WatchlistPageContent() {
                   {quote && (
                     <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-white/10">
                       <div>
-                        <p className="text-xs text-muted-foreground mb-1">High</p>
-                        <p className="text-sm font-light text-foreground">
+                        <p className="text-sm text-muted-foreground mb-1 font-medium">High</p>
+                        <p className="text-base font-normal text-foreground">
                           ${quote.high?.toFixed(2) || "N/A"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground mb-1">Low</p>
-                        <p className="text-sm font-light text-foreground">
+                        <p className="text-sm text-muted-foreground mb-1 font-medium">Low</p>
+                        <p className="text-base font-normal text-foreground">
                           ${quote.low?.toFixed(2) || "N/A"}
                         </p>
                       </div>
                       {quote.marketCap && (
                         <div className="col-span-2">
-                          <p className="text-xs text-muted-foreground mb-1">Market Cap</p>
-                          <p className="text-sm font-light text-foreground">
+                          <p className="text-sm text-muted-foreground mb-1 font-medium">Market Cap</p>
+                          <p className="text-base font-normal text-foreground">
                             ${(quote.marketCap / 1e9).toFixed(2)}B
                           </p>
                         </div>

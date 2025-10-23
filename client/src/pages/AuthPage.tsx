@@ -53,8 +53,8 @@ export default function AuthPage() {
       
       <GlassCard className="w-full max-w-md z-10">
         <div className="mb-8">
-          <h1 className="text-5xl font-extralight text-foreground mb-2">Athena AI Investing</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-5xl font-light text-foreground mb-2">Athena AI Investing</h1>
+          <p className="text-muted-foreground font-normal">
             Investing as easy as talking to a friend
           </p>
         </div>

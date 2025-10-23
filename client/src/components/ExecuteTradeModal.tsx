@@ -70,14 +70,26 @@ export default function ExecuteTradeModal({ open, onOpenChange, action, prefille
     },
   });
 
-  // Pre-fill symbol if provided
+  // Pre-fill symbol if provided and handle ESC key
   useEffect(() => {
     if (prefilledSymbol && open) {
       setSearchSymbol(prefilledSymbol);
       setSelectedSymbol(prefilledSymbol);
       form.setValue("symbol", prefilledSymbol);
     }
-  }, [prefilledSymbol, open, form]);
+
+    // Handle ESC key to close modal
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        onOpenChange(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [prefilledSymbol, open, form, onOpenChange]);
 
   const orderType = form.watch("orderType");
 

@@ -28,8 +28,8 @@ export default function PortfolioCard({
     >
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h3 className="text-3xl font-extralight text-foreground">{symbol}</h3>
-          <p className="text-sm text-muted-foreground font-light">{name}</p>
+          <h3 className="text-3xl font-light text-foreground">{symbol}</h3>
+          <p className="text-sm text-muted-foreground font-normal">{name}</p>
         </div>
         <div className={isPositive ? "text-primary" : "text-destructive"}>
           {isPositive ? (
@@ -42,24 +42,24 @@ export default function PortfolioCard({
 
       <div className="space-y-5">
         <div>
-          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-light">Total Value</p>
-          <p className="text-4xl font-extralight text-foreground">
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-medium">Total Value</p>
+          <p className="text-4xl font-light text-foreground">
             ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-light">Shares</p>
-            <p className="text-xl font-light text-foreground">{shares}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Shares</p>
+            <p className="text-xl font-normal text-foreground">{shares}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-light">Price</p>
-            <p className="text-xl font-light text-foreground">${currentPrice.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Price</p>
+            <p className="text-xl font-normal text-foreground">${currentPrice.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className={cn("text-base font-light", isPositive ? "text-primary" : "text-destructive")}>
+        <div className={cn("text-base font-medium", isPositive ? "text-primary" : "text-destructive")}>
           {isPositive ? "+" : ""}${change.toFixed(2)} ({isPositive ? "+" : ""}
           {changePercent.toFixed(2)}%)
         </div>

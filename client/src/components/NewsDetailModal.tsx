@@ -97,7 +97,7 @@ export default function NewsDetailModal({ article, open, onClose }: NewsDetailMo
         {/* Article summary */}
         {article.summary && (
           <div className="prose prose-invert max-w-none">
-            <p className="text-foreground font-light leading-relaxed">
+            <p className="text-foreground font-normal leading-relaxed">
               {article.summary}
             </p>
           </div>
