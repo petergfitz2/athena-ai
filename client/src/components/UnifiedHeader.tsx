@@ -71,17 +71,19 @@ export default function UnifiedHeader({
                 const Icon = item.icon;
                 const isActive = location === item.path;
                 return (
-                  <Link key={item.path} href={item.path}>
-                    <Button
-                      variant={isActive ? "default" : "ghost"}
-                      size="sm"
-                      className="rounded-full"
-                      data-testid={`nav-${item.label.toLowerCase()}`}
-                    >
+                  <Button
+                    key={item.path}
+                    asChild
+                    variant={isActive ? "default" : "ghost"}
+                    size="sm"
+                    className="rounded-full"
+                    data-testid={`nav-${item.label.toLowerCase()}`}
+                  >
+                    <Link href={item.path}>
                       <Icon className="w-4 h-4 mr-2" />
                       {item.label}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 );
               })}
             </nav>
@@ -98,23 +100,24 @@ export default function UnifiedHeader({
           <div className="flex items-center gap-2">
             {/* Desktop Help Menu - Hidden on mobile */}
             <div className="hidden lg:flex items-center gap-2">
-              <Link href="/help">
-                <Button variant="ghost" size="sm" className="rounded-full">
+              <Button asChild variant="ghost" size="sm" className="rounded-full">
+                <Link href="/help">
                   <HelpCircle className="w-4 h-4 mr-2" />
                   Help
-                </Button>
-              </Link>
-              <Link href="/settings">
-                <Button variant="ghost" size="sm" className="rounded-full">
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="rounded-full" aria-label="Settings">
+                <Link href="/settings">
                   <Settings className="w-4 h-4" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={logout}
                 className="rounded-full text-destructive hover:text-destructive"
                 data-testid="button-logout-desktop"
+                aria-label="Log out"
               >
                 <LogOut className="w-4 h-4" />
               </Button>
@@ -128,6 +131,7 @@ export default function UnifiedHeader({
                   size="icon"
                   className="rounded-full"
                   data-testid="button-mobile-menu"
+                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </Button>
@@ -149,20 +153,21 @@ export default function UnifiedHeader({
                       const Icon = item.icon;
                       const isActive = location === item.path;
                       return (
-                        <Link
+                        <Button
                           key={item.path}
-                          href={item.path}
-                          onClick={() => setMobileMenuOpen(false)}
+                          asChild
+                          variant={isActive ? "default" : "ghost"}
+                          className="w-full justify-start rounded-full"
+                          data-testid={`mobile-nav-${item.label.toLowerCase()}`}
                         >
-                          <Button
-                            variant={isActive ? "default" : "ghost"}
-                            className="w-full justify-start rounded-full"
-                            data-testid={`mobile-nav-${item.label.toLowerCase()}`}
+                          <Link
+                            href={item.path}
+                            onClick={() => setMobileMenuOpen(false)}
                           >
                             <Icon className="w-4 h-4 mr-3" />
                             {item.label}
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       );
                     })}
                   </div>
@@ -174,20 +179,21 @@ export default function UnifiedHeader({
                       const Icon = item.icon;
                       const isActive = location === item.path;
                       return (
-                        <Link
+                        <Button
                           key={item.path}
-                          href={item.path}
-                          onClick={() => setMobileMenuOpen(false)}
+                          asChild
+                          variant={isActive ? "default" : "ghost"}
+                          className="w-full justify-start rounded-full"
+                          data-testid={`mobile-help-${item.label.toLowerCase()}`}
                         >
-                          <Button
-                            variant={isActive ? "default" : "ghost"}
-                            className="w-full justify-start rounded-full"
-                            data-testid={`mobile-help-${item.label.toLowerCase()}`}
+                          <Link
+                            href={item.path}
+                            onClick={() => setMobileMenuOpen(false)}
                           >
                             <Icon className="w-4 h-4 mr-3" />
                             {item.label}
-                          </Button>
-                        </Link>
+                          </Link>
+                        </Button>
                       );
                     })}
                   </div>

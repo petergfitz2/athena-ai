@@ -275,6 +275,7 @@ function AmandaModeContent() {
                     isRecording ? "bg-destructive hover:bg-destructive/90" : "bg-primary hover:bg-primary/90"
                   }`}
                   data-testid="button-voice-input"
+                  aria-label={isRecording ? "Stop recording" : "Start voice input"}
                 >
                   {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </Button>
@@ -298,6 +299,7 @@ function AmandaModeContent() {
                   disabled={!input.trim() || isLoading}
                   className="rounded-full w-12 h-12 flex-shrink-0 bg-primary hover:bg-primary/90 disabled:opacity-50"
                   data-testid="button-send-message"
+                  aria-label="Send message"
                 >
                   <Send className="w-5 h-5" />
                 </Button>

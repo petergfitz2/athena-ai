@@ -429,6 +429,7 @@ function TerminalModeContent() {
               onClick={isRecording ? stopRecording : startRecording}
               className={`rounded-full flex-shrink-0 ${isRecording ? 'bg-destructive text-destructive-foreground' : ''}`}
               data-testid="button-voice-terminal"
+              aria-label={isRecording ? "Stop recording" : "Start voice input"}
             >
               {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
@@ -452,6 +453,7 @@ function TerminalModeContent() {
               disabled={!input.trim() || isLoading}
               className="rounded-full flex-shrink-0"
               data-testid="button-send-terminal"
+              aria-label="Send message"
             >
               <Send className="w-4 h-4" />
             </Button>

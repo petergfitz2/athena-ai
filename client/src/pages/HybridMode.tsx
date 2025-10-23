@@ -221,6 +221,7 @@ function HybridModeContent() {
               onClick={() => setChatExpanded(false)}
               className="rounded-full hover-elevate"
               data-testid="button-collapse-athena"
+              aria-label="Close chat"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -250,6 +251,7 @@ function HybridModeContent() {
                 onClick={isRecording ? stopRecording : startRecording}
                 className={`rounded-full flex-shrink-0 ${isRecording ? 'bg-destructive text-destructive-foreground' : ''}`}
                 data-testid="button-voice-hybrid"
+                aria-label={isRecording ? "Stop recording" : "Start voice input"}
               >
                 {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </Button>
@@ -273,6 +275,7 @@ function HybridModeContent() {
                 disabled={!input.trim() || isLoading}
                 className="rounded-full flex-shrink-0"
                 data-testid="button-send-hybrid"
+                aria-label="Send message"
               >
                 <Send className="w-5 h-5" />
               </Button>

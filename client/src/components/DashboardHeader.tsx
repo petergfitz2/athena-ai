@@ -17,39 +17,42 @@ export default function DashboardHeader({ onLogout }: DashboardHeaderProps) {
             <h1 className="text-3xl font-extralight text-foreground">Athena</h1>
             
             <nav className="hidden md:flex items-center gap-2">
-              <Link href="/dashboard">
-                <Button
-                  variant={location === "/dashboard" ? "default" : "ghost"}
-                  size="sm"
-                  className="rounded-[28px]"
-                  data-testid="link-dashboard"
-                >
+              <Button
+                asChild
+                variant={location === "/dashboard" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-[28px]"
+                data-testid="link-dashboard"
+              >
+                <Link href="/dashboard">
                   <LayoutDashboard className="h-4 w-4 mr-2" />
                   Dashboard
-                </Button>
-              </Link>
-              <Link href="/portfolio">
-                <Button
-                  variant={location === "/portfolio" ? "default" : "ghost"}
-                  size="sm"
-                  className="rounded-[28px]"
-                  data-testid="link-portfolio"
-                >
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant={location === "/portfolio" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-[28px]"
+                data-testid="link-portfolio"
+              >
+                <Link href="/portfolio">
                   <Briefcase className="h-4 w-4 mr-2" />
                   Portfolio
-                </Button>
-              </Link>
-              <Link href="/chat">
-                <Button
-                  variant={location === "/chat" ? "default" : "ghost"}
-                  size="sm"
-                  className="rounded-[28px]"
-                  data-testid="link-chat"
-                >
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant={location === "/chat" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-[28px]"
+                data-testid="link-chat"
+              >
+                <Link href="/chat">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Chat
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </nav>
           </div>
 
