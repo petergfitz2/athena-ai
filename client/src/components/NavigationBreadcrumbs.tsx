@@ -21,11 +21,13 @@ export default function NavigationBreadcrumbs() {
   const getPageTitle = (path: string): string => {
     const routes: Record<string, string> = {
       "/dashboard": "Dashboard",
+      "/command-center": "Dashboard",
       "/watchlist": "Watchlist",
       "/portfolio": "Portfolio",
       "/trades": "Trades",
       "/analytics": "Analytics",
       "/settings": "Settings",
+      "/leaderboard": "Leaderboard",
       "/athena": "Athena Mode",
       "/hybrid": "Hybrid Mode",
       "/terminal": "Terminal Mode",
