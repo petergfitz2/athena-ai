@@ -1,0 +1,1042 @@
+# Athena AI Investment Platform - Logged-In Application Build
+## Project Overview
+Build the complete logged-in experience for Athena AI - a luxury conversational investment platform where users manage their portfolio, execute trades, and receive institutional-grade market intelligence through natural conversation with an AI broker named Amanda.
+This is NOT the landing page - this is the actual working application that users access after signing up.
+## Critical Context: What We're Building
+**Current State**: We have a beautiful landing page that explains the value proposition
+**What We Need Now**: The actual functional application with:
+- Authentication and user accounts
+- Real-time conversational AI interface (text and voice)
+- Portfolio management and visualization
+- Trade execution with approval workflow
+- Live market data and analytics
+- Three adaptive interface modes (Amanda, Hybrid, Terminal)
+- Institutional-grade intelligence (13F filings, insider transactions, earnings analysis)
+## Design System (Must Follow Exactly)
+### Core Aesthetic: Luxury Minimalism
+**Visual Language**: Apple.com aesthetics meets JP Morgan Private Bank sophistication
+- Pure black background (#000000)
+- Near-white text (#f5f5f7)
+- Muted gray secondary text (#a1a1a6)
+- Ultra-light typography (Inter font, weights 200-300 for headlines)
+- Generous negative space and padding
+- Glass morphism effects (backdrop-blur with subtle backgrounds)
+- Soft, subtle shadows - never harsh
+- Razor-thin borders (0.5px, rgba(255,255,255,0.08))
+### Colors (Exact HSL Values)
+```css
+/* Background System */
+--background: 0 0% 0%;              /* Pure black */
+--card: 0 0% 3.9%;                  /* Subtle elevated surface */
+--card-elevated: 0 0% 7%;           /* More prominent elevation */
+--popover: 0 0% 3.9%;               /* Dropdown backgrounds */
+/* Text Hierarchy */
+--foreground: 0 0% 96.1%;           /* Primary text #f5f5f7 */
+--foreground-secondary: 0 0% 63%;   /* Secondary text #a1a1a6 */
+--foreground-tertiary: 0 0% 45%;    /* Least important text */
+--muted-foreground: 0 0% 63%;
+/* Brand Colors */
+--primary: 262 83% 58%;             /* Purple #8B5CF6 */
+--primary-foreground: 0 0% 98%;
+--accent: 217 91% 60%;              /* Blue #3B82F6 */
+--accent-foreground: 0 0% 98%;
+/* Status Colors */
+--success: 142 71% 45%;             /* Green - gains */
+--destructive: 0 84% 60%;           /* Red - losses */
+--warning: 38 92% 50%;              /* Amber - alerts */
+/* UI Elements */
+--border: 0 0% 14.9%;               /* Subtle borders */
+--input: 0 0% 14.9%;                /* Input borders */
+--ring: 262 83% 58%;                /* Focus rings (purple) */
+Typography Scale
+Massive Headlines: 3rem to 4.5rem, font-weight 200-300
+Section Headers: 2rem to 3rem, font-weight 300-400
+Subsections: 1.5rem to 2rem, font-weight 400
+Body Large: 1.125rem, font-weight 400
+Body Standard: 1rem, font-weight 400
+Body Small: 0.875rem, font-weight 400
+Caption: 0.75rem, font-weight 500
+Component Patterns
+Glass Morphism Cards:
+
+background: rgba(255, 255, 255, 0.02);
+border: 0.5px solid rgba(255, 255, 255, 0.08);
+border-radius: 28px;
+backdrop-filter: blur(20px);
+padding: 2rem;
+Gradient Accents (Use Sparingly):
+
+background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.05));
+border: 0.5px solid rgba(139, 92, 246, 0.2);
+Buttons:
+
+Primary: Purple gradient, white text, rounded-full, px-6 py-3
+Secondary: Transparent with border, hover elevates background
+Ghost: No background, subtle hover effect
+All buttons: Smooth transitions, subtle hover/active states
+Spacing System
+Tight: 0.5rem (8px)
+Standard: 1rem (16px)
+Comfortable: 1.5rem (24px)
+Spacious: 2rem (32px)
+Generous: 3rem (48px)
+Section: 4rem to 6rem (64-96px)
+The Three Interface Modes
+Mode 1: Amanda Mode (Conversational UI)
+Primary Use Case: Mobile users, driving, working out, quick questions
+Layout:
+
+┌─────────────────────────────┐
+│                             │
+│    [Amanda Avatar]          │  ← Top third: Photorealistic AI avatar
+│                             │     Subtle animations (breathing, eye contact)
+│                             │
+├─────────────────────────────┤
+│  User: "Should I buy        │
+│         Apple stock?"       │  ← Middle: Conversation history
+│                             │     User bubbles: right-aligned, subtle bg
+│  Amanda: "Looking at your   │     Amanda bubbles: left-aligned, gradient
+│          portfolio..."      │
+│                             │
+├─────────────────────────────┤
+│  [Voice Input Button]       │  ← Bottom: Input controls
+│  [Type message...]   [Send] │     Voice always available
+└─────────────────────────────┘
+Key Features:
+
+Full-screen chat interface
+Photorealistic Amanda avatar (use placeholder image initially, later MetaHuman/Unreal)
+Voice input always prominent (large microphone button)
+Minimal portfolio data (just total value, maybe % change)
+Natural conversation flow
+Context-aware responses
+Background voice synthesis for responses
+Technical Requirements:
+
+WebSocket connection for real-time messaging
+OpenAI Realtime API integration for voice
+Audio streaming support
+Conversation context management (last 10-20 messages)
+Portfolio data overlay (floating, dismissible)
+Mode 2: Hybrid Mode (Dashboard + Mini Amanda)
+Primary Use Case: Desktop users, active trading, multi-tasking
+Layout:
+
+┌──────┬────────────────────────────────────┐
+│      │  Portfolio: $127,453.21 (+2.3%)   │ ← Header: Portfolio summary
+├──────┼────────────────────────────────────┤
+│      │  ┌─────────────┬───────────────┐   │
+│ Nav  │  │             │   Market      │   │
+│      │  │  Portfolio  │   News        │   │ ← Main: Split view
+│      │  │  Chart      │               │   │     Left: Portfolio/charts
+│      │  │             │   Watchlist   │   │     Right: News/watchlist
+│      │  └─────────────┴───────────────┘   │
+│      │                                     │
+│      │  Holdings:                          │
+│      │  AAPL  50 shares  $8,750 (+12%)    │
+└──────┴─────────────────────────────────┬──┘
+                                         │
+                                    ┌────┴────┐
+                                    │ [Avatar]│ ← Floating mini Amanda
+                                    │  Chat   │    Bottom-right corner
+                                    └─────────┘    Expands on click
+Key Features:
+
+Main dashboard showing portfolio performance
+Interactive charts (line, candlestick)
+Holdings table with real-time prices
+Market news feed
+Watchlist with quick-add functionality
+Floating mini Amanda avatar (bottom-right)
+Chat expands to half-screen on click
+Keyboard shortcut to summon Amanda (Cmd/Ctrl + K)
+Technical Requirements:
+
+Real-time price updates via WebSocket
+Chart library (Recharts or similar)
+Responsive grid layout
+Collapsible chat panel
+Multi-panel state management
+Live data synchronization
+Mode 3: Terminal Mode (Professional Interface)
+Primary Use Case: Professional traders, deep analysis, multi-monitor setups
+Layout:
+
+┌──────┬──────────────┬──────────────┬──────────────┐
+│      │   Markets    │   Portfolio  │   Analysis   │ ← Dense multi-panel
+│ Nav  │              │              │              │
+│      │  S&P: 4521   │  Total:      │  Sharpe:     │
+│      │  NASDAQ:...  │  $127,453    │  1.82        │
+│      │              │              │              │
+│      │  [Charts]    │  [Holdings]  │  [Metrics]   │
+│      │              │              │              │
+├──────┼──────────────┴──────────────┴──────────────┤
+│      │  News & Filings                            │ ← Bottom: News feed
+│      │  • Tesla 13F: 15 funds increased...        │
+│      │  • Apple earnings call transcript...       │
+└──────┴────────────────────────────────────────────┘
+          Amanda voice available (no visible avatar)
+Key Features:
+
+Dense information display (Bloomberg-inspired BUT luxury design)
+3-4 panel layout (markets, portfolio, analysis, news)
+Advanced charts (multiple timeframes, technical indicators)
+Real-time market data (quotes, volume, bid/ask)
+13F filing analysis (hedge fund positions)
+Earnings call sentiment scores
+Risk metrics (beta, Sharpe ratio, max drawdown, VaR)
+Insider transaction alerts
+Amanda voice available (microphone icon, minimal UI)
+Keyboard-driven navigation
+Technical Requirements:
+
+Multi-panel responsive layout (CSS Grid)
+Advanced charting (TradingView-style)
+Real-time data streaming (WebSocket)
+SEC EDGAR API integration
+Natural language processing for filings
+Complex calculations (Sharpe, beta, correlation)
+Efficient data fetching and caching
+Core Functionality Specifications
+1. Authentication System
+Sign Up Flow:
+
+Landing page → "Get Started" button
+Sign up form:
+Full name
+Email address
+Password (with strength indicator)
+Agree to terms checkbox
+Email verification (send code)
+Welcome screen with mode selection tutorial
+Portfolio setup wizard (optional skip)
+Login Flow:
+
+Email + Password
+Optional: Remember me checkbox
+Redirect to last used mode (default: Amanda Mode)
+Session Management:
+
+Server-side sessions with secure cookies
+30-day session expiry (if "remember me")
+7-day session expiry (default)
+Auto-logout on suspicious activity
+Session refresh on activity
+Security Requirements:
+
+Bcrypt password hashing (12 rounds minimum)
+CSRF protection
+Rate limiting (5 failed attempts = 15min lockout)
+Secure session cookies (httpOnly, sameSite, secure)
+Password reset via email with expiring token
+Optional: 2FA (TOTP) - Phase 2
+2. Conversational AI Interface
+Chat Input:
+
+Text input with auto-resize (up to 5 lines)
+Voice input button (prominent, always visible)
+Send button (or Enter to send, Shift+Enter for newline)
+Typing indicator when AI is processing
+Character limit: 500 characters per message
+Message Display:
+
+User messages: Right-aligned, subtle background (rgba(255,255,255,0.05))
+Amanda messages: Left-aligned, gradient background (purple-blue)
+Timestamps (hover to see full time)
+Message status indicators (sending, sent, error)
+Markdown support in Amanda responses (bold, lists, code blocks)
+Embedded charts/data when relevant
+Conversation Features:
+
+Context awareness (Amanda knows your portfolio)
+Multi-turn conversations (maintains context)
+Portfolio-aware responses:
+User: "Should I buy more Apple?"
+Amanda: "You currently hold 50 shares of AAPL (8.5% of portfolio).
+         Looking at recent performance and your risk profile,
+         adding more would increase your tech sector exposure to 35%.
+         Let's discuss diversification..."
+Smart suggestions (quick replies):
+"Show my portfolio"
+"What's the market doing?"
+"Suggest trades"
+"Calculate my returns"
+Voice Integration (Phase 1: Text, Phase 2: Voice):
+
+OpenAI Realtime API for voice-to-voice
+Push-to-talk button (hold to speak)
+Visual feedback (sound waves, listening indicator)
+Voice activity detection
+Interrupt capability (stop Amanda mid-response)
+Voice personality: Professional yet friendly, female voice
+Response latency target: < 800ms
+AI Response Quality:
+
+Portfolio context in every response
+Actionable insights, not just data dumps
+Clear explanations of complex concepts
+Proactive suggestions based on market conditions
+Risk warnings when appropriate
+Trade recommendations with reasoning
+3. Portfolio Management
+Dashboard View:
+
+┌────────────────────────────────────────┐
+│  Total Portfolio Value: $127,453.21    │
+│  Today: +$2,847.32 (+2.3%)            │  ← Header card
+│  All Time: +$27,453.21 (+27.4%)       │
+└────────────────────────────────────────┘
+┌────────────────────────────────────────┐
+│  Performance Chart                     │
+│  ┌──────────────────────────────────┐  │
+│  │      [Line Chart: 1D/1W/1M/1Y]   │  │  ← Interactive chart
+│  │                                  │  │
+│  └──────────────────────────────────┘  │
+└────────────────────────────────────────┘
+Holdings:
+┌──────┬────────┬──────────┬──────────┬─────────┐
+│Symbol│Shares  │Avg Cost  │Current   │Gain/Loss│
+├──────┼────────┼──────────┼──────────┼─────────┤
+│ AAPL │ 50     │ $150.00  │ $175.00  │ +16.7%  │  ← Real-time updates
+│ MSFT │ 30     │ $320.00  │ $365.00  │ +14.1%  │
+│ TSLA │ 25     │ $210.00  │ $245.00  │ +16.7%  │
+└──────┴────────┴──────────┴──────────┴─────────┘
+Portfolio Features:
+
+Real-time total value calculation
+Today's change ($ and %)
+All-time returns
+Sector allocation pie chart
+Asset allocation (stocks, bonds, cash)
+Cost basis tracking
+Realized vs unrealized gains
+Dividend tracking
+Tax lot details
+Adding Holdings (Manual Entry - Phase 1):
+
+"+ Add Holding" button
+Modal form:
+Stock symbol (with autocomplete)
+Number of shares
+Average cost per share
+Purchase date
+Validation and confirmation
+Real-time price fetch
+Update portfolio calculations
+Editing/Removing Holdings:
+
+Click holding → Edit modal
+Update shares or cost basis
+Remove holding (with confirmation)
+Transaction history preserved
+Performance Metrics (Advanced):
+
+Total return (%)
+Annualized return
+Sharpe ratio
+Beta (vs S&P 500)
+Standard deviation (volatility)
+Max drawdown
+Win rate
+Correlation matrix
+4. Live Market Data
+Real-Time Quotes:
+
+Price updates every 1-5 seconds (WebSocket)
+Bid/Ask spread
+Volume (daily)
+Market cap
+52-week high/low
+P/E ratio
+Dividend yield
+Charts:
+
+Multiple timeframes: 1D, 1W, 1M, 3M, 6M, 1Y, 5Y, All
+Chart types: Line, Candlestick, Area
+Technical indicators (Phase 2):
+Moving averages (SMA, EMA)
+RSI, MACD
+Bollinger Bands
+Volume overlay
+Market Indices:
+
+S&P 500
+Nasdaq
+Dow Jones
+Russell 2000
+VIX (volatility index)
+Watchlist:
+
+User-created watchlists
+Quick add/remove stocks
+Real-time price updates
+Sortable by % change, volume, etc.
+Alerts (price targets, % moves)
+5. Trade Execution System
+Trade Flow (Critical: User Approval Required):
+
+AI Suggestion:
+
+Amanda: "Based on your portfolio and current market conditions,
+        I recommend selling 25% of your Tesla position (6 shares)
+        and reallocating to Apple. Here's why:
+        
+        • Tesla up 47% this month (take profits)
+        • Apple undervalued vs sector peers
+        • Reduces concentration risk
+        
+        Estimated trade:
+        Sell: 6 TSLA @ $245 = $1,470
+        Buy: 8 AAPL @ $175 = $1,400
+        
+        Would you like me to prepare this trade?"
+User Approval:
+
+Clear "Approve Trade" button
+"Review Details" expands full trade card
+Shows impact on portfolio
+Estimated fees/costs
+"Cancel" always available
+Execution:
+
+Status: "Submitting order..."
+API call to brokerage (Alpaca)
+Real-time status updates
+Confirmation: "Trade executed: 6 TSLA sold @ $245.12"
+Post-Trade:
+
+Portfolio automatically updates
+Trade added to history
+Performance recalculated
+Amanda follow-up: "Trade complete. Your tech allocation is now 28%."
+Trade History:
+
+Chronological list
+Filter by symbol, date, type
+Trade details (price, quantity, fees)
+P&L per trade
+Export to CSV (tax reporting)
+Safety Features:
+
+Explicit approval required (no auto-trading)
+Clear trade preview
+Warning for large trades (>10% of portfolio)
+Confirmation dialog for sells at loss
+Daily trade limit (configurable)
+Account balance check before buy
+6. Intelligence Engine (Institutional-Grade Analysis)
+Phase 1: SEC Filing Intelligence
+
+13F Filings (Hedge Fund Positions):
+
+Track major hedge funds (Berkshire, Citadel, ARK, etc.)
+Detect new positions (initiations)
+Detect position changes (increases, decreases, exits)
+Consensus analysis: "15 hedge funds bought XYZ last quarter"
+Portfolio-aware insights:
+"Interesting: Buffett increased Coca-Cola by 15%.
+ You hold PepsiCo, their main competitor.
+ This suggests defensive positioning in consumer staples."
+Form 4 (Insider Transactions):
+
+Monitor C-suite buying/selling
+Cluster analysis (multiple insiders = strong signal)
+Conviction scoring (large purchases vs routine sales)
+Alerts for unusual activity:
+"Alert: CEO of Microsoft bought $2M in shares yesterday.
+ Last insider purchase was 8 months ago.
+ Possible confidence signal."
+Implementation:
+
+SEC EDGAR API (free, public data)
+Daily batch processing (filings from yesterday)
+Natural language processing to extract key info
+Store in database for historical analysis
+Surface insights in chat and dashboard
+Phase 2: Management Commentary Analysis
+
+Earnings Call Transcripts:
+
+Fetch from Seeking Alpha API or similar
+NLP sentiment analysis (positive, neutral, negative)
+Key phrase extraction:
+"Margin pressure" → Negative signal
+"Accelerating growth" → Positive signal
+"Supply chain challenges" → Risk factor
+Year-over-year comparison:
+"CFO mentioned 'margin pressure' 7 times this quarter
+ vs 2 times last quarter. Potential concern."
+10-K/10-Q Analysis:
+
+Risk factor section comparison (QoQ changes)
+Management Discussion & Analysis (MD&A) sentiment
+Revenue/profit trend analysis
+Forward guidance extraction
+Phase 3: Advanced Analytics (Defer Until PMF)
+
+Estimate Revisions:
+
+Track analyst upgrades/downgrades
+Consensus price target changes
+Earnings estimate revisions
+Data source: FactSet or Bloomberg (expensive)
+Alternative Data:
+
+Social media sentiment (Twitter, Reddit)
+Web traffic analysis (SimilarWeb)
+Credit card transaction data
+Satellite imagery (retail parking lots)
+7. News & Information Feed
+Market News:
+
+Real-time headlines (Reuters, Bloomberg, CNBC)
+Company-specific news
+Earnings announcements
+Analyst reports (summaries)
+Economic calendar (Fed meetings, jobs reports)
+Personalized Feed:
+
+News about holdings
+News about watchlist stocks
+Sector-relevant news
+Filtered by relevance to portfolio
+AI Summaries:
+
+Amanda can summarize long articles
+Extract key takeaways
+Relate news to user's portfolio:
+User: "Summarize this article"
+Amanda: "This article discusses Apple's new AI features.
+        Key takeaway: Could drive iPhone upgrade cycle.
+        Impact on your portfolio: You hold 50 AAPL shares.
+        This is positive news for that position."
+Technical Implementation Details
+Frontend Architecture
+Tech Stack:
+
+React 18+ with TypeScript
+Routing: Wouter
+UI Components: shadcn/ui (Radix primitives)
+Styling: Tailwind CSS (custom config)
+State Management: TanStack Query for server state
+Real-time: WebSocket client
+Charts: Recharts or TradingView lightweight charts
+Forms: React Hook Form + Zod validation
+Project Structure:
+
+client/src/
+├── components/
+│   ├── ui/              # shadcn components
+│   ├── chat/
+│   │   ├── ChatInterface.tsx
+│   │   ├── MessageBubble.tsx
+│   │   ├── VoiceInput.tsx
+│   │   └── AmandaAvatar.tsx
+│   ├── portfolio/
+│   │   ├── PortfolioDashboard.tsx
+│   │   ├── PerformanceChart.tsx
+│   │   ├── HoldingsTable.tsx
+│   │   └── AddHoldingModal.tsx
+│   ├── market/
+│   │   ├── MarketOverview.tsx
+│   │   ├── StockChart.tsx
+│   │   ├── Watchlist.tsx
+│   │   └── NewsFeed.tsx
+│   ├── trade/
+│   │   ├── TradeApprovalCard.tsx
+│   │   ├── TradeHistory.tsx
+│   │   └── OrderStatus.tsx
+│   └── layout/
+│       ├── Navigation.tsx
+│       ├── Header.tsx
+│       └── ModeSelector.tsx
+├── pages/
+│   ├── Login.tsx
+│   ├── Signup.tsx
+│   ├── AmandaMode.tsx
+│   ├── HybridMode.tsx
+│   └── TerminalMode.tsx
+├── lib/
+│   ├── api.ts              # API client
+│   ├── websocket.ts        # WebSocket manager
+│   ├── queryClient.ts      # TanStack Query setup
+│   └── formatters.ts       # Currency, percentage utils
+└── hooks/
+    ├── usePortfolio.ts
+    ├── useMarketData.ts
+    ├── useConversation.ts
+    └── useRealtime.ts
+Backend Architecture
+Tech Stack:
+
+Node.js + Express + TypeScript
+Database: PostgreSQL (Neon serverless)
+ORM: Drizzle ORM
+Real-time: ws (WebSocket library)
+Authentication: Passport.js
+Validation: Zod
+API integrations: Axios
+API Routes:
+
+POST   /api/auth/signup
+POST   /api/auth/login
+POST   /api/auth/logout
+GET    /api/auth/me
+GET    /api/portfolio
+POST   /api/portfolio/holdings
+PATCH  /api/portfolio/holdings/:id
+DELETE /api/portfolio/holdings/:id
+GET    /api/market/quote/:symbol
+GET    /api/market/chart/:symbol
+GET    /api/market/news
+GET    /api/market/indices
+POST   /api/chat/message
+GET    /api/chat/history/:conversationId
+POST   /api/chat/voice         # Voice input
+POST   /api/trades
+GET    /api/trades/history
+PATCH  /api/trades/:id/approve
+PATCH  /api/trades/:id/cancel
+GET    /api/intelligence/filings
+GET    /api/intelligence/insider-transactions
+WebSocket Events:
+
+// Client → Server
+"subscribe_quotes" { symbols: ["AAPL", "MSFT"] }
+"unsubscribe_quotes" { symbols: ["AAPL"] }
+"chat_message" { message: "What's my portfolio value?" }
+// Server → Client
+"quote_update" { symbol: "AAPL", price: 175.32, change: +0.42 }
+"portfolio_update" { totalValue: 127453.21, change: +2847.32 }
+"chat_response" { message: "Your portfolio is worth...", id: "..." }
+"trade_status" { tradeId: "...", status: "executed", price: 175.12 }
+Database Schema
+// Users
+users {
+  id: uuid (primary key)
+  email: string (unique)
+  passwordHash: string
+  fullName: string
+  preferredMode: enum('amanda', 'hybrid', 'terminal')
+  createdAt: timestamp
+  lastLoginAt: timestamp
+}
+// Portfolio holdings
+holdings {
+  id: uuid (primary key)
+  userId: uuid (foreign key → users)
+  symbol: string
+  quantity: decimal(18,8)
+  averageCost: decimal(18,2)
+  purchaseDate: date
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+// Conversations
+conversations {
+  id: uuid (primary key)
+  userId: uuid (foreign key → users)
+  mode: enum('amanda', 'hybrid', 'terminal')
+  startedAt: timestamp
+  endedAt: timestamp (nullable)
+}
+// Messages
+messages {
+  id: uuid (primary key)
+  conversationId: uuid (foreign key → conversations)
+  role: enum('user', 'assistant')
+  content: text
+  audioUrl: string (nullable)
+  metadata: jsonb (chart data, trade info, etc.)
+  createdAt: timestamp
+}
+// Trades
+trades {
+  id: uuid (primary key)
+  userId: uuid (foreign key → users)
+  symbol: string
+  type: enum('buy', 'sell')
+  quantity: decimal(18,8)
+  estimatedPrice: decimal(18,2)
+  executedPrice: decimal(18,2) (nullable)
+  status: enum('pending', 'approved', 'executing', 'executed', 'rejected', 'cancelled')
+  reason: text (AI's reasoning)
+  approvedAt: timestamp (nullable)
+  executedAt: timestamp (nullable)
+  createdAt: timestamp
+}
+// Watchlists
+watchlists {
+  id: uuid (primary key)
+  userId: uuid (foreign key → users)
+  name: string
+  symbols: text[] (array of stock symbols)
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+// Market alerts
+alerts {
+  id: uuid (primary key)
+  userId: uuid (foreign key → users)
+  symbol: string
+  type: enum('price_above', 'price_below', 'percent_change', 'volume_spike')
+  targetValue: decimal(18,2)
+  isActive: boolean
+  triggeredAt: timestamp (nullable)
+  createdAt: timestamp
+}
+// 13F filings cache
+filings_13f {
+  id: uuid (primary key)
+  fund: string (hedge fund name)
+  cik: string (SEC identifier)
+  filingDate: date
+  symbol: string
+  shares: bigint
+  value: decimal(18,2)
+  changeType: enum('new', 'increase', 'decrease', 'exit')
+  changePercent: decimal(5,2)
+  processedAt: timestamp
+}
+// Insider transactions cache
+insider_transactions {
+  id: uuid (primary key)
+  symbol: string
+  insiderName: string
+  title: string (CEO, CFO, etc.)
+  transactionType: enum('buy', 'sell')
+  shares: bigint
+  pricePerShare: decimal(18,2)
+  totalValue: decimal(18,2)
+  filingDate: date
+  transactionDate: date
+  processedAt: timestamp
+}
+External API Integrations
+1. OpenAI (Conversational AI):
+
+// Text chat
+const response = await openai.chat.completions.create({
+  model: "gpt-4-turbo",
+  messages: [
+    { role: "system", content: AMANDA_SYSTEM_PROMPT },
+    ...conversationHistory,
+    { role: "user", content: userMessage }
+  ],
+  functions: [
+    { name: "get_portfolio", description: "Get user's portfolio" },
+    { name: "suggest_trade", description: "Suggest a trade" },
+    { name: "get_stock_analysis", description: "Analyze a stock" }
+  ]
+});
+// Voice (Realtime API - Phase 2)
+const session = await openai.realtime.sessions.create({
+  model: "gpt-4-audio-preview",
+  voice: "alloy",
+  instructions: AMANDA_SYSTEM_PROMPT
+});
+Amanda System Prompt:
+
+You are Amanda, a professional AI investment advisor working for Athena AI.
+Context:
+- User's portfolio: {portfolioData}
+- Current holdings: {holdings}
+- Portfolio value: {totalValue}
+- Today's performance: {todayChange}
+Your role:
+- Provide institutional-grade investment advice
+- Reference the user's specific portfolio in every relevant response
+- Explain complex concepts simply
+- Proactively suggest optimizations
+- Always disclose risks
+- Never guarantee returns
+Communication style:
+- Professional yet friendly
+- Confident but not arrogant
+- Use "we" and "your portfolio" (collaborative)
+- Provide reasoning for every recommendation
+- Ask clarifying questions when needed
+When suggesting trades:
+- Explain the rationale clearly
+- Show impact on portfolio allocation
+- Highlight risks
+- Always require explicit user approval
+- Use the suggest_trade function
+Examples:
+User: "Should I buy Apple?"
+Amanda: "Let me look at your portfolio. You currently hold 50 shares of AAPL,
+which represents 8.5% of your total holdings. Apple is trading at $175,
+up 12% from your average cost of $150. Before adding more, consider:
+1) This would increase tech exposure to 35%
+2) Q2 earnings are in 3 weeks (potential volatility)
+3) Your portfolio is already overweight tech vs S&P 500
+Would you like to discuss diversification alternatives, or proceed with
+adding to AAPL?"
+2. Alpaca (Trade Execution):
+
+// Market data
+const quote = await alpaca.getLatestQuote(symbol);
+// Place order
+const order = await alpaca.createOrder({
+  symbol: 'AAPL',
+  qty: 10,
+  side: 'buy',
+  type: 'market',
+  time_in_force: 'day'
+});
+// Check order status
+const orderStatus = await alpaca.getOrder(orderId);
+3. SEC EDGAR (Filing Data):
+
+// 13F filings
+const filings = await fetch(
+  `https://data.sec.gov/submissions/CIK${cik}.json`
+);
+// Parse 13F XML
+const positions = parse13F(filingXml);
+// Store in database
+await db.insert(filings13f).values(positions);
+4. Market Data Provider (Alpha Vantage, Polygon.io, or IEX Cloud):
+
+// Real-time quote
+const quote = await marketData.getQuote(symbol);
+// Historical data
+const chart = await marketData.getHistoricalPrices(symbol, {
+  from: '2024-01-01',
+  to: '2024-10-22',
+  interval: '1day'
+});
+User Flows & Interactions
+First-Time User Onboarding
+Step 1: Welcome Screen
+
+┌──────────────────────────────────────┐
+│  Welcome to Athena, [User Name]!    │
+│                                      │
+│  Choose your interface:              │
+│                                      │
+│  ┌────────────────────────────────┐ │
+│  │  💬 Amanda Mode                │ │
+│  │  Perfect for: On-the-go        │ │
+│  │  [Preview image]               │ │
+│  └────────────────────────────────┘ │
+│                                      │
+│  ┌────────────────────────────────┐ │
+│  │  📊 Hybrid Mode                │ │
+│  │  Perfect for: Desktop work     │ │
+│  │  [Preview image]               │ │
+│  └────────────────────────────────┘ │
+│                                      │
+│  ┌────────────────────────────────┐ │
+│  │  💻 Terminal Mode              │ │
+│  │  Perfect for: Pro traders      │ │
+│  │  [Preview image]               │ │
+│  └────────────────────────────────┘ │
+│                                      │
+│  (You can switch anytime)           │
+└──────────────────────────────────────┘
+Step 2: Portfolio Setup
+
+Option A: "Connect Brokerage" (Phase 2)
+Option B: "Add Holdings Manually"
+Option C: "Start with Demo Portfolio"
+Step 3: Quick Tour (Optional)
+
+"Here's where to chat with Amanda"
+"Your portfolio lives here"
+"Switch modes anytime here"
+"Ready to get started?"
+Daily User Flows
+Morning Check-In (Amanda Mode):
+
+Amanda: "Good morning! Your portfolio is up 1.2% today ($1,534).
+        Markets are positive - S&P 500 +0.8%.
+        
+        Quick highlights:
+        • AAPL up 2.1% (new product announcement)
+        • TSLA down 1.5% (profit-taking)
+        
+        Anything you'd like to discuss?"
+User: "What's driving Apple up?"
+Trade Execution (Hybrid Mode):
+
+User: "I want to take profits on Tesla"
+Amanda: "You hold 25 shares of TSLA with an average cost of $210.
+        Current price: $245 (+16.7% gain).
+        
+        Selling options:
+        • Sell all (25 shares) = $6,125 proceeds
+        • Sell half (12 shares) = $3,060 proceeds
+        • Sell just gains (3 shares) = original investment protected
+        
+        What would you like to do?"
+User: "Sell half"
+Amanda: [Trade Approval Card appears]
+        "Trade Preview:
+         Sell 12 TSLA @ market price (~$245)
+         Estimated proceeds: $2,940
+         Estimated gain: $420 (+16.7%)
+         
+         Impact on portfolio:
+         • Tesla allocation: 4.9% → 2.4%
+         • Cash: 5% → 7.4%
+         
+         [Approve Trade] [Cancel]"
+Deep Analysis (Terminal Mode):
+
+[User navigates to AAPL in holdings table]
+[Clicks "Analyze"]
+[Analysis panel opens]:
+- Valuation metrics (P/E, PEG, Price/Book)
+- Technical indicators (RSI, MACD)
+- Analyst consensus (12 Buy, 3 Hold, 0 Sell)
+- Recent 13F activity (15 funds increased)
+- Insider transactions (CEO bought $1M last week)
+- News sentiment (72% positive)
+- Earnings date (Nov 2, 2024)
+[Amanda voice available]:
+User: "What's your take on Apple?"
+Amanda: "Looking at the data, Apple is showing strong momentum..."
+Development Priorities & MVP Scope
+Phase 1: Core MVP (Weeks 1-4)
+Week 1: Authentication & Foundation
+
+ User signup/login (username + password)
+ Session management
+ Database schema setup (Drizzle migrations)
+ Basic app shell (navigation, layout)
+ Mode selector (Amanda/Hybrid/Terminal placeholders)
+Week 2: Portfolio Management
+
+ Add holdings manually (symbol, shares, cost)
+ View holdings table
+ Portfolio value calculation (real-time)
+ Performance chart (basic line chart)
+ Edit/delete holdings
+Week 3: Chat Interface (Text Only)
+
+ Chat UI (Amanda Mode)
+ Message history persistence
+ OpenAI integration (GPT-4)
+ Portfolio-aware context
+ Basic Amanda system prompt
+Week 4: Market Data
+
+ Real-time stock quotes (WebSocket)
+ Simple stock charts
+ Market indices display
+ Watchlist functionality
+ News feed integration
+Phase 2: Intelligence & Trading (Weeks 5-8)
+Week 5: Trade Execution
+
+ Trade suggestion UI
+ Approval workflow
+ Alpaca API integration
+ Order status tracking
+ Trade history
+Week 6: Advanced UI Modes
+
+ Hybrid Mode layout (dashboard + mini chat)
+ Terminal Mode multi-panel layout
+ Mode switching
+ Responsive design refinement
+Week 7: SEC Intelligence
+
+ 13F filing ingestion (daily batch)
+ Form 4 insider transaction tracking
+ AI synthesis of filing data
+ Portfolio-aware insights
+Week 8: Polish & Performance
+
+ Loading states, error handling
+ Performance optimization
+ UI refinements
+ End-to-end testing
+Phase 3: Voice & Advanced Features (Weeks 9-12)
+ OpenAI Realtime API (voice)
+ Voice input/output in Amanda Mode
+ ElevenLabs voice synthesis
+ Earnings call transcript analysis
+ Advanced performance metrics (Sharpe, beta, etc.)
+ Tax loss harvesting suggestions
+ Portfolio optimization AI
+Environment Variables
+# Database
+DATABASE_URL=postgresql://user:pass@host:5432/athena
+# Authentication
+SESSION_SECRET=your-secret-key-here
+# OpenAI
+OPENAI_API_KEY=sk-...
+# Alpaca (Paper Trading for Development)
+ALPACA_API_KEY=your-key
+ALPACA_SECRET_KEY=your-secret
+ALPACA_BASE_URL=https://paper-api.alpaca.markets
+# Market Data (choose one)
+POLYGON_API_KEY=...
+# or
+ALPHA_VANTAGE_API_KEY=...
+# or
+IEX_CLOUD_API_KEY=...
+# Optional (Phase 2+)
+ELEVENLABS_API_KEY=...
+Success Criteria
+The MVP is complete when:
+
+ Users can sign up and log in
+ Users can manually add portfolio holdings
+ Portfolio value updates in real-time
+ Chat interface works (text-based)
+ Amanda provides portfolio-aware responses
+ Users can view real-time stock quotes
+ Basic charts display correctly
+ All three modes (Amanda/Hybrid/Terminal) are functional
+ Design system is followed exactly (black bg, purple accents, glass morphism)
+ App is responsive (mobile + desktop)
+ No critical bugs or errors
+Development Commands
+# Start development
+npm run dev
+# Database migrations
+npm run db:migrate
+npm run db:generate
+# Type checking
+npm run typecheck
+# Build for production
+npm run build
+# Run tests
+npm test
+Final Notes
+What Makes This Different:
+
+NOT just another finance dashboard
+Conversational AI that UNDERSTANDS context, not keyword matching
+Portfolio-aware intelligence (not generic stock tips)
+Institutional-grade data (13Fs, insider transactions) made accessible
+Voice-first capability (talk while driving)
+Three modes for different use cases (casual to professional)
+Design Philosophy:
+
+Luxury over complexity
+Clarity over density
+Intelligence over data dumps
+Conversation over commands
+Build this app following the EXACT design system above. Every color, every font weight, every border radius matters. This is a luxury product, and the design should reflect that.
+
+Start with authentication, then chat interface, then portfolio management. Build incrementally, test constantly, and maintain the luxury aesthetic throughout.
+
+Let's build something incredible. 🚀
+
+---
+## 🎯 Quick Start Instructions
+**When you create your new Replit, paste the entire section above and add at the very end:**
+I'm ready to start building. Begin with:
+
+Set up the project structure (React + TypeScript + Express)
+Configure Tailwind with the exact color system specified above
+Set up database schema with Drizzle ORM
+Build authentication (signup/login pages)
+Create the app shell with navigation and mode selector
+Follow the design system exactly. Pure black background, Inter font, ultra-light headlines, glass morphism, 28px card radius. This is a luxury product.
+
+Start with Phase 1 Week 1 tasks. Let's build the foundation first.
