@@ -17,7 +17,7 @@ export default function PortfolioChart({ data, currentValue, totalGainPercent }:
   const isPositive = totalGainPercent >= 0;
 
   return (
-    <Card className="rounded-[28px]">
+    <Card className="rounded-[28px] glass-hover">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>

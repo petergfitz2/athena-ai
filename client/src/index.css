@@ -265,12 +265,61 @@
   }
   
   .glass-hover {
-    transition: all 0.3s ease;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .glass-hover:hover {
+    transform: scale(1.02);
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(139, 92, 246, 0.2);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15), 0 0 0 1px rgba(139, 92, 246, 0.1);
+  }
+  
+  /* Chat message slide-in animation */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-in {
+    animation: slideIn 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Purple pulse for loading states */
+  @keyframes purplePulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .animate-purple-pulse {
+    animation: purplePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  /* Data update glow animation */
+  @keyframes dataGlow {
+    0% {
+      box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 15px 5px rgba(139, 92, 246, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+  }
+  
+  .animate-data-glow {
+    animation: dataGlow 800ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   /* Gradient accent glass (use sparingly) */

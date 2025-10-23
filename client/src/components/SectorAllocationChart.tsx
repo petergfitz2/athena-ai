@@ -79,7 +79,7 @@ export default function SectorAllocationChart({
   );
 
   return (
-    <Card className="rounded-[28px]">
+    <Card className="rounded-[28px] glass-hover">
       <CardHeader>
         <CardTitle className="text-xl font-light">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>

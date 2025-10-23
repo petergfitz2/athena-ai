@@ -106,8 +106,8 @@ function DashboardPageContent() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {[1, 2, 3, 4].map(i => (
-              <Card key={i} className="bg-card/50 border-white/10 rounded-[28px] p-8 animate-pulse">
-                <div className="h-20 bg-white/5 rounded"></div>
+              <Card key={i} className="bg-card/50 border-white/10 rounded-[28px] p-8 animate-purple-pulse">
+                <div className="h-20 bg-primary/10 rounded"></div>
               </Card>
             ))}
           </div>
@@ -116,7 +116,7 @@ function DashboardPageContent() {
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               {/* Total Value */}
-              <Card className="bg-card border-white/10 rounded-[28px]" data-testid="card-total-value">
+              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-total-value">
                 <CardHeader className="pb-2">
                   <CardDescription className="text-xs text-muted-foreground font-light">
                     Total Value
@@ -130,7 +130,7 @@ function DashboardPageContent() {
               </Card>
 
               {/* Total Gain/Loss */}
-              <Card className="bg-card border-white/10 rounded-[28px]" data-testid="card-total-gain">
+              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-total-gain">
                 <CardHeader className="pb-2">
                   <CardDescription className="text-xs text-muted-foreground font-light">
                     Total Gain/Loss
@@ -147,7 +147,7 @@ function DashboardPageContent() {
               </Card>
 
               {/* Cash Balance */}
-              <Card className="bg-card border-white/10 rounded-[28px]" data-testid="card-cash-balance">
+              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-cash-balance">
                 <CardHeader className="pb-2">
                   <CardDescription className="text-xs text-muted-foreground font-light">
                     Cash Balance
@@ -161,7 +161,7 @@ function DashboardPageContent() {
               </Card>
 
               {/* Holdings Count */}
-              <Card className="bg-card border-white/10 rounded-[28px]" data-testid="card-holdings-count">
+              <Card className="bg-card border-white/10 rounded-[28px] glass-hover" data-testid="card-holdings-count">
                 <CardHeader className="pb-2">
                   <CardDescription className="text-xs text-muted-foreground font-light">
                     Holdings

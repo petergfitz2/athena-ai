@@ -12,7 +12,7 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
   return (
     <div
       className={cn(
-        "flex w-full",
+        "flex w-full animate-slide-in",
         isUser ? "justify-end" : "justify-start"
       )}
     >
