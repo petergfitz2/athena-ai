@@ -21,6 +21,10 @@ import TutorialsPage from "@/pages/TutorialsPage";
 import FAQPage from "@/pages/FAQPage";
 import HelpPage from "@/pages/HelpPage";
 import ModeSelector from "@/components/ModeSelector";
+// Phase 2 pages
+import InvestmentSimulator from "@/pages/InvestmentSimulator";
+import SocialTradingPage from "@/pages/SocialTradingPage";
+import AchievementsPage from "@/pages/AchievementsPage";
 import NotFound from "@/pages/not-found";
 
 // Command Center is now the default - no mode selection needed
@@ -50,6 +54,14 @@ function Router() {
       <Route path="/settings" component={SettingsPage} />
       <Route path="/trades" component={TradesPage} />
       <Route path="/analytics" component={AnalyticsPage} />
+      {/* Phase 2 Features */}
+      <Route path="/simulator" component={InvestmentSimulator} />
+      <Route path="/social">
+        {user ? <SocialTradingPage /> : <Redirect to="/" />}
+      </Route>
+      <Route path="/achievements">
+        {user ? <AchievementsPage /> : <Redirect to="/" />}
+      </Route>
       {/* Archived mode pages - still accessible via URL but not in main navigation */}
       <Route path="/athena" component={AthenaMode} />
       <Route path="/hybrid" component={HybridMode} />

@@ -1,0 +1,33 @@
+import Navigation from "@/components/Navigation";
+import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
+import BackButton from "@/components/BackButton";
+import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
+import SocialTradingHub from "@/components/SocialTradingHub";
+
+export default function SocialTradingPage() {
+  return (
+    <div className="min-h-screen bg-black">
+      <Navigation />
+      <NavigationBreadcrumbs />
+      <FloatingAthenaOrb />
+      
+      <div className="px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+        <div className="max-w-[1600px] mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <BackButton />
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mt-4 mb-3">
+              Social Trading
+            </h1>
+            <p className="text-lg lg:text-xl text-muted-foreground font-light">
+              Connect with top traders and share investment strategies
+            </p>
+          </div>
+
+          {/* Social Trading Hub Component */}
+          <SocialTradingHub />
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -53,10 +53,11 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   };
 
   const navLinks = [
-    { href: "/command-center", label: "Command Center", icon: LayoutDashboard, shortcut: "⌘1" },
+    { href: "/command-center", label: "Command", icon: LayoutDashboard, shortcut: "⌘1" },
     { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘2" },
-    { href: "/watchlist", label: "Discover", icon: ListChecks, shortcut: "⌘3" },
-    { href: "/analytics", label: "Learn", icon: BookOpen, shortcut: "⌘4" },
+    { href: "/simulator", label: "Simulator", icon: Activity, shortcut: "⌘3" },
+    { href: "/social", label: "Social", icon: Users, shortcut: "⌘4" },
+    { href: "/achievements", label: "Rewards", icon: Trophy, shortcut: "⌘5" },
   ];
 
   // Add keyboard shortcuts
@@ -75,11 +76,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             break;
           case '3':
             e.preventDefault();
-            setLocation('/watchlist');
+            setLocation('/simulator');
             break;
           case '4':
             e.preventDefault();
-            setLocation('/analytics');
+            setLocation('/social');
+            break;
+          case '5':
+            e.preventDefault();
+            setLocation('/achievements');
             break;
         }
       }

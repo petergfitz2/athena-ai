@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiJson } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
@@ -36,7 +37,9 @@ import {
   Star,
   MessageCircle,
   X,
-  Square
+  Square,
+  Trophy,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +67,7 @@ interface NewsArticle {
 }
 
 export default function CommandCenter() {
+  const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -203,10 +207,10 @@ export default function CommandCenter() {
   };
 
   const quickActions = [
-    { icon: ShoppingCart, label: "Buy", color: "text-success", action: () => toast({ title: "Buy Order", description: "Opening order form..." }) },
-    { icon: DollarSign, label: "Sell", color: "text-destructive", action: () => toast({ title: "Sell Order", description: "Opening sell form..." }) },
-    { icon: LineChart, label: "Analyze", color: "text-primary", action: () => toast({ title: "Analysis", description: "Starting analysis..." }) },
-    { icon: BookOpen, label: "Learn", color: "text-purple-500", action: () => toast({ title: "Learning", description: "Opening education center..." }) },
+    { icon: Activity, label: "Simulator", color: "text-primary", action: () => setLocation("/simulator") },
+    { icon: Users, label: "Social", color: "text-purple-500", action: () => setLocation("/social") },
+    { icon: Trophy, label: "Rewards", color: "text-yellow-500", action: () => setLocation("/achievements") },
+    { icon: Shield, label: "X-Ray", color: "text-blue-500", action: () => setLocation("/portfolio") },
   ];
 
   const topMovers = holdings.slice(0, 3).map(h => ({
