@@ -76,18 +76,32 @@ Athena provides a conversational interface for investment advice and portfolio m
 - Background: Pure black (#000000)
 - Text: Near-white (#f5f5f7)
 - Accent: Purple (#8B5CF6)
-- Border radius: 28px for cards
+- Border radius: 28px for all cards
 
-### Typography
+### Typography (Responsive)
 - Font: Inter
-- Headlines: 200-300 weight (ultra-light)
-- Body: 400-500 weight
+- Headlines: `text-5xl md:text-6xl lg:text-7xl font-extralight` (ultra-light 200-300 weight)
+- Section headings: `text-4xl font-extralight`
+- Body: `font-light` (400-500 weight)
+
+### Layout (Desktop-First with Responsive)
+- **Desktop Optimization**:
+  - Dashboard/Portfolio: `max-w-[1600px]` container
+  - Chat: `max-w-[1400px]` container
+  - Padding: `px-6 sm:px-10 lg:px-16 py-8 lg:py-12`
+  - Spacing: `gap-8`, `space-y-12 lg:space-y-16`
+  - Card padding: `p-8 md:p-12 lg:p-16`
+- **Responsive Grids**:
+  - Market tiles: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`
+  - Portfolio holdings: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+  - Trade suggestions: `grid-cols-1 lg:grid-cols-2`
 
 ### Components
-- Glassmorphism cards with backdrop blur
+- Glassmorphism cards (`.glass` class) with backdrop blur
+- 28px border radius (`rounded-[28px]`) throughout
 - Purple gradient accents
-- Generous spacing
-- Luxury minimal aesthetic
+- Generous spacing (especially at desktop breakpoint)
+- Luxury minimal aesthetic with ultra-light typography
 
 ## Environment Variables
 
