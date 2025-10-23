@@ -13,6 +13,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import WatchlistPage from "@/pages/WatchlistPage";
 import SettingsPage from "@/pages/SettingsPage";
 import TradesPage from "@/pages/TradesPage";
+import AnalyticsPage from "@/pages/AnalyticsPage";
 import ModeSelector from "@/components/ModeSelector";
 import NotFound from "@/pages/not-found";
 
@@ -55,6 +56,7 @@ function Router() {
       <Route path="/watchlist" component={WatchlistPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/trades" component={TradesPage} />
+      <Route path="/analytics" component={AnalyticsPage} />
       <Route path="/amanda" component={AmandaMode} />
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />

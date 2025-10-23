@@ -13,7 +13,7 @@ import ChatMessage from "@/components/ChatMessage";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
-import { Mic, Send, Square, LayoutDashboard, List, Settings } from "lucide-react";
+import { Mic, Send, Square, LayoutDashboard, List, Settings, BarChart3 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 type Message = {
@@ -178,6 +178,15 @@ function AmandaModeContent() {
             data-testid="button-dashboard"
           >
             <LayoutDashboard className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/analytics")}
+            className="rounded-full"
+            data-testid="button-analytics"
+          >
+            <BarChart3 className="w-5 h-5" />
           </Button>
           <Button
             variant="ghost"

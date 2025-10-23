@@ -8,6 +8,8 @@ import type { PortfolioSummary, Holding, MarketQuote } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import AddHoldingModal from "@/components/AddHoldingModal";
+import PortfolioChart from "@/components/PortfolioChart";
+import SectorAllocationChart, { type SectorData } from "@/components/SectorAllocationChart";
 
 function DashboardPageContent() {
   const { user } = useAuth();
@@ -24,6 +26,14 @@ function DashboardPageContent() {
 
   const { data: quotes } = useQuery<Record<string, MarketQuote>>({
     queryKey: ['/api/market/quotes'],
+  });
+
+  const { data: performanceData = [] } = useQuery<Array<{ date: string; value: number }>>({
+    queryKey: ['/api/portfolio/performance'],
+  });
+
+  const { data: sectorData = [] } = useQuery<SectorData[]>({
+    queryKey: ['/api/portfolio/sectors'],
   });
 
   const isLoading = summaryLoading || holdingsLoading;
@@ -127,6 +137,21 @@ function DashboardPageContent() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Portfolio Visualizations */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+              {/* Performance Chart */}
+              <PortfolioChart 
+                data={performanceData}
+                currentValue={summary?.totalValue || 0}
+                totalGainPercent={summary?.totalGainPercent || 0}
+              />
+              
+              {/* Sector Allocation */}
+              <SectorAllocationChart 
+                data={sectorData}
+              />
             </div>
 
             {/* Holdings Table */}

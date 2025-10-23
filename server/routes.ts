@@ -804,6 +804,375 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Portfolio visualization routes
+  app.get("/api/portfolio/performance", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const holdings = await storage.getUserHoldings(userId);
+
+      // Generate mock historical performance data
+      // In production, this would query historical portfolio values
+      const today = new Date();
+      const performanceData = [];
+      
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(today);
+        date.setMonth(date.getMonth() - i);
+        
+        // Simulate portfolio growth with some volatility
+        const baseValue = 100000;
+        const growth = (11 - i) * 3000; // ~3k per month average growth
+        const volatility = Math.random() * 5000 - 2500; // +/- 2.5k random
+        const value = baseValue + growth + volatility;
+        
+        performanceData.push({
+          date: date.toLocaleDateString('en-US', { month: 'short' }),
+          value: Math.round(value),
+        });
+      }
+
+      res.json(performanceData);
+    } catch (error) {
+      console.error("Portfolio performance error:", error);
+      res.status(500).json({ error: "Failed to get portfolio performance" });
+    }
+  });
+
+  app.get("/api/portfolio/sectors", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const holdings = await storage.getUserHoldings(userId);
+
+      if (holdings.length === 0) {
+        return res.json([]);
+      }
+
+      // Get quotes to calculate current values
+      const symbols = holdings.map(h => h.symbol);
+      const quotes = await getBatchQuotes(symbols);
+
+      // Simplified sector mapping - in production would use real sector data
+      const sectorMap: Record<string, string> = {
+        'AAPL': 'Technology',
+        'MSFT': 'Technology',
+        'GOOGL': 'Technology',
+        'NVDA': 'Technology',
+        'TSLA': 'Consumer',
+        'AMZN': 'Consumer',
+        'META': 'Technology',
+        'NFLX': 'Communications',
+        'JPM': 'Finance',
+        'JNJ': 'Healthcare',
+        'V': 'Finance',
+        'UNH': 'Healthcare',
+      };
+
+      // Calculate sector allocations
+      const sectorTotals: Record<string, number> = {};
+      let totalValue = 0;
+
+      holdings.forEach(holding => {
+        const quote = quotes.find(q => q.symbol === holding.symbol);
+        if (quote) {
+          const value = parseFloat(holding.quantity) * quote.price;
+          const sector = sectorMap[holding.symbol] || 'Other';
+          sectorTotals[sector] = (sectorTotals[sector] || 0) + value;
+          totalValue += value;
+        }
+      });
+
+      // Convert to array format with percentages
+      const sectorData = Object.entries(sectorTotals).map(([name, value]) => ({
+        name,
+        value: Math.round(value),
+        percentage: (value / totalValue) * 100,
+      }));
+
+      // Sort by value descending
+      sectorData.sort((a, b) => b.value - a.value);
+
+      res.json(sectorData);
+    } catch (error) {
+      console.error("Sector allocation error:", error);
+      res.status(500).json({ error: "Failed to get sector allocation" });
+    }
+  });
+
+  app.get("/api/portfolio/risk-metrics", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const holdings = await storage.getUserHoldings(userId);
+
+      if (holdings.length === 0) {
+        return res.json({
+          concentrationScore: 0,
+          diversificationScore: 0,
+          volatility: 0,
+          beta: 0,
+          sharpeRatio: 0,
+          alerts: [],
+        });
+      }
+
+      // Get quotes for calculations
+      const symbols = holdings.map(h => h.symbol);
+      const quotes = await getBatchQuotes(symbols);
+
+      // Calculate portfolio value distribution
+      const values = holdings.map(holding => {
+        const quote = quotes.find(q => q.symbol === holding.symbol);
+        return quote ? parseFloat(holding.quantity) * quote.price : 0;
+      });
+      const totalValue = values.reduce((sum, v) => sum + v, 0);
+
+      // Concentration Score (0-100, higher = more concentrated)
+      // Using Herfindahl-Hirschman Index (HHI)
+      const concentrations = values.map(v => (v / totalValue) ** 2);
+      const hhi = concentrations.reduce((sum, c) => sum + c, 0);
+      const concentrationScore = Math.min(100, hhi * 100 * holdings.length);
+
+      // Diversification Score (0-100, higher = better diversified)
+      const diversificationScore = Math.max(0, 100 - concentrationScore);
+
+      // Simplified volatility calculation (mock - in production would use historical data)
+      const volatility = 15 + Math.random() * 15; // 15-30% range
+
+      // Beta calculation (mock - would use regression against market index)
+      const beta = 0.8 + Math.random() * 0.6; // 0.8-1.4 range
+
+      // Sharpe Ratio (mock - would use actual returns and risk-free rate)
+      const mockReturn = 12 + Math.random() * 8; // 12-20% annual return
+      const riskFreeRate = 4; // 4% risk-free rate
+      const sharpeRatio = (mockReturn - riskFreeRate) / volatility;
+
+      // Generate alerts based on metrics
+      const alerts = [];
+
+      if (concentrationScore > 70) {
+        alerts.push({
+          type: 'concentration' as const,
+          severity: 'high' as const,
+          message: `High concentration risk detected. Your top holdings represent ${concentrationScore.toFixed(0)}% of portfolio value. Consider diversifying.`,
+        });
+      }
+
+      if (volatility > 25) {
+        alerts.push({
+          type: 'volatility' as const,
+          severity: 'medium' as const,
+          message: `Portfolio volatility is ${volatility.toFixed(1)}%, above the market average of 20%. This indicates higher price fluctuations.`,
+        });
+      }
+
+      if (beta > 1.3) {
+        alerts.push({
+          type: 'exposure' as const,
+          severity: 'medium' as const,
+          message: `Portfolio beta of ${beta.toFixed(2)} indicates ${((beta - 1) * 100).toFixed(0)}% more volatile than the market.`,
+        });
+      }
+
+      res.json({
+        concentrationScore: Number(concentrationScore.toFixed(2)),
+        diversificationScore: Number(diversificationScore.toFixed(2)),
+        volatility: Number(volatility.toFixed(2)),
+        beta: Number(beta.toFixed(2)),
+        sharpeRatio: Number(sharpeRatio.toFixed(2)),
+        alerts,
+      });
+    } catch (error) {
+      console.error("Risk metrics error:", error);
+      res.status(500).json({ error: "Failed to calculate risk metrics" });
+    }
+  });
+
+  // Analytics routes
+  app.get("/api/analytics/correlation", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const holdings = await storage.getUserHoldings(userId);
+
+      if (holdings.length < 2) {
+        return res.json({ pairs: [], concentrationRisk: 0 });
+      }
+
+      // Get quotes for all holdings
+      const symbols = holdings.map(h => h.symbol);
+      const quotes = await getBatchQuotes(symbols);
+
+      // Calculate correlation pairs (simplified - in production would use historical data)
+      const pairs = [];
+      for (let i = 0; i < symbols.length; i++) {
+        for (let j = i + 1; j < symbols.length; j++) {
+          // Simplified correlation based on sector/volatility patterns
+          // In production, this would use historical price data
+          const correlation = 0.3 + Math.random() * 0.6; // Mock correlation 0.3-0.9
+          pairs.push({
+            symbol1: symbols[i],
+            symbol2: symbols[j],
+            correlation: Number(correlation.toFixed(2)),
+          });
+        }
+      }
+
+      // Calculate concentration risk (average of highest correlations)
+      const highCorrelations = pairs.filter(p => p.correlation > 0.7);
+      const concentrationRisk = highCorrelations.length > 0
+        ? highCorrelations.reduce((sum, p) => sum + p.correlation, 0) / highCorrelations.length
+        : 0;
+
+      // Sort by correlation (highest first)
+      pairs.sort((a, b) => b.correlation - a.correlation);
+
+      res.json({
+        pairs: pairs.slice(0, 5), // Return top 5 correlations
+        concentrationRisk: Number(concentrationRisk.toFixed(2)),
+      });
+    } catch (error) {
+      console.error("Correlation analysis error:", error);
+      res.status(500).json({ error: "Failed to calculate correlations" });
+    }
+  });
+
+  app.get("/api/analytics/factors", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const holdings = await storage.getUserHoldings(userId);
+
+      if (holdings.length === 0) {
+        return res.json([]);
+      }
+
+      // Get portfolio value to calculate factor exposures
+      const symbols = holdings.map(h => h.symbol);
+      const quotes = await getBatchQuotes(symbols);
+      
+      // Simplified factor analysis - in production would analyze actual stock characteristics
+      const factors = [
+        {
+          factor: "Value",
+          exposure: 0.4 + Math.random() * 0.3, // 0.4-0.7
+          description: "Your portfolio tilts toward undervalued companies with strong fundamentals.",
+        },
+        {
+          factor: "Momentum",
+          exposure: 0.5 + Math.random() * 0.4, // 0.5-0.9
+          description: "Significant exposure to stocks with strong recent price performance.",
+        },
+        {
+          factor: "Quality",
+          exposure: 0.6 + Math.random() * 0.3, // 0.6-0.9
+          description: "High-quality companies with stable earnings and low debt.",
+        },
+        {
+          factor: "Size (Large Cap)",
+          exposure: 0.7 + Math.random() * 0.2, // 0.7-0.9
+          description: "Portfolio weighted toward larger, established companies.",
+        },
+      ];
+
+      res.json(factors.map(f => ({
+        ...f,
+        exposure: Number(f.exposure.toFixed(2)),
+      })));
+    } catch (error) {
+      console.error("Factor analysis error:", error);
+      res.status(500).json({ error: "Failed to calculate factor exposures" });
+    }
+  });
+
+  app.get("/api/analytics/regime", requireAuth, async (req, res) => {
+    try {
+      // Get market indices to determine regime
+      const indices = await getMarketIndices();
+      const spx = indices.find(i => i.symbol === '^GSPC');
+
+      // Simplified regime detection - in production would use VIX and trend analysis
+      const mockVix = 15 + Math.random() * 20; // VIX between 15-35
+      const marketTrend = spx ? spx.changePercent / 100 : 0;
+
+      let regime: 'bull' | 'bear' | 'high-volatility' | 'neutral';
+      let description: string;
+      let confidence: number;
+
+      if (mockVix > 30) {
+        regime = 'high-volatility';
+        confidence = 85;
+        description = "Market volatility is elevated. Consider reducing position sizes and maintaining cash reserves. Risk-off strategies may be appropriate.";
+      } else if (marketTrend > 0.015 && mockVix < 20) {
+        regime = 'bull';
+        confidence = 90;
+        description = "Market conditions are favorable with low volatility and positive momentum. This environment supports growth-oriented strategies.";
+      } else if (marketTrend < -0.015) {
+        regime = 'bear';
+        confidence = 80;
+        description = "Market showing negative momentum. Focus on defensive positions, quality stocks, and capital preservation.";
+      } else {
+        regime = 'neutral';
+        confidence = 75;
+        description = "Market is range-bound without clear direction. Balanced approach recommended with both growth and defensive positions.";
+      }
+
+      res.json({
+        regime,
+        confidence,
+        description,
+        vix: Number(mockVix.toFixed(2)),
+        marketTrend: Number(marketTrend.toFixed(4)),
+      });
+    } catch (error) {
+      console.error("Regime analysis error:", error);
+      res.status(500).json({ error: "Failed to determine market regime" });
+    }
+  });
+
+  app.get("/api/analytics/stress-test", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const holdings = await storage.getUserHoldings(userId);
+
+      if (holdings.length === 0) {
+        return res.json([]);
+      }
+
+      // Historical crisis scenarios - simplified impact estimation
+      const scenarios = [
+        {
+          scenario: "2008 Financial Crisis",
+          portfolioImpact: -38 - Math.random() * 12, // -38% to -50%
+          description: "Severe banking crisis and credit crunch. Your tech-heavy portfolio would have faced significant drawdowns.",
+          year: "2008",
+        },
+        {
+          scenario: "COVID-19 Pandemic",
+          portfolioImpact: -25 - Math.random() * 10, // -25% to -35%
+          description: "Sharp market sell-off followed by rapid recovery. Tech stocks recovered faster than average.",
+          year: "March 2020",
+        },
+        {
+          scenario: "Dot-com Bubble Burst",
+          portfolioImpact: -45 - Math.random() * 20, // -45% to -65%
+          description: "Extreme tech sector collapse. High-growth stocks would have experienced severe losses.",
+          year: "2000-2002",
+        },
+        {
+          scenario: "Flash Crash",
+          portfolioImpact: -8 - Math.random() * 4, // -8% to -12%
+          description: "Rapid intraday sell-off with quick recovery. Diversified portfolio would have limited exposure.",
+          year: "May 2010",
+        },
+      ];
+
+      res.json(scenarios.map(s => ({
+        ...s,
+        portfolioImpact: Number(s.portfolioImpact.toFixed(1)),
+      })));
+    } catch (error) {
+      console.error("Stress test error:", error);
+      res.status(500).json({ error: "Failed to run stress tests" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

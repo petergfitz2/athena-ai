@@ -13,7 +13,7 @@ import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import ModeSuggestion from "@/components/ModeSuggestion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, X, MessageCircle, LayoutDashboard, Square, List, Settings } from "lucide-react";
+import { Mic, Send, X, MessageCircle, LayoutDashboard, Square, List, Settings, BarChart3 } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -152,6 +152,15 @@ function HybridModeContent() {
                   data-testid="button-dashboard"
                 >
                   <LayoutDashboard className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setLocation("/analytics")}
+                  className="rounded-full"
+                  data-testid="button-analytics"
+                >
+                  <BarChart3 className="w-5 h-5" />
                 </Button>
                 <Button
                   variant="ghost"

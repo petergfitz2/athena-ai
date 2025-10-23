@@ -12,7 +12,7 @@ import NewsDetailModal from "@/components/NewsDetailModal";
 import ChatMessage from "@/components/ChatMessage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TrendingUp, TrendingDown, Activity, LayoutDashboard, Send, Mic, Square, List, Settings } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, LayoutDashboard, Send, Mic, Square, List, Settings, BarChart3 } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { NewsArticle } from "@shared/schema";
@@ -194,6 +194,15 @@ function TerminalModeContent() {
                 data-testid="button-dashboard"
               >
                 <LayoutDashboard className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/analytics")}
+                className="rounded-full"
+                data-testid="button-analytics"
+              >
+                <BarChart3 className="w-5 h-5" />
               </Button>
               <Button
                 variant="ghost"
