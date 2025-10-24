@@ -196,7 +196,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       }`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+        <div className="flex items-center justify-between h-24 gap-4">
           {/* Left Side - Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center h-14 hover-elevate active-elevate-2 px-4 rounded-lg transition-colors" data-testid="link-logo">
@@ -250,7 +250,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                     }
                   }}
                   placeholder={searchExpanded ? "Search stocks... (⌘K)" : "⌘K"}
-                  className={`w-full h-11 pl-10 pr-10 rounded-[20px] transition-all duration-250 text-sm md:text-base ${
+                  className={`w-full h-12 pl-10 pr-10 rounded-[20px] transition-all duration-250 text-base ${
                     searchExpanded 
                       ? "border-white/30 bg-white/10 ring-2 ring-primary/50 placeholder:opacity-100" 
                       : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-70"
@@ -309,14 +309,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                     <TooltipTrigger asChild>
                       <Link 
                         href={link.href}
-                        className={`flex items-center gap-2 h-10 px-3 rounded-full text-sm transition-all relative flex-shrink-0 ${
+                        className={`flex items-center gap-2 h-12 px-4 rounded-full text-base transition-all relative flex-shrink-0 ${
                           active
                             ? "bg-primary/20 text-primary font-bold"
                             : "text-white font-medium hover:text-white hover:bg-white/10"
                         }`}
                         data-testid={`link-${link.label.toLowerCase()}`}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-5 h-5" />
                         <span className="font-medium">{link.label}</span>
                       </Link>
                     </TooltipTrigger>
@@ -338,12 +338,12 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-11 w-11 rounded-full bg-white/10 hover:bg-white/20"
+                  className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20"
                   data-testid="button-mode-switcher"
                 >
-                  {currentMode === "athena" && <MessageCircle className="w-5 h-5 text-white" />}
-                  {currentMode === "hybrid" && <Layout className="w-5 h-5 text-white" />}
-                  {currentMode === "terminal" && <Grid3x3 className="w-5 h-5 text-white" />}
+                  {currentMode === "athena" && <MessageCircle className="w-6 h-6 text-white" />}
+                  {currentMode === "hybrid" && <Layout className="w-6 h-6 text-white" />}
+                  {currentMode === "terminal" && <Grid3x3 className="w-6 h-6 text-white" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -396,10 +396,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-11 w-11 rounded-full bg-white/10 hover:bg-white/20 p-0"
+                  className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 p-0"
                   data-testid="button-user-menu"
                 >
-                  <Avatar className="w-10 h-10">
+                  <Avatar className="w-11 h-11">
                     <AvatarFallback className="bg-primary/30 text-white text-sm font-bold">
                       {getUserInitials()}
                     </AvatarFallback>
@@ -504,10 +504,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-11 w-11"
+                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-12 w-12"
                   data-testid="button-mobile-menu"
                 >
-                  <Menu className="w-5 h-5 text-white" />
+                  <Menu className="w-6 h-6 text-white" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
