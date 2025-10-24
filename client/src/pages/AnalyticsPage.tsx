@@ -8,6 +8,7 @@ import RiskInsights from "@/components/RiskInsights";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
+import { TickerLink } from "@/components/TickerLink";
 
 interface CorrelationData {
   pairs: Array<{
@@ -109,8 +110,10 @@ function AnalyticsPageContent() {
                       data-testid={`correlation-pair-${idx}`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="font-light text-foreground">
-                          {pair.symbol1} × {pair.symbol2}
+                        <span className="font-light text-foreground flex items-center gap-2">
+                          <TickerLink symbol={pair.symbol1} />
+                          <span className="text-muted-foreground">×</span>
+                          <TickerLink symbol={pair.symbol2} />
                         </span>
                         <Badge
                           variant={Math.abs(pair.correlation) > 0.7 ? "default" : "secondary"}

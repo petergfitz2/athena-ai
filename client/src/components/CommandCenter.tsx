@@ -629,7 +629,16 @@ export default function CommandCenter() {
                 <p className="text-xs text-muted-foreground">Top Movers</p>
                 {topMovers.map((mover) => (
                   <div key={mover.symbol} className="flex justify-between items-center">
-                    <span className="text-sm font-medium">{mover.symbol}</span>
+                    <button 
+                      className="text-sm font-medium text-primary hover:text-primary/80 underline underline-offset-2"
+                      onClick={() => {
+                        setSelectedStock(mover.symbol);
+                        setStockDetailOpen(true);
+                      }}
+                      data-testid={`ticker-top-mover-${mover.symbol}`}
+                    >
+                      {mover.symbol}
+                    </button>
                     <div className="flex items-center gap-2">
                       <span className="text-sm">${mover.value.toFixed(0)}</span>
                       <Badge 

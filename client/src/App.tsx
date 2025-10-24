@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ModeProvider, useMode } from "@/contexts/ModeContext";
+import { StockDetailModalProvider } from "@/contexts/StockDetailModalContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthPage from "@/pages/AuthPage";
 import CommandCenter from "@/components/CommandCenter";
@@ -94,12 +95,14 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ModeProvider>
-            <TooltipProvider>
-              <div className="dark">
-                <Toaster />
-                <Router />
-              </div>
-            </TooltipProvider>
+            <StockDetailModalProvider>
+              <TooltipProvider>
+                <div className="dark">
+                  <Toaster />
+                  <Router />
+                </div>
+              </TooltipProvider>
+            </StockDetailModalProvider>
           </ModeProvider>
         </AuthProvider>
       </QueryClientProvider>
