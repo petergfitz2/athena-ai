@@ -504,7 +504,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-10 w-10"
+                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-11 w-11"
                   data-testid="button-mobile-menu"
                 >
                   <Menu className="w-5 h-5 text-white" />
