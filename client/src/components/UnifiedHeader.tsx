@@ -4,7 +4,17 @@ import { useMode } from "@/contexts/ModeContext";
 import ModeSwitcherMenu from "@/components/ModeSwitcherMenu";
 import AthenaOrb from "@/components/AthenaOrb";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Menu, 
   X, 
@@ -15,9 +25,12 @@ import {
   BookOpen, 
   HelpCircle,
   Settings,
-  LogOut
+  LogOut,
+  User,
+  Sparkles
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useQuery } from "@tanstack/react-query";
 
 interface UnifiedHeaderProps {
   showModeSwitcher?: boolean;
@@ -32,8 +45,21 @@ export default function UnifiedHeader({
 }: UnifiedHeaderProps) {
   const [location, setLocation] = useLocation();
   const { currentMode } = useMode();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Fetch active avatar data
+  const { data: activeAvatar } = useQuery<{
+    name: string;
+    imageUrl: string;
+    personalityProfile: {
+      catchphrase?: string;
+      [key: string]: any;
+    };
+  }>({
+    queryKey: ['/api/avatars/active'],
+    refetchInterval: 10000,
+  });
 
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -60,9 +86,16 @@ export default function UnifiedHeader({
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <AthenaOrb size="mini" showStatus={false} />
-              <h1 className="text-2xl font-extralight text-foreground tracking-wider hidden sm:block">
-                Athena
-              </h1>
+              <div className="hidden sm:block">
+                <h1 className="text-2xl font-extralight text-foreground tracking-wider">
+                  Athena AI
+                </h1>
+                {activeAvatar && activeAvatar.name !== "Athena" && (
+                  <p className="text-xs text-muted-foreground -mt-1">
+                    with {activeAvatar.name}
+                  </p>
+                )}
+              </div>
             </Link>
 
             {/* Desktop Navigation - Hidden on mobile */}
@@ -106,21 +139,52 @@ export default function UnifiedHeader({
                   Help
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="sm" className="rounded-full" aria-label="Settings">
-                <Link href="/settings">
-                  <Settings className="w-4 h-4" />
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={logout}
-                className="rounded-full text-destructive hover:text-destructive"
-                data-testid="button-logout-desktop"
-                aria-label="Log out"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
+              
+              {/* User Avatar Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full" data-testid="button-user-menu">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={activeAvatar?.imageUrl} alt={activeAvatar?.name} />
+                      <AvatarFallback>{activeAvatar?.name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'A'}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-72" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-2">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium leading-none">{activeAvatar?.name || 'Athena'}</p>
+                        <Badge variant="outline" className="text-[10px]">AI Advisor</Badge>
+                      </div>
+                      {activeAvatar?.personalityProfile?.catchphrase && (
+                        <p className="text-xs text-muted-foreground italic">
+                          "{activeAvatar.personalityProfile.catchphrase}"
+                        </p>
+                      )}
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/avatar-studio">
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      <span>Avatar Studio</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Mobile Menu Trigger */}
