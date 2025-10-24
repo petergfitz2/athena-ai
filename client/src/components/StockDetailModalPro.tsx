@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -179,6 +179,10 @@ export function StockDetailModalPro({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] w-[1600px] max-h-[90vh] overflow-hidden bg-black border-white/10 p-0">
+        <DialogTitle className="sr-only">Stock Details for {symbol}</DialogTitle>
+        <DialogDescription className="sr-only">
+          View comprehensive trading data, charts, and analytics for {symbol} stock
+        </DialogDescription>
         <div className="flex h-full">
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col">
