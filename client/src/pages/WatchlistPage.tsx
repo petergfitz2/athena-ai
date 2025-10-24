@@ -11,7 +11,7 @@ import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
-import StockDetailModal from "@/components/StockDetailModal";
+import { TickerLink } from "@/components/TickerLink";
 import { useLocation } from "wouter";
 
 interface WatchlistItem {
@@ -25,18 +25,10 @@ function WatchlistPageContent() {
   const [newSymbol, setNewSymbol] = useState("");
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [buyModalSymbol, setBuyModalSymbol] = useState<string | null>(null);
-  const [stockDetailOpen, setStockDetailOpen] = useState(false);
-  const [selectedStock, setSelectedStock] = useState<string | null>(null);
   const [updatedSymbols, setUpdatedSymbols] = useState<Set<string>>(new Set());
   const prevQuotesRef = useRef<Record<string, MarketQuote>>({});
   
-  const handleOpenStockDetail = (symbol: string) => {
-    setSelectedStock(symbol);
-    setStockDetailOpen(true);
-  };
-  
   const handleOpenTradeModal = (action: 'buy' | 'sell', symbol: string) => {
-    setStockDetailOpen(false);
     setBuyModalSymbol(symbol);
   };
 
@@ -267,10 +259,8 @@ function WatchlistPageContent() {
                 >
                   {/* Header with symbol and remove button */}
                   <div className="flex items-start justify-between gap-4 mb-6">
-                    <div className="cursor-pointer hover-elevate" onClick={() => handleOpenStockDetail(item.symbol)}>
-                      <h3 className="text-3xl font-light text-foreground mb-1" data-testid={`ticker-${item.symbol}`}>
-                        {item.symbol}
-                      </h3>
+                    <div>
+                      <TickerLink symbol={item.symbol} variant="large" className="text-3xl font-light mb-1" />
                       {quote && (
                         <p className="text-xs text-muted-foreground">
                           Vol: {quote.volume?.toLocaleString() || "N/A"}
@@ -359,13 +349,6 @@ function WatchlistPageContent() {
       </div>
       </div>
 
-      {/* Stock Detail Modal */}
-      <StockDetailModal
-        symbol={selectedStock}
-        open={stockDetailOpen}
-        onOpenChange={setStockDetailOpen}
-        onTrade={handleOpenTradeModal}
-      />
       
       {/* Buy Modal */}
       <ExecuteTradeModal
