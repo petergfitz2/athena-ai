@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,13 +19,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard, Palette, MoreHorizontal } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard, Palette, MoreHorizontal, Search, X } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMode } from "@/contexts/ModeContext";
+import { useChatContext } from "@/contexts/ChatContext";
 import ModeSwitcherMenu from "./ModeSwitcherMenu";
 import AvatarStudio from "./AvatarStudio";
+import SearchDropdown from "./SearchDropdown";
 import {
   Tooltip,
   TooltipContent,
@@ -40,8 +43,13 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const { currentMode, setMode } = useMode();
+  const { openPanelWithContext } = useChatContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [avatarStudioOpen, setAvatarStudioOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     try {
@@ -76,12 +84,41 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
     setLocation(href);
   };
 
+  // Handle search input changes
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      setSearchDropdownOpen(true);
+    } else {
+      setSearchDropdownOpen(false);
+    }
+  }, [searchQuery]);
+
+  // Handle clicks outside search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchDropdownOpen(false);
+        setSearchFocused(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   // Add keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Check if Cmd (Mac) or Ctrl (Windows/Linux) is pressed
       if (e.metaKey || e.ctrlKey) {
         switch (e.key.toLowerCase()) {
+          case 'k':
+            e.preventDefault();
+            const searchInput = document.querySelector('[data-testid="input-ticker-search"]') as HTMLInputElement;
+            searchInput?.focus();
+            break;
           case 'd':
             e.preventDefault();
             setLocation('/command-center');
@@ -116,16 +153,22 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             break;
         }
       }
-      // Escape to go back
-      if (e.key === 'Escape' && location !== '/command-center') {
-        e.preventDefault();
-        window.history.back();
+      // Escape to close search or go back
+      if (e.key === 'Escape') {
+        if (searchDropdownOpen) {
+          e.preventDefault();
+          setSearchDropdownOpen(false);
+          setSearchQuery("");
+        } else if (location !== '/command-center') {
+          e.preventDefault();
+          window.history.back();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [location, setLocation]);
+  }, [location, setLocation, searchDropdownOpen]);
 
   const isActive = (href: string) => location === href;
 
@@ -158,34 +201,77 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             </Link>
           </div>
 
-          {/* Center - Navigation Links with more spacing */}
-          <div className="hidden md:flex items-center gap-3 flex-1 justify-center overflow-x-auto scrollbar-none max-w-3xl">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const active = isActive(link.href);
-              return (
-                <Tooltip key={link.href}>
-                  <TooltipTrigger asChild>
-                    <Link 
-                      href={link.href}
-                      className={`flex items-center gap-2 h-10 px-3 rounded-full text-sm transition-all relative flex-shrink-0 ${
-                        active
-                          ? "bg-primary/20 text-primary font-bold"
-                          : "text-white font-medium hover:text-white hover:bg-white/10"
-                      }`}
-                      data-testid={`link-${link.label.toLowerCase()}`}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span className="font-medium text-sm">{link.label}</span>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent className="text-xs">
-                    <p>{link.label}</p>
-                    <p className="text-muted-foreground">{link.shortcut}</p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+          {/* Center - Search Bar and Navigation Links */}
+          <div className="flex-1 flex items-center gap-3 justify-center px-2">
+            {/* Smart Search Bar - Responsive */}
+            <div ref={searchRef} className="relative w-full max-w-md md:mr-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  placeholder="Search stocks... (⌘K)"
+                  className="w-full h-10 pl-10 pr-10 rounded-[20px] border-white/10 bg-white/5 
+                           placeholder:text-muted-foreground focus:ring-2 focus:ring-primary 
+                           focus:border-primary transition-all text-sm md:text-base"
+                  data-testid="input-ticker-search"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSearchDropdownOpen(false);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground 
+                             hover:text-foreground transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+              
+              {/* Search Dropdown */}
+              <SearchDropdown
+                searchQuery={searchQuery}
+                isOpen={searchDropdownOpen}
+                onClose={() => {
+                  setSearchDropdownOpen(false);
+                  setSearchQuery("");
+                }}
+              />
+            </div>
+
+            {/* Navigation Links - Hidden on Mobile */}
+            <div className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-none">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const active = isActive(link.href);
+                return (
+                  <Tooltip key={link.href}>
+                    <TooltipTrigger asChild>
+                      <Link 
+                        href={link.href}
+                        className={`flex items-center gap-1.5 h-9 px-2.5 rounded-full text-xs transition-all relative flex-shrink-0 ${
+                          active
+                            ? "bg-primary/20 text-primary font-bold"
+                            : "text-white font-medium hover:text-white hover:bg-white/10"
+                        }`}
+                        data-testid={`link-${link.label.toLowerCase()}`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="font-medium">{link.label}</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent className="text-xs">
+                      <p>{link.label}</p>
+                      <p className="text-muted-foreground">{link.shortcut}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
           </div>
 
           {/* Right Side - Mode Switcher and User Menu - ALWAYS VISIBLE */}

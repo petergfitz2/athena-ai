@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import Navigation from "@/components/Navigation";
 import { useLocation } from "wouter";
-import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import NewsDetailModal from "@/components/NewsDetailModal";
 import GuidedTour from "@/components/GuidedTour";
 import { motion } from "framer-motion";
@@ -32,15 +31,6 @@ function SimplifiedDashboardContent() {
   const [, setLocation] = useLocation();
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsArticle | null>(null);
-  const [floatingOrbPulse, setFloatingOrbPulse] = useState(false);
-
-  // Check if first-time user for orb pulsing
-  useEffect(() => {
-    const isFirstVisit = !localStorage.getItem("athena-orb-clicked");
-    if (isFirstVisit) {
-      setFloatingOrbPulse(true);
-    }
-  }, []);
 
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
@@ -81,18 +71,16 @@ function SimplifiedDashboardContent() {
 
   // Open Athena chat
   const handleChatWithAthena = () => {
-    const orbButton = document.querySelector('[data-testid="button-floating-athena"]') as HTMLElement;
-    if (orbButton) {
-      orbButton.click();
-      localStorage.setItem("athena-orb-clicked", "true");
-      setFloatingOrbPulse(false);
-    }
+    // TODO: Open left panel chat
+    toast({
+      title: "Chat with Athena",
+      description: "Chat panel will open here soon",
+    });
   };
 
   return (
     <div className="min-h-screen bg-black text-foreground">
       <Navigation />
-      <FloatingAthenaOrb />
       <GuidedTour />
       
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">

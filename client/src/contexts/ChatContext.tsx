@@ -17,15 +17,19 @@ interface ChatContextType {
   messages: Message[];
   isLoading: boolean;
   isPanelOpen: boolean;
+  isCollapsed: boolean;
   input: string;
   detectedIntent: IntentType;
   activeAvatar: any;
   setInput: (value: string) => void;
+  setIsPanelOpen: (open: boolean) => void;
+  setIsCollapsed: (collapsed: boolean) => void;
   sendMessage: (message?: string) => void;
   clearMessages: () => void;
   togglePanel: () => void;
   openPanel: () => void;
   closePanel: () => void;
+  openPanelWithContext: (context: string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -45,6 +49,7 @@ interface ChatProviderProps {
 export function ChatProvider({ children }: ChatProviderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [input, setInput] = useState("");
   const [detectedIntent, setDetectedIntent] = useState<IntentType>("unknown");
   const { toast } = useToast();
@@ -216,21 +221,36 @@ export function ChatProvider({ children }: ChatProviderProps) {
     setIsPanelOpen(false);
   }, []);
 
+  const openPanelWithContext = useCallback((context: string) => {
+    // Open panel
+    setIsPanelOpen(true);
+    setIsCollapsed(false);
+    
+    // Add context as a message and send it
+    setTimeout(() => {
+      sendMessage(context);
+    }, 500);
+  }, [sendMessage]);
+
   return (
     <ChatContext.Provider
       value={{
         messages,
         isLoading: sendMessageMutation.isPending,
         isPanelOpen,
+        isCollapsed,
         input,
         detectedIntent,
         activeAvatar,
         setInput,
+        setIsPanelOpen,
+        setIsCollapsed,
         sendMessage,
         clearMessages,
         togglePanel,
         openPanel,
         closePanel,
+        openPanelWithContext,
       }}
     >
       {children}

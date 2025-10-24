@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { ModeProvider, useMode } from "@/contexts/ModeContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 import { StockDetailModalProvider } from "@/contexts/StockDetailModalContext";
+import LeftChatPanel from "@/components/LeftChatPanel";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthPage from "@/pages/AuthPage";
 import CommandCenter from "@/components/CommandCenter";
@@ -97,14 +99,17 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ModeProvider>
-            <StockDetailModalProvider>
-              <TooltipProvider>
-                <div className="dark">
-                  <Toaster />
-                  <Router />
-                </div>
-              </TooltipProvider>
-            </StockDetailModalProvider>
+            <ChatProvider>
+              <StockDetailModalProvider>
+                <TooltipProvider>
+                  <div className="dark">
+                    <LeftChatPanel />
+                    <Toaster />
+                    <Router />
+                  </div>
+                </TooltipProvider>
+              </StockDetailModalProvider>
+            </ChatProvider>
           </ModeProvider>
         </AuthProvider>
       </QueryClientProvider>
