@@ -904,7 +904,6 @@ export default function CommandCenter() {
           </Button>
         </div>
       </div>
-      </div>
       
       {/* Athena Chat Sidebar */}
       <div className={cn(
@@ -1020,6 +1019,7 @@ export default function CommandCenter() {
           setSelectedNewsArticle(null);
         }}
       />
+      </div>
       </div>
     </TooltipProvider>
   );
