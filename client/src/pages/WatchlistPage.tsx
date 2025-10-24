@@ -12,6 +12,7 @@ import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import { TickerLink } from "@/components/TickerLink";
+import { EnhancedStockCard } from "@/components/EnhancedStockCard";
 import { useLocation } from "wouter";
 
 interface WatchlistItem {
@@ -244,106 +245,26 @@ function WatchlistPageContent() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {watchlist.map((item) => {
-              const quote = quotes[item.symbol];
-              const isPositive = quote && quote.changePercent >= 0;
-
-              return (
-                <div
-                  key={item.id}
-                  className={`glass rounded-[28px] p-8 border border-white/10 hover-elevate transition-all ${
-                    updatedSymbols.has(item.symbol) ? 'animate-data-glow' : ''
-                  }`}
-                  data-testid={`watchlist-item-${item.symbol}`}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {watchlist.map((item) => (
+              <div key={item.id} className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeMutation.mutate(item.id)}
+                  disabled={removeMutation.isPending}
+                  className="absolute top-2 right-2 z-10 rounded-full bg-black/50 hover:bg-black/70"
+                  data-testid={`button-remove-${item.symbol}`}
                 >
-                  {/* Header with symbol and remove button */}
-                  <div className="flex items-start justify-between gap-4 mb-6">
-                    <div>
-                      <TickerLink symbol={item.symbol} variant="large" className="text-3xl font-light mb-1" />
-                      {quote && (
-                        <p className="text-xs text-muted-foreground">
-                          Vol: {quote.volume?.toLocaleString() || "N/A"}
-                        </p>
-                      )}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeMutation.mutate(item.id)}
-                      disabled={removeMutation.isPending}
-                      className="rounded-full -mt-2 -mr-2"
-                      data-testid={`button-remove-${item.symbol}`}
-                    >
-                      <X className="w-5 h-5" />
-                    </Button>
-                  </div>
-
-                  {/* Price & Change */}
-                  {quote ? (
-                    <div className="mb-6">
-                      <p className="text-4xl font-normal text-foreground mb-2">
-                        ${quote.price.toFixed(2)}
-                      </p>
-                      <div className={`flex items-center gap-2 ${isPositive ? 'text-success' : 'text-destructive'}`}>
-                        {isPositive ? (
-                          <TrendingUp className="w-5 h-5" />
-                        ) : (
-                          <TrendingDown className="w-5 h-5" />
-                        )}
-                        <span className="text-lg font-medium">
-                          {isPositive ? '+' : ''}{quote.change.toFixed(2)} ({isPositive ? '+' : ''}{quote.changePercent.toFixed(2)}%)
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mb-6">
-                      <p className="text-muted-foreground">Loading price...</p>
-                    </div>
-                  )}
-
-                  {/* Additional Info */}
-                  {quote && (
-                    <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-white/10">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1 font-medium">High</p>
-                        <p className="text-base font-normal text-foreground">
-                          ${quote.high?.toFixed(2) || "N/A"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1 font-medium">Low</p>
-                        <p className="text-base font-normal text-foreground">
-                          ${quote.low?.toFixed(2) || "N/A"}
-                        </p>
-                      </div>
-                      {quote.marketCap && (
-                        <div className="col-span-2">
-                          <p className="text-sm text-muted-foreground mb-1 font-medium">Market Cap</p>
-                          <p className="text-base font-normal text-foreground">
-                            ${(quote.marketCap / 1e9).toFixed(2)}B
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Quick Actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => setBuyModalSymbol(item.symbol)}
-                      className="rounded-full flex-1 gap-2 font-medium"
-                      data-testid={`button-buy-${item.symbol}`}
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Buy
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                  <X className="w-4 h-4" />
+                </Button>
+                <EnhancedStockCard
+                  symbol={item.symbol}
+                  onBuy={(symbol) => setBuyModalSymbol(symbol)}
+                  className={updatedSymbols.has(item.symbol) ? 'animate-data-glow' : ''}
+                />
+              </div>
+            ))}
           </div>
         )}
       </div>
