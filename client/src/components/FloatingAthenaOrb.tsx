@@ -25,6 +25,8 @@ export default function FloatingAthenaOrb() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [detectedIntent, setDetectedIntent] = useState<IntentType>("unknown");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   
   // Fetch active avatar for personalized greeting
   const { data: activeAvatar } = useQuery<any>({
@@ -85,6 +87,22 @@ export default function FloatingAthenaOrb() {
       }]);
     }
   }, [isOpen, activeAvatar]);
+
+  // Auto-focus input when chat opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   // Detect intent as user types
   useEffect(() => {
@@ -163,6 +181,8 @@ export default function FloatingAthenaOrb() {
         description: `$${(Math.random() * 500 + 50).toFixed(2)} (Demo)`,
       });
       setInput("");
+      // Refocus input after clearing
+      setTimeout(() => inputRef.current?.focus(), 50);
     } else if (detectedIntent === "command") {
       // Execute command
       toast({
@@ -172,10 +192,14 @@ export default function FloatingAthenaOrb() {
       setInput("");
       // Send to AI for processing
       sendMessage.mutate(input);
+      // Refocus input after clearing
+      setTimeout(() => inputRef.current?.focus(), 50);
     } else {
       // Send to AI chat
       setInput("");
       sendMessage.mutate(input);
+      // Refocus input after clearing
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
@@ -257,7 +281,7 @@ export default function FloatingAthenaOrb() {
             </CardHeader>
             <CardContent className="p-0">
               <ScrollArea className="h-96 p-4">
-                <div className="space-y-4">
+                <div className="space-y-4" ref={scrollRef}>
                   {messages.map((message) => (
                     <div
                       key={message.id}
@@ -306,12 +330,14 @@ export default function FloatingAthenaOrb() {
                       {getIntentIcon()}
                     </div>
                     <Input
+                      ref={inputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="AAPL • Buy 10 MSFT • What's trending?"
                       className="pl-10 pr-24 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-[28px] text-sm"
                       disabled={sendMessage.isPending}
                       data-testid="omnibox-input"
+                      autoFocus
                     />
                     {input && (
                       <div className="absolute right-3 top-2">

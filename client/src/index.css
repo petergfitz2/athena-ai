@@ -223,6 +223,16 @@
   /* Fallback for older browsers */
   --destructive-border: hsl(var(--destructive));
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Terminal Mode Specific Colors */
+  --terminal-bg: 0 0% 0%;                    /* Pure black */
+  --terminal-green: 120 100% 50%;            /* Bright green #00ff00 */
+  --terminal-red: 0 100% 50%;                /* Bright red #ff0000 */
+  --terminal-amber: 45 100% 50%;             /* Amber/yellow #ffaa00 */
+  --terminal-cyan: 180 100% 50%;             /* Cyan for highlights */
+  --terminal-white: 0 0% 100%;               /* Pure white */
+  --terminal-gray: 0 0% 50%;                 /* Gray for muted text */
+  --terminal-border: 0 0% 20%;               /* Dark gray borders */
 }
 
 @layer base {
