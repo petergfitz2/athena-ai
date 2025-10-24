@@ -196,8 +196,8 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       }`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-6">
-          {/* Left Side - Logo with more breathing room */}
+        <div className="flex items-center justify-between h-16 gap-4">
+          {/* Left Side - Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center h-12 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
               <span className="text-xl lg:text-2xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
@@ -207,17 +207,17 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           </div>
 
           {/* Center - Search Bar and Navigation Links */}
-          <div className="flex-1 flex items-center gap-3 justify-center px-2">
+          <div className="flex-1 flex items-center gap-3 justify-center">
             {/* Expandable Search Bar - Responsive */}
             <motion.div 
               ref={searchRef} 
-              className="relative md:mr-4"
+              className="relative flex-shrink-0"
               initial={false}
               animate={{
                 width: searchExpanded 
                   ? typeof window !== 'undefined' && window.innerWidth < 768 
                     ? "calc(100vw - 140px)" // Mobile: take most width
-                    : "400px" // Desktop: 400px expanded
+                    : "320px" // Desktop: 320px expanded (reduced from 400px)
                   : "100px" // Collapsed: just icon and hint
               }}
               transition={{
@@ -299,17 +299,8 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               />
             </motion.div>
 
-            {/* Navigation Links - Hidden on Mobile or when search is expanded */}
-            <motion.div 
-              className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-none"
-              animate={{
-                opacity: searchExpanded ? 0.3 : 1,
-                scale: searchExpanded ? 0.95 : 1,
-              }}
-              transition={{
-                duration: 0.2
-              }}
-            >
+            {/* Navigation Links - Hidden on Mobile */}
+            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const active = isActive(link.href);
@@ -336,7 +327,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   </Tooltip>
                 );
               })}
-            </motion.div>
+            </div>
           </div>
 
           {/* Right Side - Mode Switcher and User Menu - ALWAYS VISIBLE */}
