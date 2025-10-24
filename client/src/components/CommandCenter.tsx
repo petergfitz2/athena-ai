@@ -11,7 +11,7 @@ import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
-import OmniBox from "@/components/OmniBox";
+import StockSearchBar from "@/components/StockSearchBar";
 import WelcomeTutorial from "@/components/WelcomeTutorial";
 import QuickStartGuide from "@/components/QuickStartGuide";
 import DemoModeBanner from "@/components/DemoModeBanner";
@@ -530,41 +530,29 @@ export default function CommandCenter() {
         "max-w-[1600px] mx-auto p-6 transition-all duration-300",
         sidebarOpen ? "lg:mr-[450px]" : ""
       )}>
-        {/* Main OmniBox - Hidden when chat is open */}
+        {/* Stock Search Bar - Always visible for quick lookups */}
+        <div className="mb-6">
+          <StockSearchBar 
+            onSelectStock={(symbol) => {
+              // Open trade modal for selected stock
+              handleOpenTradeModal("buy", symbol);
+            }}
+            placeholder="Search stocks or companies (AAPL, Tesla, Microsoft)..."
+          />
+        </div>
+        
+        {/* Chat Button - Opens AI advisor conversation */}
         {!sidebarOpen && (
           <div className="mb-6">
-            <OmniBox 
-              onSendMessage={(message) => {
-                // Open chat sidebar
-                setSidebarOpen(true);
-                handleSendMessage(message);
-              }}
-              isLoading={isLoading}
-              placeholder="Try: AAPL • Buy 10 MSFT • What's the market outlook?"
-            />
-          </div>
-        )}
-        
-        {/* Chat Active Indicator */}
-        {sidebarOpen && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-[20px] border border-primary/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <div>
-                  <p className="text-sm font-medium text-white">Chat with your AI advisor is active</p>
-                  <p className="text-xs text-white/60">Type in the chat panel on the right →</p>
-                </div>
-              </div>
-              <Button
-                onClick={() => setSidebarOpen(false)}
-                variant="ghost"
-                size="sm"
-                className="rounded-full text-xs"
-              >
-                Close Chat
-              </Button>
-            </div>
+            <Button
+              onClick={() => setSidebarOpen(true)}
+              size="lg"
+              className="rounded-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+              data-testid="button-open-chat"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Chat with your AI advisor
+            </Button>
           </div>
         )}
 
@@ -963,23 +951,50 @@ export default function CommandCenter() {
             </div>
           </ScrollArea>
           
-          {/* OmniBox Input - Now IN the sidebar */}
+          {/* Chat Input - Simple and focused */}
           <div className="p-4 border-t border-white/10">
-            <OmniBox 
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-              placeholder="Ask your AI advisor..."
-            />
-            <Button
-              onClick={isRecording ? stopRecording : startRecording}
-              variant={isRecording ? "destructive" : "ghost"}
-              size="sm"
-              className="rounded-full w-full mt-2"
-              data-testid="button-sidebar-voice"
-            >
-              {isRecording ? <Square className="w-3 h-3 mr-2" /> : <Mic className="w-3 h-3 mr-2" />}
-              {isRecording ? "Stop" : "Voice Input"}
-            </Button>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder="Ask about investments, strategies, or any stock..."
+                  className="flex-1 min-h-[60px] max-h-[120px] resize-none rounded-[20px] bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  disabled={isLoading}
+                  data-testid="textarea-chat-message"
+                  autoFocus
+                />
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={() => handleSendMessage()}
+                    disabled={!input.trim() || isLoading}
+                    size="icon"
+                    className="rounded-full h-10 w-10"
+                    data-testid="button-send-chat"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    variant={isRecording ? "destructive" : "ghost"}
+                    size="icon"
+                    className="rounded-full h-10 w-10"
+                    data-testid="button-voice-chat"
+                  >
+                    {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-center text-white/40">
+                You can discuss any stock naturally - "What do you think about AAPL?"
+              </p>
+            </div>
           </div>
         </div>
       </div>
