@@ -138,9 +138,9 @@ export default function FloatingChatBubble() {
           {/* Avatar or Icon */}
           <div className="relative">
             <AthenaTraderAvatar 
-              isActive={true}
+              size="mini"
               showStatus={false}
-              size="sm"
+              showName={false}
               className="w-8 h-8"
             />
           </div>

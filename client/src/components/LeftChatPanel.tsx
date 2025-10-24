@@ -206,7 +206,11 @@ export default function LeftChatPanel() {
                     ? "bg-primary/20 backdrop-blur-sm border border-primary/30" 
                     : "bg-white/5 backdrop-blur-sm border border-white/10"
                 )}>
-                  <ChatMessage message={message} variant="compact" />
+                  <ChatMessage 
+                    content={message.content} 
+                    role={message.sender === "user" ? "user" : "assistant"}
+                    timestamp={message.timestamp}
+                  />
                 </div>
               </motion.div>
             ))}

@@ -1,8 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
-import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
+import { AlertTriangle, RefreshCw, Home, Bot } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -60,7 +59,11 @@ export default class ErrorBoundary extends Component<Props, State> {
             <CardHeader className="text-center pb-4">
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <AthenaTraderAvatar size="medium" showStatus={false} showName={false} />
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-purple-600/20 p-1 flex items-center justify-center">
+                    <div className="w-full h-full rounded-full bg-black/50 backdrop-blur-xl border border-white/20 flex items-center justify-center">
+                      <Bot className="w-16 h-16 text-primary/60" />
+                    </div>
+                  </div>
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-destructive/20 rounded-full flex items-center justify-center">
                     <AlertTriangle className="w-5 h-5 text-destructive" />
                   </div>

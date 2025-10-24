@@ -38,6 +38,11 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
 
   // Function to parse content and make tickers clickable
   const renderContentWithClickableTickers = (text: string) => {
+    // Handle undefined or null content
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
+    
     // Enhanced regex to match tickers with word boundaries
     // Matches $SYMBOL or standalone SYMBOL (2-5 uppercase letters)
     const tickerRegex = /(\$[A-Z]{1,5})\b|(?:^|\s)([A-Z]{2,5})(?=[\s,.\?!;:]|$)/g;

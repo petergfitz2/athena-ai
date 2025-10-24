@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import defaultAvatarImage from "@assets/generated_images/Professional_AI_assistant_avatar_Amanda_7849a892.png";
 
 interface AthenaTraderAvatarProps {
@@ -36,7 +36,7 @@ export default function AthenaTraderAvatar({
   }>({
     queryKey: ['/api/avatars/active'],
     refetchInterval: 10000, // Refresh every 10 seconds to catch updates
-  });
+  })
 
   const sizeClasses = {
     mini: "w-12 h-12",
