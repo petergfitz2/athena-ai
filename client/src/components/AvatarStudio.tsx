@@ -131,7 +131,7 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black border-white/10">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black border-white/10 z-[100]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
             Avatar Studio
@@ -277,25 +277,25 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                 </div>
 
                 <div>
-                  <Label htmlFor="name">Avatar Name</Label>
+                  <Label htmlFor="name" className="text-white">Avatar Name</Label>
                   <Input 
                     id="name"
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     placeholder="e.g., Morgan Blake"
-                    className="mt-1 bg-white/5 border-white/10"
+                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
                     data-testid="input-avatar-name"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="personality">Personality Description</Label>
+                  <Label htmlFor="personality" className="text-white">Personality Description</Label>
                   <Textarea
                     id="personality"
                     value={personality}
                     onChange={(e) => setPersonality(e.target.value)}
                     placeholder="Describe their personality and background. Example: Former hedge fund manager who made millions in the 2008 crash. Speaks with confidence and uses market metaphors. Loves to share war stories from trading floors..."
-                    className="mt-1 bg-white/5 border-white/10"
+                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
                     rows={4}
                     data-testid="input-personality-traits"
                   />
@@ -305,35 +305,35 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                 </div>
 
                 <div>
-                  <Label className="text-foreground font-medium">Trading Style</Label>
+                  <Label className="text-white font-medium">Trading Style</Label>
                   <RadioGroup value={tradingStyle} onValueChange={setTradingStyle} className="mt-2 space-y-2">
                     <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                       <RadioGroupItem value="conservative" id="conservative" className="border-white/40 text-primary" />
-                      <Label htmlFor="conservative" className="text-foreground font-normal cursor-pointer">Conservative - Focus on stability</Label>
+                      <Label htmlFor="conservative" className="text-white font-normal cursor-pointer">Conservative - Focus on stability</Label>
                     </div>
                     <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                       <RadioGroupItem value="balanced" id="balanced" className="border-white/40 text-primary" />
-                      <Label htmlFor="balanced" className="text-foreground font-normal cursor-pointer">Balanced - Mix of growth and safety</Label>
+                      <Label htmlFor="balanced" className="text-white font-normal cursor-pointer">Balanced - Mix of growth and safety</Label>
                     </div>
                     <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                       <RadioGroupItem value="aggressive" id="aggressive" className="border-white/40 text-primary" />
-                      <Label htmlFor="aggressive" className="text-foreground font-normal cursor-pointer">Aggressive - High risk, high reward</Label>
+                      <Label htmlFor="aggressive" className="text-white font-normal cursor-pointer">Aggressive - High risk, high reward</Label>
                     </div>
                     <div className="flex items-center space-x-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                       <RadioGroupItem value="analytical" id="analytical" className="border-white/40 text-primary" />
-                      <Label htmlFor="analytical" className="text-foreground font-normal cursor-pointer">Analytical - Data-driven decisions</Label>
+                      <Label htmlFor="analytical" className="text-white font-normal cursor-pointer">Analytical - Data-driven decisions</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
                 <div>
-                  <Label htmlFor="appearance">Visual Style (Optional)</Label>
+                  <Label htmlFor="appearance" className="text-white">Visual Style (Optional)</Label>
                   <Input
                     id="appearance"
                     value={appearance}
                     onChange={(e) => setAppearance(e.target.value)}
                     placeholder="e.g., professional, modern, approachable"
-                    className="mt-1 bg-white/5 border-white/10"
+                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
                     data-testid="input-visual-style"
                   />
                 </div>
@@ -346,7 +346,7 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                     appearance 
                   })}
                   disabled={!personality || createCustom.isPending}
-                  className="w-full rounded-[28px]"
+                  className="w-full rounded-[28px] relative z-10"
                   data-testid="button-create-custom-avatar"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
