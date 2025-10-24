@@ -518,15 +518,14 @@ export default function CommandCenter() {
             </div>
           </div>
         </div>
-      </div>
+        
+        {/* Daily Briefing */}
+        {showBriefing && (
+          <DailyBriefing onDismiss={() => setShowBriefing(false)} />
+        )}
 
-      {/* Daily Briefing */}
-      {showBriefing && (
-        <DailyBriefing onDismiss={() => setShowBriefing(false)} />
-      )}
-
-      {/* Main Grid Layout */}
-      <div className={cn(
+        {/* Main Grid Layout */}
+        <div className={cn(
         "max-w-[1600px] mx-auto p-6 transition-all duration-300",
         sidebarOpen ? "lg:mr-[450px]" : ""
       )}>
@@ -905,7 +904,8 @@ export default function CommandCenter() {
           </Button>
         </div>
       </div>
-
+      </div>
+      
       {/* Athena Chat Sidebar */}
       <div className={cn(
         "fixed right-0 top-0 h-full w-[450px] bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 z-50",
@@ -1020,7 +1020,7 @@ export default function CommandCenter() {
           setSelectedNewsArticle(null);
         }}
       />
-    </div>
+      </div>
     </TooltipProvider>
   );
 }
