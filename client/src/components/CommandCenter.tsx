@@ -836,20 +836,34 @@ export default function CommandCenter() {
                   const gainPercent = (gain / (avgCost * quantity)) * 100;
 
                   return (
-                    <div key={holding.id} className="flex items-center justify-between p-3 rounded-[16px] bg-white/5 hover-elevate active-elevate-2 cursor-pointer">
+                    <div key={holding.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-[16px] bg-white/5 hover-elevate active-elevate-2 cursor-pointer space-y-3 sm:space-y-0">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                           <span className="text-xs font-medium text-primary">
                             {holding.symbol.slice(0, 2)}
                           </span>
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <TickerLink symbol={holding.symbol} />
                           <p className="text-xs text-muted-foreground">{quantity} shares @ ${currentPrice.toFixed(2)}</p>
                         </div>
+                        <div className="text-right sm:hidden">
+                          <p className="font-medium">${totalValue.toLocaleString()}</p>
+                          <p className={cn(
+                            "text-xs flex items-center justify-end gap-1",
+                            gainPercent >= 0 ? "text-success" : "text-destructive"
+                          )}>
+                            {gainPercent >= 0 ? (
+                              <ArrowUpRight className="w-3 h-3" />
+                            ) : (
+                              <ArrowDownRight className="w-3 h-3" />
+                            )}
+                            {gainPercent >= 0 ? "+" : ""}{gainPercent.toFixed(2)}%
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="text-right">
+                      <div className="hidden sm:block text-right">
                         <p className="font-medium">${totalValue.toLocaleString()}</p>
                         <p className={cn(
                           "text-xs flex items-center justify-end gap-1",
@@ -864,11 +878,11 @@ export default function CommandCenter() {
                         </p>
                       </div>
                       
-                      <div className="flex gap-2 ml-4">
+                      <div className="flex gap-2 w-full sm:w-auto sm:ml-4">
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="rounded-full h-8 px-3 font-semibold hover:bg-primary/20"
+                          className="rounded-full h-11 min-h-[44px] px-4 font-semibold hover:bg-primary/20 flex-1 sm:flex-none"
                           onClick={() => handleOpenTradeModal("buy", holding.symbol)}
                           data-testid={`button-buy-${holding.symbol}`}
                         >
@@ -877,7 +891,7 @@ export default function CommandCenter() {
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="rounded-full h-8 px-3 font-semibold hover:bg-destructive/20"
+                          className="rounded-full h-11 min-h-[44px] px-4 font-semibold hover:bg-destructive/20 flex-1 sm:flex-none"
                           onClick={() => handleOpenTradeModal("sell", holding.symbol)}
                           data-testid={`button-sell-${holding.symbol}`}
                         >

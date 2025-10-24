@@ -65,7 +65,7 @@ export default function FloatingChatBubble() {
           damping: 20, 
           stiffness: 300 
         }}
-        className="fixed bottom-5 right-5 z-50"
+        className="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50"
         data-testid="floating-chat-bubble"
       >
         {/* Message Preview */}
@@ -76,10 +76,10 @@ export default function FloatingChatBubble() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.9 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-[70px] right-0 mb-2"
+              className="absolute bottom-[70px] right-0 mb-2 max-w-[calc(100vw-100px)]"
             >
               <div className={cn(
-                "max-w-[200px] p-3 rounded-[20px]",
+                "max-w-[200px] sm:max-w-[250px] p-3 rounded-[20px]",
                 "bg-black/90 backdrop-blur-xl",
                 "border border-white/10",
                 "shadow-2xl shadow-purple-500/10"

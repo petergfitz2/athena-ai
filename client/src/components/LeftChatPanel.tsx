@@ -138,15 +138,15 @@ export default function LeftChatPanel() {
         data-testid="left-chat-panel"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-white/10">
+          <div className="flex items-center gap-2 sm:gap-3">
             <AthenaTraderAvatar 
               isActive={true}
               showStatus={true}
               size="sm"
             />
-            <div>
-              <h3 className="text-lg font-light">
+            <div className="flex-1">
+              <h3 className="text-base sm:text-lg font-light">
                 {activeAvatar?.name || "Athena AI"}
               </h3>
               <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function LeftChatPanel() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-8 w-8"
+              className="rounded-full h-10 w-10 min-h-[40px] min-w-[40px]"
               onClick={clearMessages}
               data-testid="button-clear-chat"
             >
@@ -168,7 +168,7 @@ export default function LeftChatPanel() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-8 w-8"
+              className="rounded-full h-10 w-10 min-h-[40px] min-w-[40px] hidden sm:flex"
               onClick={handleCollapse}
               data-testid="button-minimize-chat"
             >
@@ -177,7 +177,7 @@ export default function LeftChatPanel() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full h-8 w-8"
+              className="rounded-full h-10 w-10 min-h-[40px] min-w-[40px]"
               onClick={handleClose}
               data-testid="button-close-chat"
             >
@@ -249,7 +249,7 @@ export default function LeftChatPanel() {
             <Button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="rounded-full h-10 w-10 p-0 bg-primary hover:bg-primary/90"
+              className="rounded-full h-11 w-11 min-h-[44px] min-w-[44px] p-0 bg-primary hover:bg-primary/90"
               data-testid="button-send-message"
             >
               {isLoading ? (

@@ -82,7 +82,7 @@ export default function StockDetailModal({ symbol, open, onOpenChange, onTrade }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black border-white/10">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-black border-white/10">
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-foreground flex items-center gap-3">
             <Activity className="w-6 h-6 text-primary" />
@@ -168,14 +168,14 @@ export default function StockDetailModal({ symbol, open, onOpenChange, onTrade }
                   <BarChart3 className="w-5 h-5 text-primary" />
                   Price History
                 </h3>
-                <div className="flex gap-1">
+                <div className="flex gap-1 flex-wrap">
                   {periodOptions.map(period => (
                     <Button
                       key={period.value}
                       variant={selectedPeriod === period.value ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setSelectedPeriod(period.value)}
-                      className="h-8 px-3 text-xs"
+                      className="h-9 min-h-[36px] px-2 sm:px-3 text-xs"
                       data-testid={`button-period-${period.value.toLowerCase()}`}
                     >
                       {period.label}
