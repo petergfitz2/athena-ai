@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import AthenaTraderAvatar from "./AthenaTraderAvatar";
-import StockDetailModal from "./StockDetailModal";
+import { TickerLink } from "./TickerLink";
 
 interface ChatMessageProps {
   content: string;
@@ -26,7 +25,6 @@ const commonTickers = [
 
 export default function ChatMessage({ content, role, timestamp }: ChatMessageProps) {
   const isUser = role === "user";
-  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   
   // Fetch active avatar for AI messages
   const { data: activeAvatar } = useQuery<{
@@ -64,14 +62,13 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
         
         // Add clickable ticker
         parts.push(
-          <button
+          <TickerLink
             key={`${match.index}-${ticker}`}
-            onClick={() => setSelectedSymbol(ticker)}
-            className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium mx-1"
-            data-testid={`ticker-${ticker}`}
-          >
-            ${ticker}
-          </button>
+            symbol={ticker}
+            showDollarSign={true}
+            variant="badge"
+            className="mx-1"
+          />
         );
         
         lastIndex = match.index + match[0].length;
@@ -131,14 +128,6 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
         </div>
       </div>
       
-      {/* Stock Detail Modal */}
-      {selectedSymbol && (
-        <StockDetailModal
-          symbol={selectedSymbol}
-          open={!!selectedSymbol}
-          onOpenChange={(open) => !open && setSelectedSymbol(null)}
-        />
-      )}
     </div>
   );
 }

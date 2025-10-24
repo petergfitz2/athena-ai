@@ -19,7 +19,6 @@ import KeyboardShortcutsGuide from "@/components/KeyboardShortcutsGuide";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import NewsDetailModal from "@/components/NewsDetailModal";
 import MarketOverview from "@/components/MarketOverview";
-import StockDetailModal from "@/components/StockDetailModal";
 import AnimatedCounter, { formatCurrency, formatPercent } from "@/components/AnimatedCounter";
 import { LoadingMessage, MarketDataSkeleton, PortfolioSkeleton } from "@/components/LoadingSkeletons";
 import { TickerLink } from "@/components/TickerLink";
@@ -555,8 +554,8 @@ export default function CommandCenter() {
 
         {/* Main Grid Layout */}
         <div className={cn(
-        "max-w-[1600px] mx-auto p-6 transition-all duration-300",
-        sidebarOpen ? "lg:mr-[450px]" : ""
+        "max-w-[1600px] mx-auto p-4 sm:p-6 transition-all duration-300",
+        sidebarOpen ? "sm:mr-[400px] md:mr-[450px]" : ""
       )}>
         {/* Stock Search Bar - Always visible for quick lookups */}
         <div className="mb-6">
@@ -590,20 +589,20 @@ export default function CommandCenter() {
         </div>
 
         <div className={cn(
-          "grid gap-6",
-          expandedView ? "lg:grid-cols-3 md:grid-cols-2" : "lg:grid-cols-2"
+          "grid gap-4 sm:gap-6",
+          expandedView ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
         )}>
           {/* Portfolio Snapshot */}
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center justify-between">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                 <span className="font-medium">Portfolio Snapshot</span>
-                <Shield className="w-5 h-5 text-primary" />
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div>
-                <p className="text-3xl font-medium text-foreground">
+                <p className="text-2xl sm:text-3xl font-medium text-foreground">
                   <AnimatedCounter 
                     value={portfolioSummary?.totalValue || 0} 
                     formatValue={formatCurrency}
@@ -651,10 +650,10 @@ export default function CommandCenter() {
 
           {/* AI Insights */}
           <Card className="bg-gradient-to-br from-primary/20 to-purple-600/20 border-white/10 rounded-[20px]">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center justify-between">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                 <span className="font-medium">AI Insights</span>
-                <Brain className="w-5 h-5 text-primary" />
+                <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -696,22 +695,22 @@ export default function CommandCenter() {
 
           {/* Quick Actions */}
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-4">
-              <CardTitle className="font-medium">Quick Actions</CardTitle>
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="font-medium text-base sm:text-lg">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {quickActions.map((action) => (
                   <Tooltip key={action.label}>
                     <TooltipTrigger asChild>
                       <Button
                         onClick={action.action}
                         variant="outline"
-                        className="rounded-[16px] h-20 flex flex-col gap-2 hover-elevate active-elevate-2"
+                        className="rounded-[16px] h-16 sm:h-20 flex flex-col gap-1 sm:gap-2 hover-elevate active-elevate-2 p-2 sm:p-3"
                         data-testid={`button-quick-${action.label.toLowerCase()}`}
                       >
-                        <action.icon className={cn("w-6 h-6", action.color)} />
-                        <span className="text-sm font-medium">{action.label}</span>
+                        <action.icon className={cn("w-5 h-5 sm:w-6 sm:h-6", action.color)} />
+                        <span className="text-xs sm:text-sm font-medium">{action.label}</span>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -830,9 +829,9 @@ export default function CommandCenter() {
           </Card>
 
           {/* Active Positions */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-2">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center justify-between">
+          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] col-span-1 sm:col-span-2 lg:col-span-2">
+            <CardHeader className="pb-3 sm:pb-4">
+              <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                 <span className="font-medium">Active Positions</span>
                 <Badge variant="outline" className="text-xs">
                   {holdings.length} Holdings
@@ -1017,7 +1016,7 @@ export default function CommandCenter() {
       
       {/* Athena Chat Sidebar */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-[450px] bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 z-50",
+        "fixed right-0 top-0 h-full w-full sm:w-[400px] md:w-[450px] bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 z-50",
         sidebarOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="flex flex-col h-full">
@@ -1130,13 +1129,6 @@ export default function CommandCenter() {
         }}
       />
       
-      {/* Stock Detail Modal */}
-      <StockDetailModal
-        symbol={selectedStock}
-        open={stockDetailOpen}
-        onOpenChange={setStockDetailOpen}
-        onTrade={handleOpenTradeModal}
-      />
       </div>
     </TooltipProvider>
   );
