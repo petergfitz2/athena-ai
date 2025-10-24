@@ -8,15 +8,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { 
-  LineChart, Line, AreaChart, Area, BarChart, Bar, ComposedChart,
+  LineChart, Line, AreaChart, Area, BarChart, Bar, CandlestickChart,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend,
-  ReferenceLine, Brush
+  ReferenceLine, Brush, Cell
 } from "recharts";
 import {
   TrendingUp, TrendingDown, Activity, BarChart3, ArrowUpRight, ArrowDownRight,
   Newspaper, Building2, Target, DollarSign, Calendar, AlertCircle, 
   ChevronUp, ChevronDown, Info, Star, Clock, Volume2, Play, Pause,
-  Settings, Download, Maximize2, Grid3x3, ChartCandlestick, LineChartIcon
+  Settings, Download, Maximize2, Grid3x3, ChartCandlestick, LineChartIcon,
+  X, ShoppingCart, Wallet
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -36,8 +37,8 @@ export function StockDetailModalPro({
   onTrade,
 }: StockDetailModalProProps) {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("1D");
-  const [chartType, setChartType] = useState<"line" | "candle" | "area">("candle");
-  const [selectedIndicator, setSelectedIndicator] = useState<string>("volume");
+  const [chartType, setChartType] = useState<"line" | "candle" | "area">("area");
+  const [selectedTab, setSelectedTab] = useState("overview");
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   // Fetch real-time quote
@@ -53,114 +54,135 @@ export function StockDetailModalPro({
     enabled: !!symbol && open,
   });
 
-  // Fetch news
-  const { data: newsData } = useQuery({
-    queryKey: ['/api/market/news', symbol],
-    queryFn: async () => {
-      // Mock news data for now
-      return [
-        {
-          id: 1,
-          headline: `${symbol} Beats Q3 Earnings Expectations, Revenue Up 15%`,
-          source: "Reuters",
-          time: "2 hours ago",
-          sentiment: "positive",
-          impact: "high",
-        },
-        {
-          id: 2,
-          headline: `Analysts Upgrade ${symbol} Price Target to $${((quote?.price || 100) * 1.2).toFixed(2)}`,
-          source: "Bloomberg",
-          time: "5 hours ago",
-          sentiment: "positive",
-          impact: "medium",
-        },
-        {
-          id: 3,
-          headline: `${symbol} Announces Strategic Partnership for AI Development`,
-          source: "CNBC",
-          time: "1 day ago",
-          sentiment: "neutral",
-          impact: "medium",
-        },
-        {
-          id: 4,
-          headline: `Market Watch: ${symbol} Among Top Movers in Tech Sector`,
-          source: "WSJ",
-          time: "2 days ago",
-          sentiment: "neutral",
-          impact: "low",
-        },
-      ];
-    },
-    enabled: !!symbol && open,
-  });
-
-  // Prepare chart data with technical indicators
-  const chartData = historicalData?.data?.map(point => {
-    const sma20 = historicalData.data
-      .slice(Math.max(0, historicalData.data.indexOf(point) - 20), historicalData.data.indexOf(point) + 1)
-      .reduce((sum, p) => sum + p.close, 0) / Math.min(20, historicalData.data.indexOf(point) + 1);
+  // Mock comprehensive trading data
+  const tradingData = {
+    // Price Information
+    bid: quote?.price ? (quote.price - 0.01).toFixed(2) : "0.00",
+    ask: quote?.price ? (quote.price + 0.01).toFixed(2) : "0.00",
+    bidSize: "1,500",
+    askSize: "1,200",
+    spread: "0.02",
     
-    const sma50 = historicalData.data
-      .slice(Math.max(0, historicalData.data.indexOf(point) - 50), historicalData.data.indexOf(point) + 1)
-      .reduce((sum, p) => sum + p.close, 0) / Math.min(50, historicalData.data.indexOf(point) + 1);
-
-    return {
-      date: new Date(point.date).getTime(),
-      open: point.open,
-      high: point.high,
-      low: point.low,
-      close: point.close,
-      volume: point.volume,
-      sma20,
-      sma50,
-      formattedDate: format(new Date(point.date), selectedPeriod === '1D' ? 'HH:mm' : 'MMM d'),
-    };
-  }) || [];
-
-  // Mock fundamentals data
-  const fundamentals = {
-    marketCap: quote ? (quote.price * 1000000000).toLocaleString() : "N/A",
-    peRatio: "28.5",
+    // Volume Data
+    volume: quote?.volume?.toLocaleString() || "2,345,678",
+    avgVolume: "3,456,789",
+    volumeRatio: "0.68",
+    
+    // Price Ranges
+    dayLow: quote?.low?.toFixed(2) || (quote?.price ? (quote.price * 0.98).toFixed(2) : "98.00"),
+    dayHigh: quote?.high?.toFixed(2) || (quote?.price ? (quote.price * 1.02).toFixed(2) : "102.00"),
+    weekLow: quote?.price ? (quote.price * 0.95).toFixed(2) : "95.00",
+    weekHigh: quote?.price ? (quote.price * 1.05).toFixed(2) : "105.00",
+    monthLow: quote?.price ? (quote.price * 0.92).toFixed(2) : "92.00",
+    monthHigh: quote?.price ? (quote.price * 1.08).toFixed(2) : "108.00",
+    yearLow: quote?.price ? (quote.price * 0.70).toFixed(2) : "70.00",
+    yearHigh: quote?.price ? (quote.price * 1.30).toFixed(2) : "130.00",
+    
+    // Fundamental Metrics
+    marketCap: quote?.marketCap ? (quote.marketCap / 1e9).toFixed(2) + "B" : "345.67B",
+    peRatio: quote?.pe?.toFixed(2) || "28.50",
+    forwardPE: "25.30",
+    pegRatio: "1.85",
     eps: "12.45",
+    epsGrowth: "+15.2%",
     dividend: "2.40",
     divYield: "1.85%",
+    payoutRatio: "32.5%",
+    
+    // Technical Indicators
+    rsi: "58.3",
+    macd: "1.25",
+    movingAvg50: quote?.price ? (quote.price * 0.97).toFixed(2) : "97.00",
+    movingAvg200: quote?.price ? (quote.price * 0.93).toFixed(2) : "93.00",
     beta: "1.12",
-    yearHigh: quote ? (quote.price * 1.3).toFixed(2) : "N/A",
-    yearLow: quote ? (quote.price * 0.7).toFixed(2) : "N/A",
-    avgVolume: "25.3M",
-    shares: "1.05B",
+    volatility: "28.5%",
+    
+    // Company Metrics
+    revenue: "$89.5B",
+    revenueGrowth: "+12.3%",
+    grossMargin: "42.5%",
+    operatingMargin: "28.3%",
+    netMargin: "21.7%",
+    roe: "45.2%",
+    roa: "18.6%",
+    debtToEquity: "0.65",
+    currentRatio: "1.85",
+    quickRatio: "1.45",
+    
+    // Trading Activity
+    shortInterest: "3.2%",
+    shortRatio: "2.8",
+    institutionalOwnership: "78.5%",
+    insiderOwnership: "5.2%",
+    floatShares: "985M",
+    sharesOutstanding: "1.05B",
   };
 
-  // Mock analyst ratings
-  const analystRatings = {
-    strongBuy: 12,
-    buy: 8,
-    hold: 5,
-    sell: 2,
+  // Prepare chart data
+  const chartData = historicalData?.data?.map((point, index) => ({
+    date: new Date(point.date).getTime(),
+    time: format(new Date(point.date), selectedPeriod === '1D' ? 'HH:mm' : 'MMM d'),
+    open: point.open,
+    high: point.high,
+    low: point.low,
+    close: point.close,
+    volume: point.volume,
+    value: point.close,
+    change: index > 0 ? point.close - historicalData.data[index - 1].close : 0,
+  })) || Array.from({ length: 50 }, (_, i) => ({
+    time: format(new Date(Date.now() - (50 - i) * 3600000), selectedPeriod === '1D' ? 'HH:mm' : 'MMM d'),
+    value: (quote?.price || 100) + (Math.random() - 0.5) * 5,
+    volume: Math.floor(Math.random() * 1000000),
+  }));
+
+  // Mock news data
+  const newsData = [
+    {
+      id: 1,
+      headline: `${symbol} Beats Q3 Earnings Expectations, Revenue Up 15%`,
+      source: "Reuters",
+      time: "2 hours ago",
+      sentiment: "positive",
+      impact: "high",
+      summary: "Company reports strong quarterly results with revenue beating analyst estimates by 8%.",
+    },
+    {
+      id: 2,
+      headline: `Analysts Upgrade ${symbol} Price Target to $${((quote?.price || 100) * 1.2).toFixed(2)}`,
+      source: "Bloomberg",
+      time: "5 hours ago",
+      sentiment: "positive",
+      impact: "medium",
+      summary: "Major investment banks raise price targets following strong product launch.",
+    },
+    {
+      id: 3,
+      headline: `${symbol} Announces $10B Share Buyback Program`,
+      source: "CNBC",
+      time: "1 day ago",
+      sentiment: "positive",
+      impact: "high",
+      summary: "Board approves massive share repurchase program signaling confidence in future growth.",
+    },
+  ];
+
+  // Analyst ratings
+  const analystData = {
+    strongBuy: 15,
+    buy: 12,
+    hold: 8,
+    sell: 3,
     strongSell: 1,
-    consensus: "Buy",
-    priceTarget: quote ? (quote.price * 1.15).toFixed(2) : "N/A",
+    total: 39,
+    consensus: "Strong Buy",
+    avgTarget: quote?.price ? (quote.price * 1.18).toFixed(2) : "118.00",
+    highTarget: quote?.price ? (quote.price * 1.35).toFixed(2) : "135.00",
+    lowTarget: quote?.price ? (quote.price * 1.05).toFixed(2) : "105.00",
   };
 
-  // Mock order book data
-  const orderBook = {
-    bids: [
-      { price: quote?.price || 100 - 0.01, size: 1500, total: 1500 },
-      { price: quote?.price || 100 - 0.02, size: 2300, total: 3800 },
-      { price: quote?.price || 100 - 0.03, size: 1800, total: 5600 },
-      { price: quote?.price || 100 - 0.04, size: 3200, total: 8800 },
-      { price: quote?.price || 100 - 0.05, size: 2100, total: 10900 },
-    ],
-    asks: [
-      { price: quote?.price || 100 + 0.01, size: 1200, total: 1200 },
-      { price: quote?.price || 100 + 0.02, size: 1800, total: 3000 },
-      { price: quote?.price || 100 + 0.03, size: 2500, total: 5500 },
-      { price: quote?.price || 100 + 0.04, size: 1900, total: 7400 },
-      { price: quote?.price || 100 + 0.05, size: 2200, total: 9600 },
-    ],
-  };
+  const changePercent = quote?.changePercent || 2.85;
+  const isPositive = changePercent >= 0;
+  const changeAmount = quote?.change || 2.78;
 
   const periodOptions = [
     { label: "1D", value: "1D" },
@@ -173,420 +195,620 @@ export function StockDetailModalPro({
     { label: "Max", value: "ALL" },
   ];
 
-  const changePercent = quote?.changePercent || 0;
-  const isPositive = changePercent >= 0;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[1600px] max-h-[90vh] overflow-hidden bg-black border-white/10 p-0">
+      <DialogContent className="max-w-[95vw] w-[1400px] h-[90vh] overflow-hidden bg-black border border-white/20 p-0">
         <DialogTitle className="sr-only">Stock Details for {symbol}</DialogTitle>
         <DialogDescription className="sr-only">
           View comprehensive trading data, charts, and analytics for {symbol} stock
         </DialogDescription>
-        <div className="flex h-full">
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col">
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-primary/20 to-transparent">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold">{symbol}</h2>
-                      <Badge variant="outline" className="text-xs">NASDAQ</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Technology Sector • Large Cap</p>
-                  </div>
-                  <Separator orientation="vertical" className="h-12" />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold">
-                        ${quote?.price?.toFixed(2) || "0.00"}
-                      </span>
-                      <Badge 
-                        variant={isPositive ? "default" : "destructive"}
-                        className="text-sm px-2 py-1"
-                      >
-                        {isPositive ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
-                        {isPositive ? "+" : ""}{changePercent.toFixed(2)}%
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Volume: {quote?.volume?.toLocaleString() || "0"} • 
-                      Avg: {fundamentals.avgVolume}
-                    </p>
+        
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-3xl font-bold text-white">{symbol}</h2>
+                  <Badge className="bg-primary/20 text-primary border-primary/30">NASDAQ</Badge>
+                  <Badge variant="outline" className="text-xs">Technology</Badge>
+                </div>
+                <p className="text-sm text-gray-400 mt-1">Large Cap • United States</p>
+              </div>
+              
+              <Separator orientation="vertical" className="h-14 bg-white/10" />
+              
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-4xl font-bold text-white">
+                    ${quote?.price?.toFixed(2) || "100.00"}
+                  </span>
+                  <div className={cn(
+                    "flex items-center gap-1",
+                    isPositive ? "text-green-400" : "text-red-400"
+                  )}>
+                    {isPositive ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+                    <span className="text-xl font-semibold">
+                      {isPositive ? "+" : ""}{changeAmount.toFixed(2)}
+                    </span>
+                    <span className="text-lg">
+                      ({isPositive ? "+" : ""}{changePercent.toFixed(2)}%)
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setAutoRefresh(!autoRefresh)}
-                    className="h-8 w-8"
-                  >
-                    {autoRefresh ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Settings className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Maximize2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Updated: {new Date().toLocaleTimeString()}
+                </p>
               </div>
             </div>
-
-            {/* Chart Controls */}
-            <div className="px-6 py-2 border-b border-white/10 bg-white/5">
-              <div className="flex items-center justify-between">
-                <div className="flex gap-2">
-                  {periodOptions.map(period => (
-                    <Button
-                      key={period.value}
-                      variant={selectedPeriod === period.value ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setSelectedPeriod(period.value)}
-                      className="h-7 px-3 text-xs"
-                    >
-                      {period.label}
-                    </Button>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={chartType === "line" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setChartType("line")}
-                    className="h-7 w-7 p-0"
-                  >
-                    <LineChartIcon className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant={chartType === "candle" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setChartType("candle")}
-                    className="h-7 w-7 p-0"
-                  >
-                    <ChartCandlestick className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant={chartType === "area" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setChartType("area")}
-                    className="h-7 w-7 p-0"
-                  >
-                    <Grid3x3 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="default"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => onTrade?.('buy', symbol)}
+                data-testid="button-modal-buy"
+              >
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Buy
+              </Button>
+              <Button
+                variant="outline"
+                className="border-red-600 text-red-600 hover:bg-red-600/10"
+                onClick={() => onTrade?.('sell', symbol)}
+                data-testid="button-modal-sell"
+              >
+                <Wallet className="w-4 h-4 mr-2" />
+                Sell
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onOpenChange(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-
-            {/* Main Chart Area */}
-            <div className="flex-1 p-6">
-              <div className="h-full bg-white/5 rounded-[20px] border border-white/10 p-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={chartData}>
-                    <defs>
-                      <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis 
-                      dataKey="formattedDate" 
-                      stroke="rgba(255,255,255,0.5)"
-                      tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
-                    />
-                    <YAxis 
-                      yAxisId="price"
-                      stroke="rgba(255,255,255,0.5)"
-                      tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
-                      domain={['auto', 'auto']}
-                    />
-                    <YAxis 
-                      yAxisId="volume"
-                      orientation="right"
-                      stroke="rgba(255,255,255,0.3)"
-                      tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '8px',
-                      }}
-                    />
-                    <Legend />
-                    
-                    {/* Volume Bars */}
-                    <Bar 
-                      yAxisId="volume" 
-                      dataKey="volume" 
-                      fill="rgba(139, 92, 246, 0.3)" 
-                      name="Volume"
-                    />
-                    
-                    {/* Price Chart */}
-                    {chartType === "area" && (
-                      <Area
-                        yAxisId="price"
-                        type="monotone"
-                        dataKey="close"
-                        stroke="#8B5CF6"
-                        fill="url(#colorPrice)"
-                        strokeWidth={2}
-                        name="Price"
+          </div>
+        </div>
+        
+        {/* Key Metrics Bar */}
+        <div className="px-6 py-3 border-b border-white/10 bg-black/50">
+          <div className="grid grid-cols-8 gap-4 text-sm">
+            <div>
+              <p className="text-gray-500 text-xs">Volume</p>
+              <p className="text-white font-semibold">{tradingData.volume}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">Market Cap</p>
+              <p className="text-white font-semibold">{tradingData.marketCap}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">P/E Ratio</p>
+              <p className="text-white font-semibold">{tradingData.peRatio}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">Day Range</p>
+              <p className="text-white font-semibold">{tradingData.dayLow} - {tradingData.dayHigh}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">52W Range</p>
+              <p className="text-white font-semibold">{tradingData.yearLow} - {tradingData.yearHigh}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">Dividend</p>
+              <p className="text-white font-semibold">${tradingData.dividend} ({tradingData.divYield})</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">EPS</p>
+              <p className="text-white font-semibold">${tradingData.eps}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs">Beta</p>
+              <p className="text-white font-semibold">{tradingData.beta}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Main Content */}
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col">
+          <TabsList className="w-full justify-start px-6 bg-transparent border-b border-white/10 rounded-none">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-primary/20">Overview</TabsTrigger>
+            <TabsTrigger value="chart" className="data-[state=active]:bg-primary/20">Chart</TabsTrigger>
+            <TabsTrigger value="analysis" className="data-[state=active]:bg-primary/20">Analysis</TabsTrigger>
+            <TabsTrigger value="news" className="data-[state=active]:bg-primary/20">News</TabsTrigger>
+            <TabsTrigger value="financials" className="data-[state=active]:bg-primary/20">Financials</TabsTrigger>
+            <TabsTrigger value="options" className="data-[state=active]:bg-primary/20">Options</TabsTrigger>
+          </TabsList>
+          
+          <ScrollArea className="flex-1">
+            <TabsContent value="overview" className="p-6 space-y-6">
+              {/* Main Chart */}
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white">Price Chart</CardTitle>
+                    <div className="flex gap-2">
+                      {periodOptions.map((period) => (
+                        <Button
+                          key={period.value}
+                          size="sm"
+                          variant={selectedPeriod === period.value ? "default" : "ghost"}
+                          onClick={() => setSelectedPeriod(period.value)}
+                          className="h-7"
+                        >
+                          {period.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                      <XAxis dataKey="time" stroke="#666" />
+                      <YAxis stroke="#666" domain={['dataMin - 5', 'dataMax + 5']} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                        labelStyle={{ color: '#999' }}
                       />
-                    )}
-                    {chartType === "line" && (
-                      <>
-                        <Line
-                          yAxisId="price"
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#8B5CF6"
+                        fill="url(#colorValue)"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+              
+              {/* Trading Metrics Grid */}
+              <div className="grid grid-cols-3 gap-6">
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg text-white">Trading Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Bid/Ask</span>
+                      <span className="text-white font-medium">${tradingData.bid} / ${tradingData.ask}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Spread</span>
+                      <span className="text-white font-medium">${tradingData.spread}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Volume</span>
+                      <span className="text-white font-medium">{tradingData.volume}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Avg Volume</span>
+                      <span className="text-white font-medium">{tradingData.avgVolume}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Volume Ratio</span>
+                      <span className="text-white font-medium">{tradingData.volumeRatio}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg text-white">Fundamentals</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Market Cap</span>
+                      <span className="text-white font-medium">${tradingData.marketCap}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">P/E Ratio</span>
+                      <span className="text-white font-medium">{tradingData.peRatio}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Forward P/E</span>
+                      <span className="text-white font-medium">{tradingData.forwardPE}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">EPS</span>
+                      <span className="text-white font-medium">${tradingData.eps}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Revenue</span>
+                      <span className="text-white font-medium">{tradingData.revenue}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg text-white">Technical Indicators</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">RSI (14)</span>
+                      <span className="text-white font-medium">{tradingData.rsi}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">50-Day MA</span>
+                      <span className="text-white font-medium">${tradingData.movingAvg50}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">200-Day MA</span>
+                      <span className="text-white font-medium">${tradingData.movingAvg200}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Volatility</span>
+                      <span className="text-white font-medium">{tradingData.volatility}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Beta</span>
+                      <span className="text-white font-medium">{tradingData.beta}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Analyst Ratings */}
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white">Analyst Ratings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Badge className="bg-green-600/20 text-green-400 border-green-600/30 text-lg px-3 py-1">
+                          {analystData.consensus}
+                        </Badge>
+                        <span className="text-gray-400">Based on {analystData.total} analysts</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-400">Average Target</p>
+                        <p className="text-2xl font-bold text-white">${analystData.avgTarget}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 flex gap-1">
+                        {Array.from({ length: analystData.strongBuy }).map((_, i) => (
+                          <div key={`sb-${i}`} className="flex-1 h-8 bg-green-600 rounded-sm" />
+                        ))}
+                        {Array.from({ length: analystData.buy }).map((_, i) => (
+                          <div key={`b-${i}`} className="flex-1 h-8 bg-green-500 rounded-sm" />
+                        ))}
+                        {Array.from({ length: analystData.hold }).map((_, i) => (
+                          <div key={`h-${i}`} className="flex-1 h-8 bg-yellow-600 rounded-sm" />
+                        ))}
+                        {Array.from({ length: analystData.sell }).map((_, i) => (
+                          <div key={`s-${i}`} className="flex-1 h-8 bg-red-500 rounded-sm" />
+                        ))}
+                        {Array.from({ length: analystData.strongSell }).map((_, i) => (
+                          <div key={`ss-${i}`} className="flex-1 h-8 bg-red-600 rounded-sm" />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-5 gap-2 text-center text-sm">
+                      <div>
+                        <p className="text-green-400 font-semibold">{analystData.strongBuy}</p>
+                        <p className="text-gray-500 text-xs">Strong Buy</p>
+                      </div>
+                      <div>
+                        <p className="text-green-300 font-semibold">{analystData.buy}</p>
+                        <p className="text-gray-500 text-xs">Buy</p>
+                      </div>
+                      <div>
+                        <p className="text-yellow-400 font-semibold">{analystData.hold}</p>
+                        <p className="text-gray-500 text-xs">Hold</p>
+                      </div>
+                      <div>
+                        <p className="text-red-300 font-semibold">{analystData.sell}</p>
+                        <p className="text-gray-500 text-xs">Sell</p>
+                      </div>
+                      <div>
+                        <p className="text-red-400 font-semibold">{analystData.strongSell}</p>
+                        <p className="text-gray-500 text-xs">Strong Sell</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="chart" className="p-6">
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white">Advanced Chart</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1 bg-black/30 rounded-lg p-1">
+                        <Button
+                          size="sm"
+                          variant={chartType === "line" ? "default" : "ghost"}
+                          onClick={() => setChartType("line")}
+                          className="h-7"
+                        >
+                          <LineChartIcon className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={chartType === "area" ? "default" : "ghost"}
+                          onClick={() => setChartType("area")}
+                          className="h-7"
+                        >
+                          <Activity className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={chartType === "candle" ? "default" : "ghost"}
+                          onClick={() => setChartType("candle")}
+                          className="h-7"
+                        >
+                          <ChartCandlestick className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      {periodOptions.map((period) => (
+                        <Button
+                          key={period.value}
+                          size="sm"
+                          variant={selectedPeriod === period.value ? "default" : "ghost"}
+                          onClick={() => setSelectedPeriod(period.value)}
+                          className="h-7"
+                        >
+                          {period.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={500}>
+                    {chartType === "area" ? (
+                      <AreaChart data={chartData}>
+                        <defs>
+                          <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                        <XAxis dataKey="time" stroke="#666" />
+                        <YAxis stroke="#666" />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                        />
+                        <Area
                           type="monotone"
-                          dataKey="close"
+                          dataKey="value"
+                          stroke="#8B5CF6"
+                          fill="url(#colorGradient)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    ) : (
+                      <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                        <XAxis dataKey="time" stroke="#666" />
+                        <YAxis stroke="#666" />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
                           stroke="#8B5CF6"
                           strokeWidth={2}
                           dot={false}
-                          name="Price"
                         />
-                        <Line
-                          yAxisId="price"
-                          type="monotone"
-                          dataKey="sma20"
-                          stroke="#10B981"
-                          strokeWidth={1}
-                          dot={false}
-                          strokeDasharray="5 5"
-                          name="SMA 20"
-                        />
-                        <Line
-                          yAxisId="price"
-                          type="monotone"
-                          dataKey="sma50"
-                          stroke="#F59E0B"
-                          strokeWidth={1}
-                          dot={false}
-                          strokeDasharray="5 5"
-                          name="SMA 50"
-                        />
-                      </>
+                      </LineChart>
                     )}
-                    
-                    <Brush dataKey="formattedDate" height={30} stroke="#8B5CF6" />
-                  </ComposedChart>
-                </ResponsiveContainer>
+                  </ResponsiveContainer>
+                  
+                  {/* Volume Chart */}
+                  <ResponsiveContainer width="100%" height={100}>
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                      <XAxis dataKey="time" stroke="#666" />
+                      <YAxis stroke="#666" />
+                      <Bar dataKey="volume" fill="#8B5CF6" opacity={0.3} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="analysis" className="p-6">
+              <div className="grid grid-cols-2 gap-6">
+                {/* Price Targets */}
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader>
+                    <CardTitle className="text-white">Price Targets</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Current Price</span>
+                        <span className="text-white font-bold text-lg">${quote?.price?.toFixed(2) || "100.00"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Average Target</span>
+                        <span className="text-green-400 font-bold text-lg">${analystData.avgTarget}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">High Target</span>
+                        <span className="text-green-300">${analystData.highTarget}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Low Target</span>
+                        <span className="text-yellow-400">${analystData.lowTarget}</span>
+                      </div>
+                    </div>
+                    <Separator className="bg-white/10" />
+                    <div>
+                      <p className="text-sm text-gray-400 mb-2">Implied Upside</p>
+                      <p className="text-2xl font-bold text-green-400">+18.0%</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Key Metrics */}
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader>
+                    <CardTitle className="text-white">Key Metrics</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">ROE</span>
+                      <span className="text-white font-medium">{tradingData.roe}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">ROA</span>
+                      <span className="text-white font-medium">{tradingData.roa}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Gross Margin</span>
+                      <span className="text-white font-medium">{tradingData.grossMargin}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Operating Margin</span>
+                      <span className="text-white font-medium">{tradingData.operatingMargin}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Net Margin</span>
+                      <span className="text-white font-medium">{tradingData.netMargin}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Debt/Equity</span>
+                      <span className="text-white font-medium">{tradingData.debtToEquity}</span>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </div>
-
-            {/* Trade Actions */}
-            <div className="px-6 pb-6">
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => onTrade?.('buy', symbol)}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  size="lg"
-                >
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Buy
-                </Button>
-                <Button
-                  onClick={() => onTrade?.('sell', symbol)}
-                  variant="outline"
-                  className="flex-1 border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-                  size="lg"
-                >
-                  <TrendingDown className="w-4 h-4 mr-2" />
-                  Sell
-                </Button>
+            </TabsContent>
+            
+            <TabsContent value="news" className="p-6">
+              <div className="space-y-4">
+                {newsData.map((news) => (
+                  <Card key={news.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-white font-semibold mb-1">{news.headline}</h3>
+                          <p className="text-gray-400 text-sm mb-2">{news.summary}</p>
+                          <div className="flex items-center gap-4">
+                            <span className="text-xs text-gray-500">{news.source}</span>
+                            <span className="text-xs text-gray-500">{news.time}</span>
+                            <Badge 
+                              className={cn(
+                                "text-xs",
+                                news.sentiment === "positive" && "bg-green-600/20 text-green-400 border-green-600/30",
+                                news.sentiment === "negative" && "bg-red-600/20 text-red-400 border-red-600/30",
+                                news.sentiment === "neutral" && "bg-gray-600/20 text-gray-400 border-gray-600/30"
+                              )}
+                            >
+                              {news.sentiment}
+                            </Badge>
+                          </div>
+                        </div>
+                        <ChevronUp className="w-4 h-4 text-gray-500 rotate-90" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </div>
-          </div>
-
-          {/* Right Sidebar */}
-          <div className="w-[400px] border-l border-white/10 bg-white/5">
-            <Tabs defaultValue="overview" className="h-full flex flex-col">
-              <TabsList className="w-full justify-start rounded-none bg-transparent border-b border-white/10 h-12">
-                <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
-                <TabsTrigger value="news" className="text-xs">News</TabsTrigger>
-                <TabsTrigger value="analysis" className="text-xs">Analysis</TabsTrigger>
-                <TabsTrigger value="depth" className="text-xs">Depth</TabsTrigger>
-                <TabsTrigger value="options" className="text-xs">Options</TabsTrigger>
-              </TabsList>
-
-              <ScrollArea className="flex-1">
-                {/* Overview Tab */}
-                <TabsContent value="overview" className="p-4 space-y-4">
-                  <Card className="bg-white/5 border-white/10">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Building2 className="w-4 h-4" />
-                        Fundamentals
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Market Cap</span>
-                        <span>${fundamentals.marketCap}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">P/E Ratio</span>
-                        <span>{fundamentals.peRatio}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">EPS</span>
-                        <span>${fundamentals.eps}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Dividend</span>
-                        <span>${fundamentals.dividend} ({fundamentals.divYield})</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Beta</span>
-                        <span>{fundamentals.beta}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">52W High</span>
-                        <span className="text-green-500">${fundamentals.yearHigh}</span>
-                      </div>
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">52W Low</span>
-                        <span className="text-red-500">${fundamentals.yearLow}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-white/5 border-white/10">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        Analyst Ratings
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-green-500">
-                          {analystRatings.consensus}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          Target: ${analystRatings.priceTarget}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="w-20 text-green-500">Strong Buy</span>
-                          <div className="flex-1 bg-white/10 rounded-full h-4 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 h-full bg-green-500" style={{ width: `${(analystRatings.strongBuy / 28) * 100}%` }} />
-                          </div>
-                          <span className="w-8 text-right">{analystRatings.strongBuy}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="w-20 text-green-400">Buy</span>
-                          <div className="flex-1 bg-white/10 rounded-full h-4 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 h-full bg-green-400" style={{ width: `${(analystRatings.buy / 28) * 100}%` }} />
-                          </div>
-                          <span className="w-8 text-right">{analystRatings.buy}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="w-20 text-yellow-500">Hold</span>
-                          <div className="flex-1 bg-white/10 rounded-full h-4 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 h-full bg-yellow-500" style={{ width: `${(analystRatings.hold / 28) * 100}%` }} />
-                          </div>
-                          <span className="w-8 text-right">{analystRatings.hold}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="w-20 text-red-400">Sell</span>
-                          <div className="flex-1 bg-white/10 rounded-full h-4 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 h-full bg-red-400" style={{ width: `${(analystRatings.sell / 28) * 100}%` }} />
-                          </div>
-                          <span className="w-8 text-right">{analystRatings.sell}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="w-20 text-red-500">Strong Sell</span>
-                          <div className="flex-1 bg-white/10 rounded-full h-4 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 h-full bg-red-500" style={{ width: `${(analystRatings.strongSell / 28) * 100}%` }} />
-                          </div>
-                          <span className="w-8 text-right">{analystRatings.strongSell}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* News Tab */}
-                <TabsContent value="news" className="p-4">
-                  <div className="space-y-3">
-                    {newsData?.map((news) => (
-                      <Card key={news.id} className="bg-white/5 border-white/10 hover-elevate cursor-pointer">
-                        <CardContent className="p-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 space-y-1">
-                              <p className="text-sm font-medium leading-tight">{news.headline}</p>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span>{news.source}</span>
-                                <span>•</span>
-                                <span>{news.time}</span>
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-end gap-1">
-                              <Badge 
-                                variant={news.sentiment === "positive" ? "default" : news.sentiment === "negative" ? "destructive" : "secondary"}
-                                className="text-xs"
-                              >
-                                {news.sentiment}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                {news.impact}
-                              </Badge>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
-
-                {/* Market Depth Tab */}
-                <TabsContent value="depth" className="p-4">
-                  <Card className="bg-white/5 border-white/10">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">Order Book</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="text-xs font-medium text-green-500 mb-2">Bids</h4>
-                          <div className="space-y-1">
-                            {orderBook.bids.map((bid, i) => (
-                              <div key={i} className="flex items-center justify-between text-xs">
-                                <span className="text-green-500">{bid.size.toLocaleString()}</span>
-                                <span>${bid.price.toFixed(2)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-medium text-red-500 mb-2">Asks</h4>
-                          <div className="space-y-1">
-                            {orderBook.asks.map((ask, i) => (
-                              <div key={i} className="flex items-center justify-between text-xs">
-                                <span>${ask.price.toFixed(2)}</span>
-                                <span className="text-red-500">{ask.size.toLocaleString()}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </ScrollArea>
-            </Tabs>
-          </div>
-        </div>
+            </TabsContent>
+            
+            <TabsContent value="financials" className="p-6">
+              <div className="grid grid-cols-2 gap-6">
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader>
+                    <CardTitle className="text-white">Income Statement</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Revenue</span>
+                      <span className="text-white font-medium">{tradingData.revenue}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Revenue Growth</span>
+                      <span className="text-green-400 font-medium">{tradingData.revenueGrowth}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Gross Margin</span>
+                      <span className="text-white font-medium">{tradingData.grossMargin}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Operating Margin</span>
+                      <span className="text-white font-medium">{tradingData.operatingMargin}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Net Margin</span>
+                      <span className="text-white font-medium">{tradingData.netMargin}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">EPS Growth</span>
+                      <span className="text-green-400 font-medium">{tradingData.epsGrowth}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader>
+                    <CardTitle className="text-white">Balance Sheet</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Current Ratio</span>
+                      <span className="text-white font-medium">{tradingData.currentRatio}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Quick Ratio</span>
+                      <span className="text-white font-medium">{tradingData.quickRatio}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Debt/Equity</span>
+                      <span className="text-white font-medium">{tradingData.debtToEquity}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">ROE</span>
+                      <span className="text-white font-medium">{tradingData.roe}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">ROA</span>
+                      <span className="text-white font-medium">{tradingData.roa}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-sm">Payout Ratio</span>
+                      <span className="text-white font-medium">{tradingData.payoutRatio}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="options" className="p-6">
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white">Options Chain</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-400">Options data coming soon...</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
