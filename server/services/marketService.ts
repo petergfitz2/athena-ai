@@ -117,14 +117,21 @@ export async function getQuote(symbol: string): Promise<MarketQuote | null> {
   // Check cache first
   const cached = quoteCache.get(symbol);
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log(`[CACHE HIT] Returning cached quote for ${symbol}`);
     return cached.quote;
   }
 
   try {
+    console.log(`[Yahoo Finance] Fetching quote for ${symbol}...`);
     const quote = await yahooFinance.quote(symbol);
+    console.log(`[Yahoo Finance] Received data for ${symbol}:`, {
+      symbol: quote?.symbol,
+      price: quote?.regularMarketPrice,
+      hasData: !!quote
+    });
     
     if (!quote || !quote.regularMarketPrice) {
-      console.warn(`No valid quote data for ${symbol}`);
+      console.warn(`[Yahoo Finance] No valid quote data for ${symbol}`);
       return null;
     }
 
