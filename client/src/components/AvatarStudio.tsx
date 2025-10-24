@@ -131,7 +131,14 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black border-white/10 z-[100]">
+      <DialogContent 
+        className="max-w-4xl max-h-[80vh] overflow-y-auto !bg-black border-white/10 !text-white" 
+        style={{ 
+          zIndex: 9999,
+          backgroundColor: '#000000',
+          color: 'white',
+          pointerEvents: 'auto'
+        }}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
             Avatar Studio
@@ -283,7 +290,8 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     placeholder="e.g., Morgan Blake"
-                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
+                    className="mt-1 !bg-white/5 border-white/10 !text-white placeholder:!text-white/40 focus:!bg-white/10"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' }}
                     data-testid="input-avatar-name"
                   />
                 </div>
@@ -295,7 +303,8 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                     value={personality}
                     onChange={(e) => setPersonality(e.target.value)}
                     placeholder="Describe their personality and background. Example: Former hedge fund manager who made millions in the 2008 crash. Speaks with confidence and uses market metaphors. Loves to share war stories from trading floors..."
-                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
+                    className="mt-1 !bg-white/5 border-white/10 !text-white placeholder:!text-white/40 focus:!bg-white/10"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' }}
                     rows={4}
                     data-testid="input-personality-traits"
                   />
@@ -333,7 +342,8 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                     value={appearance}
                     onChange={(e) => setAppearance(e.target.value)}
                     placeholder="e.g., professional, modern, approachable"
-                    className="mt-1 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:bg-white/10"
+                    className="mt-1 !bg-white/5 border-white/10 !text-white placeholder:!text-white/40 focus:!bg-white/10"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' }}
                     data-testid="input-visual-style"
                   />
                 </div>
@@ -346,7 +356,8 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                     appearance 
                   })}
                   disabled={!personality || createCustom.isPending}
-                  className="w-full rounded-[28px] relative z-10"
+                  className="w-full rounded-[28px]"
+                  style={{ position: 'relative', zIndex: 20 }}
                   data-testid="button-create-custom-avatar"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
