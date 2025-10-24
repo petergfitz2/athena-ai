@@ -25,6 +25,7 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
   const [appearance, setAppearance] = useState("");
   const [avatarImage, setAvatarImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -54,38 +55,80 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
     }
   });
 
+  // Process file (shared between select and drop)
+  const processFile = (file: File) => {
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file (JPEG, PNG, GIF, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setAvatarImage(file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file type
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select an image file (JPEG, PNG, GIF, etc.)",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select an image smaller than 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setAvatarImage(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      processFile(file);
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Only set dragging to false if we're leaving the actual drop zone
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      processFile(files[0]);
     }
   };
 
@@ -269,10 +312,24 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                     ) : (
                       <div 
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-32 h-32 mx-auto border-2 border-dashed border-white/20 rounded-full flex flex-col items-center justify-center cursor-pointer hover:border-white/40 transition-colors"
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        className={`w-32 h-32 mx-auto border-2 border-dashed rounded-full flex flex-col items-center justify-center cursor-pointer transition-all ${
+                          isDragging 
+                            ? 'border-primary bg-primary/10 scale-105' 
+                            : 'border-white/20 hover:border-white/40'
+                        }`}
                       >
-                        <Upload className="w-8 h-8 text-white/40 mb-2" />
-                        <span className="text-xs text-white/60">Upload Image</span>
+                        <Upload className={`w-8 h-8 mb-2 transition-colors ${
+                          isDragging ? 'text-primary' : 'text-white/40'
+                        }`} />
+                        <span className={`text-xs transition-colors ${
+                          isDragging ? 'text-primary font-semibold' : 'text-white/60'
+                        }`}>
+                          {isDragging ? 'Drop image here' : 'Upload Image'}
+                        </span>
                       </div>
                     )}
                     <input
@@ -284,7 +341,7 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                       data-testid="input-avatar-image"
                     />
                     <p className="text-xs text-muted-foreground text-center">
-                      JPEG, PNG, or GIF up to 5MB
+                      JPEG, PNG, or GIF up to 5MB • Click or drag & drop
                     </p>
                   </div>
                 </div>
