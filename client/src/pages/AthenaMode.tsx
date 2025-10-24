@@ -28,12 +28,51 @@ function AthenaModeContent() {
   const { toast } = useToast();
   const { setMode } = useMode();
   const [, setLocation] = useLocation();
-  const [messages, setMessages] = useState<Message[]>([{
-    id: "welcome",
-    role: "assistant",
-    content: "Hello! I'm Athena, your AI investment advisor.\n\nI can help you with:\n• Portfolio analysis\n• Market insights\n• Trade suggestions\n\nHow can I assist you today?",
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  }]);
+  
+  // Fetch active avatar for personalized greeting
+  const { data: activeAvatar } = useQuery<any>({
+    queryKey: ['/api/avatars/active']
+  });
+  
+  // Generate dynamic greeting based on avatar personality
+  const getAvatarGreeting = () => {
+    if (!activeAvatar) {
+      return "Hello! I'm Athena, your AI investment advisor.\n\nI can help you with:\n• Portfolio analysis\n• Market insights\n• Trade suggestions\n\nHow can I assist you today?";
+    }
+    
+    const name = activeAvatar?.name || "Athena";
+    const profile = activeAvatar?.personalityProfile || {};
+    
+    // Use custom greeting if available
+    if (profile.greeting) {
+      return profile.greeting;
+    }
+    
+    // Generate greeting based on personality traits
+    if (profile.backstory?.toLowerCase().includes('wolf') || 
+        profile.traits?.includes('aggressive')) {
+      return `${name} here. Sell me this pen.\n\nJust kidding. Let's make some real money. What are you holding?`;
+    }
+    
+    if (profile.traits?.includes('analytical') || 
+        profile.tradingStyle === 'analytical') {
+      return `Greetings, I'm ${name}.\n\nReady to analyze:\n• Portfolio optimization\n• Risk metrics\n• Market correlations\n\nWhat would you like to examine?`;
+    }
+    
+    if (profile.traits?.includes('friendly') || 
+        profile.traits?.includes('casual')) {
+      return `Hey! ${name} here.\n\nLet's talk about:\n• Your investments\n• Market trends\n• Smart trades\n\nWhat's on your mind?`;
+    }
+    
+    if (profile.tradingStyle === 'conservative') {
+      return `Hello, I'm ${name}.\n\nI can help you with:\n• Safe investment strategies\n• Risk management\n• Steady growth opportunities\n\nHow may I assist you today?`;
+    }
+    
+    // Default professional greeting
+    return `Hello! I'm ${name}, your AI investment advisor.\n\nI can help you with:\n• Portfolio analysis\n• Market insights\n• Trade suggestions\n\nHow can I assist you today?`;
+  };
+  
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -43,6 +82,18 @@ function AthenaModeContent() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useKeyboardShortcuts();
+  
+  // Update greeting when avatar changes
+  useEffect(() => {
+    if (messages.length === 0 || (messages.length === 1 && messages[0].id === "welcome")) {
+      setMessages([{
+        id: "welcome",
+        role: "assistant",
+        content: getAvatarGreeting(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }]);
+    }
+  }, [activeAvatar]);
 
   // Set current mode
   useEffect(() => {

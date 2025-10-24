@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageCircle, X, Sparkles, TrendingUp, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocation } from "wouter";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,17 +20,66 @@ interface Message {
 
 export default function FloatingAthenaOrb() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      content: "Hi! I'm Athena, your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ]);
+  
+  // Fetch active avatar for personalized greeting
+  const { data: activeAvatar } = useQuery<any>({
+    queryKey: ['/api/avatars/active']
+  });
+  
+  // Generate dynamic greeting based on avatar personality
+  const getAvatarGreeting = () => {
+    if (!activeAvatar) {
+      return "Hi! I'm Athena, your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?";
+    }
+    
+    const name = activeAvatar?.name || "Athena";
+    const profile = activeAvatar?.personalityProfile || {};
+    
+    // Use custom greeting if available
+    if (profile.greeting) {
+      return profile.greeting;
+    }
+    
+    // Generate greeting based on personality traits
+    if (profile.backstory?.toLowerCase().includes('wolf') || 
+        profile.traits?.includes('aggressive')) {
+      return `${name} here. Let's cut to the chase - what trades are you looking at?`;
+    }
+    
+    if (profile.traits?.includes('analytical') || 
+        profile.tradingStyle === 'analytical') {
+      return `I'm ${name}. Ready to analyze your portfolio with precision. What can I help you with?`;
+    }
+    
+    if (profile.traits?.includes('friendly') || 
+        profile.traits?.includes('casual')) {
+      return `Hey! ${name} here. What's on your mind about the markets today?`;
+    }
+    
+    if (profile.tradingStyle === 'conservative') {
+      return `Hello, I'm ${name}. Let's review your investments carefully. How can I assist?`;
+    }
+    
+    // Default professional greeting
+    return `Hi! I'm ${name}, your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?`;
+  };
+  
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Update greeting when avatar changes or when opened
+  useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      setMessages([{
+        id: "welcome",
+        content: getAvatarGreeting(),
+        sender: "ai",
+        timestamp: new Date(),
+      }]);
+    }
+  }, [isOpen, activeAvatar]);
 
   const sendMessage = useMutation({
     mutationFn: async (message: string) => {

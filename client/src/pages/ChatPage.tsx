@@ -24,14 +24,65 @@ type Conversation = {
 function ChatPageContent() {
   const { toast } = useToast();
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([{
-    id: "welcome",
-    role: "assistant",
-    content: "Hello! I'm Athena, your AI investment advisor. How can I help you today?",
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  }]);
+  
+  // Fetch active avatar for personalized greeting
+  const { data: activeAvatar } = useQuery<any>({
+    queryKey: ['/api/avatars/active']
+  });
+  
+  // Generate dynamic greeting based on avatar personality
+  const getAvatarGreeting = () => {
+    if (!activeAvatar) {
+      return "Hello! I'm Athena, your AI investment advisor. How can I help you today?";
+    }
+    
+    const name = activeAvatar?.name || "Athena";
+    const profile = activeAvatar?.personalityProfile || {};
+    
+    // Use custom greeting if available
+    if (profile.greeting) {
+      return profile.greeting;
+    }
+    
+    // Generate greeting based on personality traits
+    if (profile.backstory?.toLowerCase().includes('wolf') || 
+        profile.traits?.includes('aggressive')) {
+      return `${name} here. Show me your portfolio - let's make some real money.`;
+    }
+    
+    if (profile.traits?.includes('analytical') || 
+        profile.tradingStyle === 'analytical') {
+      return `Greetings, I'm ${name}. Let's analyze your investment opportunities with data-driven precision.`;
+    }
+    
+    if (profile.traits?.includes('friendly') || 
+        profile.traits?.includes('casual')) {
+      return `Hey there! I'm ${name}. Ready to talk about your investments?`;
+    }
+    
+    if (profile.tradingStyle === 'conservative') {
+      return `Hello, I'm ${name}. Let's build your wealth safely and strategically.`;
+    }
+    
+    // Default professional greeting
+    return `Hello! I'm ${name}, your AI investment advisor. How can I help you today?`;
+  };
+  
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Update greeting when avatar changes
+  useEffect(() => {
+    if (!currentConversationId) {
+      setMessages([{
+        id: "welcome",
+        role: "assistant",
+        content: getAvatarGreeting(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }]);
+    }
+  }, [activeAvatar, currentConversationId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -70,7 +121,7 @@ function ChatPageContent() {
         setMessages([{
           id: "welcome",
           role: "assistant",
-          content: "Hello! I'm Athena, your AI investment advisor. How can I help you today?",
+          content: getAvatarGreeting(),
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }]);
       }
@@ -144,7 +195,7 @@ function ChatPageContent() {
     setMessages([{
       id: "welcome",
       role: "assistant",
-      content: "Hello! I'm Athena, your AI investment advisor. How can I help you today?",
+      content: getAvatarGreeting(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }]);
     setIsLoading(false);
