@@ -35,7 +35,15 @@ export default function StockDetailModal({ symbol, open, onOpenChange, onTrade }
   // Fetch current quote
   const { data: quote, isLoading: quoteLoading } = useQuery<MarketQuote>({
     queryKey: ['/api/market/quote', symbol],
+    queryFn: async () => {
+      if (!symbol) throw new Error('No symbol provided');
+      const response = await fetch(`/api/market/quote/${symbol}`);
+      if (!response.ok) throw new Error('Failed to fetch quote');
+      return response.json();
+    },
     enabled: !!symbol && open,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch historical data
