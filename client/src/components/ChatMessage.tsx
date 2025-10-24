@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import AthenaTraderAvatar from "./AthenaTraderAvatar";
+import StockDetailModal from "./StockDetailModal";
 
 interface ChatMessageProps {
   content: string;
@@ -8,8 +10,23 @@ interface ChatMessageProps {
   timestamp?: string;
 }
 
+// Common stock tickers to increase confidence in detection
+const commonTickers = [
+  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM', 'JNJ', 'V', 'PG', 'UNH',
+  'HD', 'MA', 'DIS', 'BAC', 'ADBE', 'CRM', 'NFLX', 'PFE', 'TMO', 'CSCO', 'PEP', 'ABT',
+  'NKE', 'CVX', 'WMT', 'XOM', 'ABBV', 'COST', 'MRK', 'VZ', 'INTC', 'CMCSA', 'ORCL',
+  'ACN', 'DHR', 'T', 'TXN', 'LLY', 'MDT', 'HON', 'PM', 'UNP', 'NEE', 'IBM', 'QCOM',
+  'BMY', 'RTX', 'SBUX', 'AMD', 'LIN', 'GE', 'CAT', 'MMM', 'AMT', 'BA', 'GS', 'DE',
+  'INTU', 'AMAT', 'CVS', 'LMT', 'AXP', 'BKNG', 'MU', 'TJX', 'SCHW', 'GILD', 'MO',
+  'MDLZ', 'CI', 'BLK', 'ZTS', 'SPGI', 'ISRG', 'PLD', 'C', 'TMUS', 'ADP', 'CB', 'REGN',
+  'SYK', 'VRTX', 'FISV', 'TGT', 'BDX', 'MS', 'PNC', 'USB', 'TFC', 'DUK', 'BSX', 'CCI',
+  'GME', 'AMC', 'PLTR', 'RBLX', 'COIN', 'HOOD', 'SOFI', 'LCID', 'RIVN', 'SMR',
+  'SPY', 'QQQ', 'IWM', 'DIA', 'VTI', 'VOO', 'EFA', 'EEM', 'GLD', 'SLV', 'USO', 'TLT'
+];
+
 export default function ChatMessage({ content, role, timestamp }: ChatMessageProps) {
   const isUser = role === "user";
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   
   // Fetch active avatar for AI messages
   const { data: activeAvatar } = useQuery<{
@@ -20,6 +37,54 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
     queryKey: ['/api/avatars/active'],
     enabled: !isUser, // Only fetch for AI messages
   });
+
+  // Function to parse content and make tickers clickable
+  const renderContentWithClickableTickers = (text: string) => {
+    // Enhanced regex to match tickers with word boundaries
+    // Matches $SYMBOL or standalone SYMBOL (2-5 uppercase letters)
+    const tickerRegex = /(\$[A-Z]{1,5})\b|(?:^|\s)([A-Z]{2,5})(?=[\s,.\?!;:]|$)/g;
+    
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = tickerRegex.exec(text)) !== null) {
+      const ticker = (match[1] || match[2]).replace('$', '');
+      
+      // Check if this is likely a ticker (either has $ prefix or is in common list)
+      const hasPrefix = !!match[1];
+      const isCommon = commonTickers.includes(ticker);
+      
+      // Only make it clickable if it has $ prefix OR is a known ticker
+      if (hasPrefix || isCommon) {
+        // Add text before the ticker
+        if (match.index > lastIndex) {
+          parts.push(text.substring(lastIndex, match.index));
+        }
+        
+        // Add clickable ticker
+        parts.push(
+          <button
+            key={`${match.index}-${ticker}`}
+            onClick={() => setSelectedSymbol(ticker)}
+            className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium mx-1"
+            data-testid={`ticker-${ticker}`}
+          >
+            ${ticker}
+          </button>
+        );
+        
+        lastIndex = match.index + match[0].length;
+      }
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+    
+    return parts.length > 0 ? parts : text;
+  };
 
   return (
     <div
@@ -57,12 +122,23 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
           )}
           data-testid={`message-${role}`}
         >
-          <p className="text-base md:text-lg leading-relaxed font-light whitespace-pre-wrap text-foreground">{content}</p>
+          <div className="text-base md:text-lg leading-relaxed font-light whitespace-pre-wrap text-foreground">
+            {renderContentWithClickableTickers(content)}
+          </div>
           {timestamp && (
             <p className="text-xs text-muted-foreground mt-3 lg:mt-4 font-light">{timestamp}</p>
           )}
         </div>
       </div>
+      
+      {/* Stock Detail Modal */}
+      {selectedSymbol && (
+        <StockDetailModal
+          symbol={selectedSymbol}
+          open={!!selectedSymbol}
+          onOpenChange={(open) => !open && setSelectedSymbol(null)}
+        />
+      )}
     </div>
   );
 }
