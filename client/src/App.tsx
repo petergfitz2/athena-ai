@@ -46,14 +46,15 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {user ? <CommandCenter /> : <AuthPage />}
+        {/* Always show CommandCenter with demo data when not logged in */}
+        <CommandCenter />
       </Route>
       {/* Command Center is now the main dashboard */}
       <Route path="/command-center">
-        {user ? <CommandCenter /> : <Redirect to="/" />}
+        <CommandCenter />
       </Route>
       <Route path="/dashboard">
-        {user ? <CommandCenter /> : <Redirect to="/" />}
+        <CommandCenter />
       </Route>
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/watchlist" component={WatchlistPage} />

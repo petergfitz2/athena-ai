@@ -189,9 +189,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Portfolio/Holdings routes
-  app.get("/api/holdings", requireAuth, async (req, res) => {
+  // Portfolio/Holdings routes - Now accessible without login for demo
+  app.get("/api/holdings", async (req, res) => {
     try {
+      // If not authenticated, return demo holdings
+      if (!req.user) {
+        const demoHoldings = [
+          { id: 'demo-1', userId: 'demo', symbol: 'AAPL', quantity: '50', averageCost: '150.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-2', userId: 'demo', symbol: 'MSFT', quantity: '25', averageCost: '320.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-3', userId: 'demo', symbol: 'GOOGL', quantity: '15', averageCost: '125.75', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-4', userId: 'demo', symbol: 'TSLA', quantity: '30', averageCost: '210.25', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-5', userId: 'demo', symbol: 'NVDA', quantity: '20', averageCost: '450.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-6', userId: 'demo', symbol: 'META', quantity: '35', averageCost: '300.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-7', userId: 'demo', symbol: 'AMZN', quantity: '40', averageCost: '140.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-8', userId: 'demo', symbol: 'JPM', quantity: '45', averageCost: '145.00', createdAt: new Date(), updatedAt: new Date() },
+        ];
+        return res.json(demoHoldings);
+      }
+      
       const user = req.user as any;
       let holdings = await storage.getUserHoldings(user.id);
       
@@ -541,9 +556,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Watchlist routes
-  app.get("/api/watchlist", requireAuth, async (req, res) => {
+  // Watchlist routes - Now accessible without login for demo
+  app.get("/api/watchlist", async (req, res) => {
     try {
+      // If not authenticated, return demo watchlist
+      if (!req.user) {
+        const demoWatchlist = [
+          { id: 'demo-w1', userId: 'demo', symbol: 'SMR', addedAt: new Date() },
+          { id: 'demo-w2', userId: 'demo', symbol: 'AAPL', addedAt: new Date() },
+          { id: 'demo-w3', userId: 'demo', symbol: 'NVDA', addedAt: new Date() },
+          { id: 'demo-w4', userId: 'demo', symbol: 'TSLA', addedAt: new Date() },
+        ];
+        return res.json(demoWatchlist);
+      }
+      
       const user = req.user as any;
       let watchlist = await storage.getUserWatchlist(user.id);
       
@@ -1056,9 +1082,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Portfolio summary route
-  app.get("/api/portfolio/summary", requireAuth, async (req, res) => {
+  // Portfolio summary route - Now accessible without login for demo
+  app.get("/api/portfolio/summary", async (req, res) => {
     try {
+      // If not authenticated, return demo summary
+      if (!req.user) {
+        return res.json({
+          totalValue: 125850,
+          totalCost: 110000,
+          totalGain: 15850,
+          totalGainPercent: 14.41,
+          cashBalance: 25000,
+          holdingsCount: 8,
+          topHoldings: [
+            { symbol: 'AAPL', value: 8916, percentOfPortfolio: 7.08 },
+            { symbol: 'MSFT', value: 9472.75, percentOfPortfolio: 7.52 },
+            { symbol: 'NVDA', value: 9906.4, percentOfPortfolio: 7.87 },
+            { symbol: 'META', value: 11375, percentOfPortfolio: 9.04 },
+            { symbol: 'TSLA', value: 7285.2, percentOfPortfolio: 5.79 },
+          ],
+        });
+      }
+      
       const user = req.user as any;
       let holdings = await storage.getUserHoldings(user.id);
       const isUsingMockData = holdings.length === 0;
