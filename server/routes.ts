@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer } from "ws";
 import { storage } from "./storage";
+import { avatarPresets } from "./avatarPresets";
 import { passport } from "./auth";
 import bcrypt from "bcrypt";
 import { insertUserSchema, insertHoldingSchema, insertTradeSchema, type PortfolioSummary } from "@shared/schema";
@@ -52,6 +53,13 @@ function getModeChangeReason(
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize preset avatars in database on server start
+  storage.initializePresetAvatars(avatarPresets).then(() => {
+    console.log('Preset avatars initialized');
+  }).catch(err => {
+    console.error('Error initializing preset avatars:', err);
+  });
+
   // Authentication routes
   app.post("/api/auth/register", async (req, res, next) => {
     try {
@@ -730,10 +738,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/avatars/:id/select", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
-      const avatarId = req.params.id;
+      const avatarIdentifier = req.params.id;
       
+      // Check if this is a persona key (for presets) or an avatar ID
+      let avatar = await storage.getAvatarByPersonaKey(avatarIdentifier);
+      let avatarId = avatar?.id;
+      
+      if (!avatar) {
+        // Try to get by ID directly (for custom avatars)
+        const avatarRecord = await storage.getPresetAvatars();
+        avatar = avatarRecord.find(a => a.id === avatarIdentifier) || null;
+        avatarId = avatarIdentifier;
+      }
+      
+      if (!avatarId) {
+        return res.status(404).json({ error: "Avatar not found" });
+      }
+      
+      // Check if user has a userAvatar record for this avatar
+      const userAvatarHistory = await storage.getUserAvatarHistory(user.id);
+      const existingUserAvatar = userAvatarHistory.find(ua => ua.avatarId === avatarId);
+      
+      if (!existingUserAvatar) {
+        // Create a userAvatar record for preset avatars
+        await storage.createUserAvatar({
+          userId: user.id,
+          avatarId: avatarId,
+          customPrompt: null,
+          tradingStyle: avatar?.personalityProfile?.tradingStyle || null,
+          isActive: false
+        } as any);
+      }
+      
+      // Now activate the avatar
       await storage.setActiveAvatar(user.id, avatarId);
-      res.json({ success: true });
+      res.json({ success: true, avatarId });
     } catch (error) {
       console.error("Error selecting avatar:", error);
       res.status(500).json({ error: "Failed to select avatar" });

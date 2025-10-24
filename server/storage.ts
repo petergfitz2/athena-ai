@@ -59,6 +59,8 @@ export interface IStorage {
   createUserAvatar(userAvatar: Omit<UserAvatar, 'id'>): Promise<UserAvatar>;
   setActiveAvatar(userId: string, avatarId: string): Promise<void>;
   getActiveAvatar(userId: string): Promise<Avatar | null>;
+  initializePresetAvatars(presets: any[]): Promise<void>;
+  getAvatarByPersonaKey(personaKey: string): Promise<Avatar | null>;
 }
 
 export class DbStorage implements IStorage {
@@ -268,6 +270,46 @@ export class DbStorage implements IStorage {
     
     const result = await db.select().from(avatars)
       .where(eq(avatars.id, user.activeAvatarId))
+      .limit(1);
+    
+    return result[0] || null;
+  }
+
+  async initializePresetAvatars(presets: any[]): Promise<void> {
+    for (const preset of presets) {
+      const existing = await db.select()
+        .from(avatars)
+        .where(eq(avatars.personaKey, preset.personaKey))
+        .limit(1);
+      
+      if (existing.length === 0) {
+        await db.insert(avatars).values({
+          name: preset.name,
+          personaKey: preset.personaKey,
+          imageUrl: preset.imageUrl,
+          personalityProfile: preset.personalityProfile,
+          voiceStyle: preset.voiceStyle,
+          isPreset: preset.isPreset
+        });
+      } else {
+        // Update existing preset avatar with new data (in case we changed images)
+        await db.update(avatars)
+          .set({
+            name: preset.name,
+            imageUrl: preset.imageUrl,
+            personalityProfile: preset.personalityProfile,
+            voiceStyle: preset.voiceStyle,
+            isPreset: preset.isPreset
+          })
+          .where(eq(avatars.personaKey, preset.personaKey));
+      }
+    }
+  }
+
+  async getAvatarByPersonaKey(personaKey: string): Promise<Avatar | null> {
+    const result = await db.select()
+      .from(avatars)
+      .where(eq(avatars.personaKey, personaKey))
       .limit(1);
     
     return result[0] || null;
