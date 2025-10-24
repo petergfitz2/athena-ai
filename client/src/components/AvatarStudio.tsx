@@ -11,6 +11,90 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User, Sparkles, Check } from "lucide-react";
 
+// Import Wall Street avatar images
+import blondeTrader from "@assets/generated_images/Blonde_female_trader_portrait_1d8c0025.png";
+import wolfTrader from "@assets/generated_images/Wolf_of_Wall_Street_male_trader_13276854.png";
+import quantAnalyst from "@assets/generated_images/Asian_female_quant_analyst_25a439f1.png";
+import financeBro from "@assets/generated_images/Finance_bro_with_vest_142a35d3.png";
+import hedgeFundManager from "@assets/generated_images/Black_hedge_fund_manager_1ff2f687.png";
+import investmentBanker from "@assets/generated_images/Latina_investment_banker_407e9e03.png";
+
+// Preset Wall Street avatars
+const wallStreetAvatars = [
+  {
+    id: "margot-trader",
+    name: "Victoria Sterling",
+    image: blondeTrader,
+    personaKey: "victoria",
+    personalityProfile: {
+      backstory: "Former Goldman Sachs equity trader turned wealth advisor. Sharp, ambitious, and always two steps ahead.",
+      traits: ["Confident", "Strategic", "Persuasive", "Risk-aware"],
+      tradingStyle: "aggressive",
+      catchphrase: "Money never sleeps, and neither do opportunities."
+    }
+  },
+  {
+    id: "wolf-trader",
+    name: "Jordan Chase",
+    image: wolfTrader,
+    personaKey: "jordan",
+    personalityProfile: {
+      backstory: "Wall Street prodigy who made his first million by 25. Lives for the thrill of the deal.",
+      traits: ["Charismatic", "Bold", "Relentless", "Intuitive"],
+      tradingStyle: "aggressive",
+      catchphrase: "The only thing standing between you and your goal is the story you keep telling yourself."
+    }
+  },
+  {
+    id: "quant-analyst",
+    name: "Dr. Mei Chen",
+    image: quantAnalyst,
+    personaKey: "mei",
+    personalityProfile: {
+      backstory: "MIT PhD in quantitative finance. Sees patterns where others see chaos.",
+      traits: ["Analytical", "Precise", "Innovative", "Data-driven"],
+      tradingStyle: "analytical",
+      catchphrase: "Numbers don't lie. The key is knowing which ones to listen to."
+    }
+  },
+  {
+    id: "finance-bro",
+    name: "Tyler Hudson",
+    image: financeBro,
+    personaKey: "tyler",
+    personalityProfile: {
+      backstory: "Fintech startup founder turned day trader. Brings Silicon Valley energy to Wall Street.",
+      traits: ["Tech-savvy", "Trendy", "Optimistic", "Social"],
+      tradingStyle: "balanced",
+      catchphrase: "WAGMI - We're all gonna make it! Just gotta trust the process."
+    }
+  },
+  {
+    id: "hedge-fund",
+    name: "Marcus Wellington III",
+    image: hedgeFundManager,
+    personaKey: "marcus",
+    personalityProfile: {
+      backstory: "30-year Wall Street veteran. Built a billion-dollar hedge fund from scratch.",
+      traits: ["Wise", "Patient", "Disciplined", "Sophisticated"],
+      tradingStyle: "conservative",
+      catchphrase: "Wealth is built in decades, not days. Play the long game."
+    }
+  },
+  {
+    id: "investment-banker",
+    name: "Isabella Rodriguez",
+    image: investmentBanker,
+    personaKey: "isabella",
+    personalityProfile: {
+      backstory: "Managing Director at a top investment bank. Specializes in high-stakes M&A deals.",
+      traits: ["Powerful", "Decisive", "Networked", "Eloquent"],
+      tradingStyle: "balanced",
+      catchphrase: "Success is where preparation meets opportunity."
+    }
+  }
+];
+
 interface AvatarStudioProps {
   open: boolean;
   onClose: () => void;
@@ -22,11 +106,8 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
   const [tradingStyle, setTradingStyle] = useState("balanced");
   const [appearance, setAppearance] = useState("");
 
-  // Fetch preset avatars
-  const { data: presets } = useQuery({
-    queryKey: ['/api/avatars/presets'],
-    enabled: open,
-  });
+  // Use local preset avatars (no API call needed)
+  const presets = wallStreetAvatars;
 
   // Fetch user's avatar history
   const { data: history } = useQuery({
@@ -73,37 +154,40 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
           </TabsList>
 
           <TabsContent value="presets" className="space-y-4 mt-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {presets?.map((avatar: any) => (
                 <Card 
                   key={avatar.id} 
-                  className="bg-white/5 border-white/10 hover-elevate cursor-pointer backdrop-blur-xl rounded-[28px]"
+                  className="bg-white/5 border-white/10 hover-elevate cursor-pointer backdrop-blur-xl rounded-[28px] overflow-hidden"
                   onClick={() => selectAvatar.mutate(avatar.id)}
                   data-testid={`card-preset-${avatar.personaKey}`}
                 >
-                  <CardHeader>
-                    <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="w-8 h-8 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{avatar.name}</CardTitle>
-                        <CardDescription className="text-sm mt-1">
-                          {avatar.personalityProfile.backstory}
-                        </CardDescription>
-                      </div>
+                  <div className="h-48 relative overflow-hidden">
+                    <img 
+                      src={avatar.image} 
+                      alt={avatar.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-xl font-bold text-white">{avatar.name}</h3>
+                      <p className="text-sm text-white/80 italic mt-1">"{avatar.personalityProfile.catchphrase}"</p>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
+                  </div>
+                  <CardContent className="pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {avatar.personalityProfile.backstory}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-3">
                       {avatar.personalityProfile.traits.map((trait: string) => (
                         <span key={trait} className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
                           {trait}
                         </span>
                       ))}
                     </div>
-                    <div className="mt-3 text-sm text-muted-foreground">
-                      Trading Style: <span className="text-foreground capitalize">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Trading Style:</span>
+                      <span className="text-foreground capitalize font-medium">
                         {avatar.personalityProfile.tradingStyle}
                       </span>
                     </div>
