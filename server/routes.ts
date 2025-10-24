@@ -45,6 +45,26 @@ const upload = multer({
   }
 });
 
+// In-memory storage for demo conversations
+interface DemoMessage {
+  id: string;
+  conversationId: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: Date;
+}
+
+interface DemoConversation {
+  id: string;
+  userId: string;
+  startedAt: Date;
+  endedAt: Date | null;
+  messages: DemoMessage[];
+}
+
+// Store demo conversations in memory (resets on server restart)
+const demoConversations: Map<string, DemoConversation> = new Map();
+
 // Middleware to require authentication
 function requireAuth(req: any, res: any, next: any) {
   if (req.isAuthenticated()) {
@@ -508,9 +528,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Conversation routes
-  app.get("/api/conversations", requireAuth, async (req, res) => {
+  // Conversation routes - Now accessible without login for demo
+  app.get("/api/conversations", async (req, res) => {
     try {
+      // If not authenticated, return demo conversations
+      if (!req.user) {
+        const conversations = Array.from(demoConversations.values()).map(conv => ({
+          id: conv.id,
+          userId: conv.userId,
+          startedAt: conv.startedAt,
+          endedAt: conv.endedAt
+        }));
+        
+        // Always have at least one conversation for demo
+        if (conversations.length === 0) {
+          const initialConversation: DemoConversation = {
+            id: 'demo-conversation-1',
+            userId: 'demo',
+            startedAt: new Date(Date.now() - 86400000),
+            endedAt: null,
+            messages: []
+          };
+          demoConversations.set(initialConversation.id, initialConversation);
+          conversations.push({
+            id: initialConversation.id,
+            userId: initialConversation.userId,
+            startedAt: initialConversation.startedAt,
+            endedAt: initialConversation.endedAt
+          });
+        }
+        
+        return res.json(conversations);
+      }
+      
       const user = req.user as any;
       const conversations = await storage.getUserConversations(user.id);
       res.json(conversations);
@@ -519,8 +569,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/conversations", requireAuth, async (req, res) => {
+  app.post("/api/conversations", async (req, res) => {
     try {
+      // If not authenticated, create a demo conversation in memory
+      if (!req.user) {
+        const demoConversation: DemoConversation = {
+          id: 'demo-conversation-' + Date.now(), 
+          userId: 'demo', 
+          startedAt: new Date(),
+          endedAt: null,
+          messages: []
+        };
+        demoConversations.set(demoConversation.id, demoConversation);
+        
+        return res.json({
+          id: demoConversation.id,
+          userId: demoConversation.userId,
+          startedAt: demoConversation.startedAt,
+          endedAt: demoConversation.endedAt
+        });
+      }
+      
       const user = req.user as any;
       const conversation = await storage.createConversation({ userId: user.id });
       res.json(conversation);
@@ -529,9 +598,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/conversations/:id/messages", requireAuth, async (req, res) => {
+  app.get("/api/conversations/:id/messages", async (req, res) => {
     try {
       const { id } = req.params;
+      
+      // If not authenticated, return demo messages from memory
+      if (!req.user) {
+        const conversation = demoConversations.get(id);
+        if (!conversation) {
+          // Create conversation if it doesn't exist
+          const newConversation: DemoConversation = {
+            id,
+            userId: 'demo',
+            startedAt: new Date(),
+            endedAt: null,
+            messages: [{
+              id: 'demo-msg-welcome',
+              conversationId: id,
+              role: 'assistant',
+              content: 'Welcome to Athena AI! I\'m here to help you explore our investment platform. What would you like to know about?',
+              createdAt: new Date(Date.now() - 3600000)
+            }]
+          };
+          demoConversations.set(id, newConversation);
+          return res.json(newConversation.messages);
+        }
+        return res.json(conversation.messages || []);
+      }
+      
       const messages = await storage.getConversationMessages(id);
       res.json(messages);
     } catch (error) {
@@ -539,10 +633,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/conversations/:id/messages", requireAuth, async (req, res) => {
+  app.post("/api/conversations/:id/messages", async (req, res) => {
     try {
       const { id } = req.params;
       const { role, content } = req.body;
+      
+      // If not authenticated, store demo message in memory
+      if (!req.user) {
+        let conversation = demoConversations.get(id);
+        if (!conversation) {
+          conversation = {
+            id,
+            userId: 'demo',
+            startedAt: new Date(),
+            endedAt: null,
+            messages: []
+          };
+          demoConversations.set(id, conversation);
+        }
+        
+        const demoMessage: DemoMessage = {
+          id: 'demo-msg-' + Date.now(),
+          conversationId: id,
+          role: role as 'user' | 'assistant',
+          content,
+          createdAt: new Date()
+        };
+        
+        conversation.messages.push(demoMessage);
+        return res.json(demoMessage);
+      }
       
       const message = await storage.createMessage({
         conversationId: id,
@@ -617,15 +737,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Chat endpoint
-  app.post("/api/chat", requireAuth, async (req, res) => {
+  // AI Chat endpoint - Now accessible without login for demo
+  app.post("/api/chat", async (req, res) => {
     try {
-      const user = req.user as any;
       const { message, conversationId, lastMessageTime } = req.body;
 
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
       }
+
+      // Demo mode - no authentication required
+      if (!req.user) {
+        // Demo holdings for context
+        const demoHoldings = [
+          { id: 'demo-1', userId: 'demo', symbol: 'AAPL', quantity: '50', averageCost: '150.00', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-2', userId: 'demo', symbol: 'MSFT', quantity: '25', averageCost: '320.50', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-3', userId: 'demo', symbol: 'GOOGL', quantity: '15', averageCost: '125.75', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-4', userId: 'demo', symbol: 'TSLA', quantity: '30', averageCost: '210.25', createdAt: new Date(), updatedAt: new Date() },
+          { id: 'demo-5', userId: 'demo', symbol: 'NVDA', quantity: '20', averageCost: '450.00', createdAt: new Date(), updatedAt: new Date() },
+        ];
+
+        // Generate AI response for demo user
+        const aiResponse = await generateAIResponse(message, {
+          userId: 'demo',
+          holdings: demoHoldings,
+          contextMode: null,
+        });
+
+        // Save messages to in-memory storage if conversation ID provided
+        if (conversationId) {
+          let conversation = demoConversations.get(conversationId);
+          if (!conversation) {
+            conversation = {
+              id: conversationId,
+              userId: 'demo',
+              startedAt: new Date(),
+              endedAt: null,
+              messages: []
+            };
+            demoConversations.set(conversationId, conversation);
+          }
+          
+          // Add user message
+          const userMessage: DemoMessage = {
+            id: 'demo-msg-user-' + Date.now(),
+            conversationId,
+            role: 'user',
+            content: message,
+            createdAt: new Date()
+          };
+          conversation.messages.push(userMessage);
+          
+          // Add AI response
+          const aiMessage: DemoMessage = {
+            id: 'demo-msg-ai-' + Date.now(),
+            conversationId,
+            role: 'assistant',
+            content: aiResponse,
+            createdAt: new Date()
+          };
+          conversation.messages.push(aiMessage);
+        }
+
+        // Return simplified response for demo mode with mock analysis
+        return res.json({ 
+          response: aiResponse,
+          analysis: {
+            hurriedScore: 30,
+            analyticalScore: 50,
+            conversationalScore: 60,
+            recommendedMode: 'athena',
+          }
+        });
+      }
+
+      // Authenticated user flow
+      const user = req.user as any;
 
       // Calculate response time if provided
       let responseTimeSeconds: number | undefined;
@@ -924,10 +1111,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Context Analysis endpoints
-  app.get("/api/context/:conversationId", requireAuth, async (req, res) => {
+  // Context Analysis endpoints - Now accessible without login for demo
+  app.get("/api/context/:conversationId", async (req, res) => {
     try {
       const { conversationId } = req.params;
+      
+      // Demo mode - return static context
+      if (!req.user) {
+        return res.json({
+          hurriedScore: 30,
+          analyticalScore: 50,
+          conversationalScore: 60,
+          recommendedMode: 'athena',
+          messageCount: 5,
+          avgResponseTimeSeconds: 2,
+        });
+      }
+      
       const user = req.user as any;
 
       // Verify ownership
@@ -956,9 +1156,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/context/:conversationId/suggestion", requireAuth, async (req, res) => {
+  app.get("/api/context/:conversationId/suggestion", async (req, res) => {
     try {
       const { conversationId } = req.params;
+      
+      // Demo mode - return static suggestion
+      if (!req.user) {
+        return res.json({
+          shouldSuggestChange: false,
+          suggestedMode: 'athena',
+          currentMode: 'athena',
+          reason: 'Your current mode works well for exploring the platform.',
+        });
+      }
+      
       const user = req.user as any;
       
       // Verify ownership
