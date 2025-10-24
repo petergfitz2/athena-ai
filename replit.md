@@ -6,6 +6,20 @@ Athena AI Investing is a luxury AI-powered investment platform featuring a profe
 
 ## Recent Changes
 
+### October 24, 2025 - Live Stock Data Integration with Yahoo Finance
+- **Real-Time Market Data**: Integrated yahoo-finance2 library for live stock prices
+  - Replaced all mock data in marketService.ts with real Yahoo Finance API calls
+  - Implemented smart caching (1-minute cache) to optimize API usage
+  - Fallback to cached/mock data on API failures for reliability
+  - Real-time quotes for stocks with price, change, volume, market cap, high, low, open, and previous close
+  - Live market indices data (S&P 500, NASDAQ, Dow Jones) with current prices and changes
+  - Stock data now updates across Dashboard, Portfolio, Watchlist, and Trade Modal
+- **Compact Modal Improvements**: Enhanced UX for ExecuteTradeModal and AddHoldingModal
+  - Reduced modal heights (max-h-[85vh] and max-h-[70vh] respectively)
+  - Fixed action buttons always visible at bottom without scrolling
+  - Smaller text sizes and tighter spacing for better readability
+  - Improved form field heights and label styling
+
 ### October 24, 2025 - Fixed Avatar Studio Form Visibility & Confirmed Personality Flow
 - **Fixed Form Input Issues**: Resolved text visibility problems in Avatar Studio
   - Added explicit white text color to all input fields, labels, and placeholders
