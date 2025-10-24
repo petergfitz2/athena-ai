@@ -197,7 +197,7 @@ export function StockDetailModalPro({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[1400px] h-[90vh] overflow-hidden bg-black border border-white/20 p-0">
+      <DialogContent className="max-w-[95vw] w-[1400px] h-[90vh] bg-black border border-white/20 p-0 flex flex-col">
         <DialogTitle className="sr-only">Stock Details for {symbol}</DialogTitle>
         <DialogDescription className="sr-only">
           View comprehensive trading data, charts, and analytics for {symbol} stock
@@ -312,8 +312,8 @@ export function StockDetailModalPro({
         </div>
         
         {/* Main Content */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col">
-          <TabsList className="w-full justify-start px-6 bg-transparent border-b border-white/10 rounded-none">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col overflow-hidden">
+          <TabsList className="w-full justify-start px-6 bg-transparent border-b border-white/10 rounded-none h-12 shrink-0">
             <TabsTrigger value="overview" className="data-[state=active]:bg-primary/20">Overview</TabsTrigger>
             <TabsTrigger value="chart" className="data-[state=active]:bg-primary/20">Chart</TabsTrigger>
             <TabsTrigger value="analysis" className="data-[state=active]:bg-primary/20">Analysis</TabsTrigger>
@@ -322,7 +322,7 @@ export function StockDetailModalPro({
             <TabsTrigger value="options" className="data-[state=active]:bg-primary/20">Options</TabsTrigger>
           </TabsList>
           
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 overflow-auto">
             <TabsContent value="overview" className="p-6 space-y-6">
               {/* Main Chart */}
               <Card className="bg-white/5 border-white/10">
