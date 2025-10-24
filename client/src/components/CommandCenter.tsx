@@ -844,8 +844,8 @@ export default function CommandCenter() {
                           </span>
                         </div>
                         <div>
-                          <p 
-                            className="font-medium cursor-pointer hover:text-primary transition-colors"
+                          <button 
+                            className="font-medium text-primary hover:text-primary/80 underline underline-offset-2 transition-all hover:underline-offset-4"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedStock(holding.symbol);
@@ -854,7 +854,7 @@ export default function CommandCenter() {
                             data-testid={`ticker-${holding.symbol}`}
                           >
                             {holding.symbol}
-                          </p>
+                          </button>
                           <p className="text-xs text-muted-foreground">{quantity} shares @ ${currentPrice.toFixed(2)}</p>
                         </div>
                       </div>

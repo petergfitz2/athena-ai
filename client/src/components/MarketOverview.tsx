@@ -59,7 +59,7 @@ export default function MarketOverview({ onTrade }: MarketOverviewProps) {
                   }
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">{index.symbol}</p>
+                  <p className="text-sm font-medium text-primary underline underline-offset-2">{index.symbol}</p>
                   <p className="text-xs text-white/40">{index.name}</p>
                 </div>
               </div>
