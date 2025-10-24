@@ -21,6 +21,8 @@ interface ChatContextType {
   input: string;
   detectedIntent: IntentType;
   activeAvatar: any;
+  unreadCount: number;
+  lastMessage: Message | null;
   setInput: (value: string) => void;
   setIsPanelOpen: (open: boolean) => void;
   setIsCollapsed: (collapsed: boolean) => void;
@@ -48,10 +50,18 @@ interface ChatProviderProps {
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(() => {
+    const saved = localStorage.getItem("chatPanelOpen");
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem("chatPanelCollapsed");
+    return saved ? JSON.parse(saved) : false;
+  });
   const [input, setInput] = useState("");
   const [detectedIntent, setDetectedIntent] = useState<IntentType>("unknown");
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [lastMessage, setLastMessage] = useState<Message | null>(null);
   const { toast } = useToast();
   const conversationIdRef = useRef<string | null>(null);
 
@@ -111,6 +121,34 @@ export function ChatProvider({ children }: ChatProviderProps) {
     }
   }, [isPanelOpen, messages.length, getAvatarGreeting]);
 
+  // Save panel states to localStorage
+  useEffect(() => {
+    localStorage.setItem("chatPanelOpen", JSON.stringify(isPanelOpen));
+  }, [isPanelOpen]);
+
+  useEffect(() => {
+    localStorage.setItem("chatPanelCollapsed", JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
+
+  // Reset unread count when panel is opened and expanded
+  useEffect(() => {
+    if (isPanelOpen && !isCollapsed) {
+      setUnreadCount(0);
+    }
+  }, [isPanelOpen, isCollapsed]);
+
+  // Handle ESC key to minimize panel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isPanelOpen && !isCollapsed) {
+        setIsCollapsed(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPanelOpen, isCollapsed]);
+
   // Detect intent as user types
   useEffect(() => {
     const trimmed = input.trim().toUpperCase();
@@ -145,16 +183,22 @@ export function ChatProvider({ children }: ChatProviderProps) {
       if (data.conversationId) {
         conversationIdRef.current = data.conversationId;
       }
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `ai-${Date.now()}`,
-          content: data.response,
-          sender: "ai",
-          timestamp: new Date(),
-          type: "chat"
-        },
-      ]);
+      
+      const newMessage: Message = {
+        id: `ai-${Date.now()}`,
+        content: data.response,
+        sender: "ai",
+        timestamp: new Date(),
+        type: "chat"
+      };
+      
+      setMessages((prev) => [...prev, newMessage]);
+      setLastMessage(newMessage);
+      
+      // Increment unread count if panel is closed or collapsed
+      if (!isPanelOpen || isCollapsed) {
+        setUnreadCount(prev => prev + 1);
+      }
     },
     onError: (error: any) => {
       toast({
@@ -242,6 +286,8 @@ export function ChatProvider({ children }: ChatProviderProps) {
         input,
         detectedIntent,
         activeAvatar,
+        unreadCount,
+        lastMessage,
         setInput,
         setIsPanelOpen,
         setIsCollapsed,

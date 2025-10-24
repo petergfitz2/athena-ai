@@ -8,6 +8,7 @@ import { ModeProvider, useMode } from "@/contexts/ModeContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { StockDetailModalProvider } from "@/contexts/StockDetailModalContext";
 import LeftChatPanel from "@/components/LeftChatPanel";
+import FloatingChatBubble from "@/components/FloatingChatBubble";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthPage from "@/pages/AuthPage";
 import CommandCenter from "@/components/CommandCenter";
@@ -104,6 +105,7 @@ function App() {
                 <TooltipProvider>
                   <div className="dark">
                     <LeftChatPanel />
+                    <FloatingChatBubble />
                     <Toaster />
                     <Router />
                   </div>

@@ -82,37 +82,28 @@ export default function LeftChatPanel() {
     setIsPanelOpen(false);
   };
 
-  // Collapsed tab view when panel is closed or collapsed
-  if (!isPanelOpen || isCollapsed) {
+  // Don't render panel if it's not open
+  if (!isPanelOpen) {
+    return null;
+  }
+
+  // Handle collapsed state with a minimal vertical bar
+  if (isCollapsed) {
     return (
       <AnimatePresence>
-        {isPanelOpen && isCollapsed && (
-          <motion.div
-            initial={{ x: -100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
-            transition={{ type: "spring", damping: 25 }}
-            className="fixed left-0 top-1/2 -translate-y-1/2 z-50"
-          >
-            <button
-              onClick={handleExpand}
-              className="group flex items-center gap-2 p-3 bg-black/90 backdrop-blur-xl border border-white/10 
-                         rounded-r-[20px] hover-elevate active-elevate-2 transition-all"
-              data-testid="button-expand-chat"
-            >
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 
-                                flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-primary" />
-                </div>
-                {messages.filter(m => m.sender === "ai").length > 1 && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
-                )}
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-            </button>
-          </motion.div>
-        )}
+        <motion.div
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -100, opacity: 0 }}
+          transition={{ type: "spring", damping: 25 }}
+          className="fixed left-0 top-0 h-screen w-1 z-40 bg-gradient-to-b from-primary/30 to-primary/10 
+                     hover:w-2 cursor-pointer transition-all duration-200"
+          onClick={handleExpand}
+          data-testid="button-expand-chat-bar"
+        >
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-20 
+                          bg-gradient-to-b from-transparent via-primary to-transparent opacity-60 animate-pulse" />
+        </motion.div>
       </AnimatePresence>
     );
   }
