@@ -147,10 +147,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           : "bg-black border-white/10"
       }`}
     >
-      <div className="w-full pl-6 pr-6 sm:pr-8 lg:pr-12">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo and Navigation Links */}
-          <div className="flex items-center gap-6 h-full">
+          <div className="flex items-center gap-4 lg:gap-6 h-full">
             {/* Logo */}
             <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
               <span className="text-xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
@@ -367,11 +367,19 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
-              <SheetHeader>
-                <SheetTitle className="text-foreground">Navigation</SheetTitle>
-                <SheetDescription className="text-muted-foreground">
-                  Access all features and settings
-                </SheetDescription>
+              <SheetHeader className="pb-6">
+                {/* User Profile Section */}
+                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl">
+                  <Avatar className="w-12 h-12">
+                    <AvatarFallback className="bg-primary/30 text-white text-sm font-bold">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 text-left">
+                    <p className="font-semibold text-white">{user?.username || 'Guest User'}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email || 'guest@example.com'}</p>
+                  </div>
+                </div>
               </SheetHeader>
               <div className="flex flex-col gap-2 mt-8">
                 {/* Mode Selector */}
