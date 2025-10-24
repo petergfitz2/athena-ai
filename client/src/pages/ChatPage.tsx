@@ -1,22 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ChatMessage from "@/components/ChatMessage";
-import ChatInput from "@/components/ChatInput";
+import OmniBox from "@/components/OmniBox";
 import QuickActionButtons from "@/components/QuickActionButtons";
-import CommandBar from "@/components/CommandBar";
 import { ProtectedRoute } from "@/lib/auth";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Command, Sparkles } from "lucide-react";
+import { MessageSquare, TrendingUp, Wallet, Info, ChevronRight } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
-// Import dashboard components for left panel
-import PortfolioSummary from "@/components/PortfolioSummary";
-import MarketOverview from "@/components/MarketOverview";
-import NewsSection from "@/components/NewsSection";
-import QuickActions from "@/components/QuickActions";
 
 type Message = {
   id: string;
@@ -24,6 +17,7 @@ type Message = {
   content: string;
   timestamp: string;
   createdAt?: string;
+  type?: "chat" | "stock" | "command";
 };
 
 type Conversation = {
@@ -31,24 +25,56 @@ type Conversation = {
   title: string;
 };
 
+type PortfolioSummary = {
+  totalValue: number;
+  dayChange: number;
+  dayChangePercent: number;
+};
+
+type MarketIndex = {
+  symbol: string;
+  name: string;
+  value: number;
+  change: number;
+  changePercent: number;
+};
+
 function ChatPageContent() {
   const { toast } = useToast();
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [commandBarOpen, setCommandBarOpen] = useState(false);
-  const [chatInput, setChatInput] = useState("");
   
   // Fetch active avatar for personalized greeting
   const { data: activeAvatar } = useQuery<any>({
     queryKey: ['/api/avatars/active']
   });
+
+  // Fetch portfolio summary for sidebar
+  const { data: portfolio } = useQuery<PortfolioSummary>({
+    queryKey: ['/api/portfolio/summary'],
+    select: () => ({
+      totalValue: 125850,
+      dayChange: 3020,
+      dayChangePercent: 2.4
+    })
+  });
+
+  // Fetch market indices
+  const { data: indices = [] } = useQuery<MarketIndex[]>({
+    queryKey: ['/api/market/indices'],
+    select: () => [
+      { symbol: 'SPY', name: 'S&P 500', value: 4783.45, change: 23.31, changePercent: 0.49 },
+      { symbol: 'DIA', name: 'Dow Jones', value: 37863.80, change: 211.02, changePercent: 0.56 },
+      { symbol: 'QQQ', name: 'NASDAQ', value: 16734.12, change: -19.07, changePercent: -0.11 },
+    ]
+  });
   
   // Generate dynamic greeting based on avatar personality
   const getAvatarGreeting = () => {
     if (!activeAvatar) {
-      return "Hello! I'm Athena, your AI investment advisor. How can I help you today?";
+      return "Hello! I'm your AI investment advisor. How can I help you today?";
     }
     
-    const name = activeAvatar?.name || "Athena";
+    const name = activeAvatar?.name || "Your advisor";
     const profile = activeAvatar?.personalityProfile || {};
     
     // Use custom greeting if available
@@ -92,6 +118,7 @@ function ChatPageContent() {
         role: "assistant",
         content: getAvatarGreeting(),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: "chat"
       }]);
     }
   }, [activeAvatar, currentConversationId]);
@@ -115,31 +142,6 @@ function ChatPageContent() {
     enabled: !!currentConversationId,
   });
 
-  // Update messages when conversation changes or messages load
-  useEffect(() => {
-    if (currentConversationId && conversationMessages) {
-      if (conversationMessages.length > 0) {
-        const formattedMessages = conversationMessages.map((msg) => ({
-          id: msg.id,
-          role: msg.role as "user" | "assistant",
-          content: msg.content,
-          timestamp: msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }));
-        setMessages(formattedMessages);
-      } else {
-        setMessages([{
-          id: "welcome",
-          role: "assistant",
-          content: getAvatarGreeting(),
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }]);
-      }
-    }
-  }, [currentConversationId, conversationMessages]);
-
   useEffect(() => {
     if (messagesError) {
       setIsLoading(false);
@@ -160,6 +162,7 @@ function ChatPageContent() {
       role: "user",
       content,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: "chat"
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -186,6 +189,7 @@ function ChatPageContent() {
         role: "assistant",
         content: data.response,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: "chat"
       };
       
       setMessages(prev => [...prev, aiResponse]);
@@ -209,156 +213,166 @@ function ChatPageContent() {
       role: "assistant",
       content: getAvatarGreeting(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: "chat"
     }]);
     setIsLoading(false);
   };
 
-  const handleSelectConversation = (convId: string) => {
-    setCurrentConversationId(convId);
-    setIsLoading(true);
-    setMessages([]);
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
-  useEffect(() => {
-    if (currentConversationId && conversationMessages !== undefined) {
-      setIsLoading(false);
-    }
-  }, [currentConversationId, conversationMessages]);
-
-  // Keyboard shortcut for command bar
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setCommandBarOpen(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Handle chat form submission
-  const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (chatInput.trim() && !isLoading) {
-      handleSendMessage(chatInput.trim());
-      setChatInput("");
-    }
+  const formatPercent = (value: number) => {
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${value.toFixed(1)}%`;
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Command Bar */}
-      <CommandBar open={commandBarOpen} setOpen={setCommandBarOpen} />
-
-      {/* Top Command Bar */}
-      <div className="border-b border-white/10 bg-black/60 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-16 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-extralight text-white">Athena AI</h1>
-              <Badge variant="outline" className="text-xs">Command Center</Badge>
+    <div className="min-h-screen bg-black px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
+      <div className="max-w-[1400px] mx-auto">
+        
+        {/* Header */}
+        <div className="mb-8 lg:mb-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight">
+                Invest Smarter
+              </h1>
+              <p className="text-lg lg:text-xl text-muted-foreground font-light mt-2">
+                Search stocks, execute trades, or ask your AI advisor anything
+              </p>
             </div>
             
-            {/* Central Command Bar Trigger */}
-            <button
-              onClick={() => setCommandBarOpen(true)}
-              className="glass rounded-[28px] px-6 py-2.5 text-sm font-light text-white/60 hover:text-white hover:bg-white/5 transition-all flex items-center gap-2"
-              data-testid="button-open-command-bar"
-            >
-              <Command className="w-4 h-4" />
-              <span>Quick Command</span>
-              <kbd className="ml-2 px-2 py-0.5 text-xs bg-white/10 rounded">⌘K</kbd>
-            </button>
-            
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-white/40">Your Investment Advisor</span>
-              <div className="flex items-center gap-2">
-                {activeAvatar?.imageUrl && (
+            {/* Avatar Display */}
+            {activeAvatar && (
+              <div className="flex items-center gap-3">
+                {activeAvatar.imageUrl && (
                   <img 
                     src={activeAvatar.imageUrl} 
                     alt={activeAvatar.name}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-white/10"
                   />
                 )}
-                <span className="text-sm font-light text-white">{activeAvatar?.name || "Athena"}</span>
+                <div>
+                  <p className="text-sm font-light text-white">{activeAvatar.name}</p>
+                  <p className="text-xs text-white/40">Your Advisor</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[calc(100vh-8rem)]">
+        {/* Single Unified Input */}
+        <div className="mb-8">
+          <OmniBox 
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            placeholder="Try: AAPL for price • Buy 10 MSFT • What's the market outlook?"
+          />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Left Panel - Dashboard Info (3 cols) */}
-          <div className="lg:col-span-3 space-y-6 overflow-y-auto">
-            {/* Portfolio Overview */}
-            <PortfolioSummary />
+          {/* Left Sidebar - Quick Info */}
+          <div className="lg:col-span-1 space-y-6">
             
-            {/* Market Overview */}
-            <MarketOverview />
-            
-            {/* Quick Actions */}
-            <div className="glass rounded-[28px] p-6">
-              <h3 className="text-lg font-light text-white mb-4">Quick Actions</h3>
-              <QuickActions />
-            </div>
-            
-            {/* News */}
-            <NewsSection />
-          </div>
-
-          {/* Right Panel - Chat (2 cols) */}
-          <div className="lg:col-span-2 glass rounded-[28px] flex flex-col h-full">
-            {/* Chat Header */}
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-extralight text-white flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-purple-400" />
-                    {activeAvatar?.name || "Athena"} Chat
-                  </h2>
-                  <p className="text-xs text-white/40 mt-1">Your personal investment conversation</p>
-                </div>
-                {conversations.length > 0 && (
-                  <Button
-                    onClick={handleNewConversation}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-[28px] text-xs"
-                    data-testid="button-new-chat"
-                  >
-                    + New Chat
-                  </Button>
-                )}
+            {/* Portfolio Snapshot */}
+            <Card className="glass rounded-[28px] p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-light text-white flex items-center gap-2">
+                  <Wallet className="w-5 h-5 text-purple-400" />
+                  Portfolio
+                </h3>
+                <ChevronRight className="w-4 h-4 text-white/40" />
               </div>
-              
-              {/* Conversation tabs */}
-              {conversations.length > 0 && (
-                <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
-                  {conversations.slice(0, 3).map((conv) => (
-                    <button
-                      key={conv.id}
-                      onClick={() => handleSelectConversation(conv.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-all
-                        ${currentConversationId === conv.id 
-                          ? 'bg-primary text-primary-foreground' 
-                          : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
-                      data-testid={`tab-conversation-${conv.id}`}
-                    >
-                      {conv.title}
-                    </button>
-                  ))}
+              {portfolio && (
+                <div>
+                  <p className="text-3xl font-extralight text-white mb-1">
+                    {formatCurrency(portfolio.totalValue)}
+                  </p>
+                  <p className={`text-sm ${portfolio.dayChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {formatPercent(portfolio.dayChangePercent)} Today
+                  </p>
                 </div>
               )}
-            </div>
+            </Card>
 
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6" data-testid="chat-messages">
-              <div className="space-y-4">
+            {/* Market Indices */}
+            <Card className="glass rounded-[28px] p-6">
+              <h3 className="text-lg font-light text-white mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-purple-400" />
+                Markets
+              </h3>
+              <div className="space-y-3">
+                {indices.map(index => (
+                  <div key={index.symbol} className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm font-medium text-white">{index.symbol}</p>
+                      <p className="text-xs text-white/40">{index.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-white">${index.value.toLocaleString()}</p>
+                      <p className={`text-xs ${index.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {formatPercent(index.changePercent)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Help */}
+            <Card className="glass rounded-[28px] p-6">
+              <h3 className="text-lg font-light text-white mb-3 flex items-center gap-2">
+                <Info className="w-5 h-5 text-purple-400" />
+                Quick Tips
+              </h3>
+              <div className="space-y-2 text-xs text-white/60">
+                <p>• Type any ticker symbol for instant price</p>
+                <p>• Say "Buy 10 AAPL" to trade</p>
+                <p>• Ask questions like "How do I diversify?"</p>
+                <p>• Type "portfolio" to see holdings</p>
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Chat Area */}
+          <div className="lg:col-span-2">
+            {/* Conversation History Tabs */}
+            {conversations.length > 0 && (
+              <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
+                <Button
+                  onClick={handleNewConversation}
+                  variant="outline"
+                  className="rounded-[28px] text-sm"
+                  data-testid="button-new-conversation"
+                >
+                  + New Chat
+                </Button>
+                {conversations.slice(0, 4).map((conv) => (
+                  <Button
+                    key={conv.id}
+                    onClick={() => setCurrentConversationId(conv.id)}
+                    variant={currentConversationId === conv.id ? "default" : "ghost"}
+                    className="rounded-[28px] text-sm"
+                    data-testid={`button-conversation-${conv.id}`}
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    {conv.title}
+                  </Button>
+                ))}
+              </div>
+            )}
+
+            {/* Messages */}
+            <div className="glass rounded-[28px] p-6 md:p-10 lg:p-12 h-[600px] overflow-y-auto" data-testid="chat-messages">
+              <div className="space-y-6 lg:space-y-8">
                 {messages.length <= 1 && !isLoading && (
                   <QuickActionButtons onAction={handleSendMessage} disabled={isLoading} />
                 )}
@@ -366,43 +380,17 @@ function ChatPageContent() {
                   <ChatMessage key={message.id} {...message} />
                 ))}
                 {isLoading && messages.length > 0 && (
-                  <div className="flex items-center gap-2 text-white/40">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="flex items-center gap-2 lg:gap-3 text-muted-foreground">
+                    <div className="flex gap-1 lg:gap-1.5">
+                      <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 lg:w-2.5 h-2 lg:h-2.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
-                    <span className="text-sm">{activeAvatar?.name || "Athena"} is thinking...</span>
+                    <span className="text-sm">{activeAvatar?.name || "Your advisor"} is thinking...</span>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
-            </div>
-
-            {/* Chat Input - Now at bottom of right panel */}
-            <div className="p-6 border-t border-white/10">
-              <form onSubmit={handleChatSubmit} className="relative">
-                <Input
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder={`Ask ${activeAvatar?.name || "Athena"} about investments...`}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pr-12 rounded-[28px]"
-                  disabled={isLoading}
-                  data-testid="chat-input"
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="absolute right-1 top-1 rounded-full"
-                  disabled={isLoading || !chatInput.trim()}
-                  data-testid="button-send-chat"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </Button>
-              </form>
-              <p className="text-xs text-white/30 mt-2 text-center">
-                Press ⌘K for quick commands • Enter to chat
-              </p>
             </div>
           </div>
         </div>
