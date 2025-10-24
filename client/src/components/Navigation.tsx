@@ -148,18 +148,18 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       }`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Left Side - Logo only */}
+        <div className="flex items-center justify-between h-16 gap-6">
+          {/* Left Side - Logo with more breathing room */}
           <div className="flex items-center flex-shrink-0">
-            <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-lg font-bold tracking-tight text-white whitespace-nowrap leading-none">
+            <Link href="/" className="flex items-center h-12 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
+              <span className="text-xl lg:text-2xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
                 Athena AI
               </span>
             </Link>
           </div>
 
-          {/* Center - Navigation Links */}
-          <div className="hidden md:flex items-center gap-1 flex-1 justify-center overflow-x-auto scrollbar-none max-w-2xl">
+          {/* Center - Navigation Links with more spacing */}
+          <div className="hidden md:flex items-center gap-3 flex-1 justify-center overflow-x-auto scrollbar-none max-w-3xl">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -168,15 +168,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-1.5 h-9 px-2 rounded-full text-xs transition-all relative flex-shrink-0 ${
+                      className={`flex items-center gap-2 h-10 px-3 rounded-full text-sm transition-all relative flex-shrink-0 ${
                         active
                           ? "bg-primary/20 text-primary font-bold"
                           : "text-white font-medium hover:text-white hover:bg-white/10"
                       }`}
                       data-testid={`link-${link.label.toLowerCase()}`}
                     >
-                      <Icon className="w-3 h-3" />
-                      <span className="font-medium hidden xl:block text-xs">{link.label.length > 8 ? link.label.slice(0, 6) + '..' : link.label}</span>
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium hidden xl:block text-sm">{link.label.length > 8 ? link.label.slice(0, 6) + '..' : link.label}</span>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs">
@@ -189,19 +189,19 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           </div>
 
           {/* Right Side - Mode Switcher and User Menu - ALWAYS VISIBLE */}
-          <div className="hidden md:flex items-center gap-2 flex-shrink-0">
-            {/* Mode Switcher - Icon only to save space */}
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+            {/* Mode Switcher - Larger icons */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20"
+                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20"
                   data-testid="button-mode-switcher"
                 >
-                  {currentMode === "athena" && <MessageCircle className="w-4 h-4 text-white" />}
-                  {currentMode === "hybrid" && <Layout className="w-4 h-4 text-white" />}
-                  {currentMode === "terminal" && <Grid3x3 className="w-4 h-4 text-white" />}
+                  {currentMode === "athena" && <MessageCircle className="w-5 h-5 text-white" />}
+                  {currentMode === "hybrid" && <Layout className="w-5 h-5 text-white" />}
+                  {currentMode === "terminal" && <Grid3x3 className="w-5 h-5 text-white" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -248,17 +248,17 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Menu - Icon only to ensure it fits */}
+            {/* User Menu - Larger profile icon */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 p-0"
+                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 p-0"
                   data-testid="button-user-menu"
                 >
-                  <Avatar className="w-7 h-7">
-                    <AvatarFallback className="bg-primary/30 text-white text-xs font-bold">
+                  <Avatar className="w-9 h-9">
+                    <AvatarFallback className="bg-primary/30 text-white text-sm font-bold">
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
@@ -354,10 +354,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-9 w-9"
+                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-10 w-10"
                   data-testid="button-mobile-menu"
                 >
-                  <Menu className="w-4 h-4 text-white" />
+                  <Menu className="w-5 h-5 text-white" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
