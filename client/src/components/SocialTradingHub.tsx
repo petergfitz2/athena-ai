@@ -14,6 +14,7 @@ import {
   TrendingDown,
   Users,
   UserPlus,
+  Plus,
   Star,
   Copy,
   Eye,
