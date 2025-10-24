@@ -22,6 +22,7 @@ import MarketOverview from "@/components/MarketOverview";
 import StockDetailModal from "@/components/StockDetailModal";
 import AnimatedCounter, { formatCurrency, formatPercent } from "@/components/AnimatedCounter";
 import { LoadingMessage, MarketDataSkeleton, PortfolioSkeleton } from "@/components/LoadingSkeletons";
+import { TickerLink } from "@/components/TickerLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -629,16 +630,7 @@ export default function CommandCenter() {
                 <p className="text-xs text-muted-foreground">Top Movers</p>
                 {topMovers.map((mover) => (
                   <div key={mover.symbol} className="flex justify-between items-center">
-                    <button 
-                      className="text-sm font-medium text-primary hover:text-primary/80 underline underline-offset-2"
-                      onClick={() => {
-                        setSelectedStock(mover.symbol);
-                        setStockDetailOpen(true);
-                      }}
-                      data-testid={`ticker-top-mover-${mover.symbol}`}
-                    >
-                      {mover.symbol}
-                    </button>
+                    <TickerLink symbol={mover.symbol} />
                     <div className="flex items-center gap-2">
                       <span className="text-sm">${mover.value.toFixed(0)}</span>
                       <Badge 
@@ -867,17 +859,7 @@ export default function CommandCenter() {
                           </span>
                         </div>
                         <div>
-                          <button 
-                            className="font-medium text-primary hover:text-primary/80 underline underline-offset-2 transition-all hover:underline-offset-4"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedStock(holding.symbol);
-                              setStockDetailOpen(true);
-                            }}
-                            data-testid={`ticker-${holding.symbol}`}
-                          >
-                            {holding.symbol}
-                          </button>
+                          <TickerLink symbol={holding.symbol} />
                           <p className="text-xs text-muted-foreground">{quantity} shares @ ${currentPrice.toFixed(2)}</p>
                         </div>
                       </div>
@@ -965,17 +947,7 @@ export default function CommandCenter() {
                       data-testid={`watchlist-${item.symbol}`}
                     >
                       <div className="flex items-center gap-2">
-                        <button 
-                          className="font-medium text-primary hover:text-primary/80 underline underline-offset-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedStock(item.symbol);
-                            setStockDetailOpen(true);
-                          }}
-                          data-testid={`ticker-${item.symbol}`}
-                        >
-                          {item.symbol}
-                        </button>
+                        <TickerLink symbol={item.symbol} />
                       </div>
                       
                       <div className="flex items-center gap-3">
