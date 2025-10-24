@@ -323,6 +323,26 @@ export const NewsArticleSchema = z.object({
 
 export type NewsArticle = z.infer<typeof NewsArticleSchema>;
 
+// Historical price data for charts
+export const HistoricalDataPointSchema = z.object({
+  date: z.string(), // ISO date string
+  open: z.number(),
+  high: z.number(),
+  low: z.number(),
+  close: z.number(),
+  volume: z.number(),
+});
+
+export type HistoricalDataPoint = z.infer<typeof HistoricalDataPointSchema>;
+
+export const HistoricalDataSchema = z.object({
+  symbol: z.string(),
+  period: z.enum(['1D', '5D', '1M', '3M', '6M', '1Y', 'YTD', '5Y']),
+  data: z.array(HistoricalDataPointSchema),
+});
+
+export type HistoricalData = z.infer<typeof HistoricalDataSchema>;
+
 // Portfolio summary (calculated aggregates)
 export const PortfolioSummarySchema = z.object({
   totalValue: z.number(),

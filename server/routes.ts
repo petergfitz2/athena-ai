@@ -9,7 +9,7 @@ import { insertUserSchema, insertHoldingSchema, insertTradeSchema, type Portfoli
 import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { processVoiceInput } from "./voice";
 import { ConversationAnalyzer } from "./conversationAnalyzer";
-import { getMarketIndices, getQuote, getBatchQuotes, getNews } from "./services/marketService";
+import { getMarketIndices, getQuote, getBatchQuotes, getNews, getHistoricalData } from "./services/marketService";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -1040,6 +1040,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("News error:", error);
       res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  app.get("/api/market/historical/:symbol", async (req, res) => {
+    try {
+      const symbol = req.params.symbol.toUpperCase();
+      const period = (req.query.period as '1D' | '5D' | '1M' | '3M' | '6M' | '1Y' | 'YTD' | '5Y') || '1M';
+      
+      const historicalData = await getHistoricalData(symbol, period);
+      res.json(historicalData);
+    } catch (error) {
+      console.error("Historical data error:", error);
+      res.status(500).json({ error: "Failed to fetch historical data" });
     }
   });
 

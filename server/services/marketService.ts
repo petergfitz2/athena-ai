@@ -1,4 +1,4 @@
-import type { MarketQuote, MarketIndex, NewsArticle } from "@shared/schema";
+import type { MarketQuote, MarketIndex, NewsArticle, HistoricalData, HistoricalDataPoint } from "@shared/schema";
 import yahooFinance from 'yahoo-finance2';
 
 // Cache for quotes to avoid excessive API calls
@@ -178,6 +178,89 @@ export async function getBatchQuotes(symbols: string[]): Promise<Map<string, Mar
   );
 
   return quotes;
+}
+
+export async function getHistoricalData(
+  symbol: string, 
+  period: '1D' | '5D' | '1M' | '3M' | '6M' | '1Y' | 'YTD' | '5Y' = '1M'
+): Promise<HistoricalData> {
+  try {
+    console.log(`[Yahoo Finance] Fetching historical data for ${symbol}, period: ${period}`);
+    
+    // Calculate date range based on period
+    const endDate = new Date();
+    let startDate = new Date();
+    let interval: '1d' | '1h' | '5m' = '1d';
+    
+    switch (period) {
+      case '1D':
+        startDate.setDate(endDate.getDate() - 1);
+        interval = '5m';
+        break;
+      case '5D':
+        startDate.setDate(endDate.getDate() - 5);
+        interval = '1h';
+        break;
+      case '1M':
+        startDate.setMonth(endDate.getMonth() - 1);
+        interval = '1d';
+        break;
+      case '3M':
+        startDate.setMonth(endDate.getMonth() - 3);
+        interval = '1d';
+        break;
+      case '6M':
+        startDate.setMonth(endDate.getMonth() - 6);
+        interval = '1d';
+        break;
+      case '1Y':
+        startDate.setFullYear(endDate.getFullYear() - 1);
+        interval = '1d';
+        break;
+      case 'YTD':
+        startDate = new Date(endDate.getFullYear(), 0, 1);
+        interval = '1d';
+        break;
+      case '5Y':
+        startDate.setFullYear(endDate.getFullYear() - 5);
+        interval = '1d';
+        break;
+    }
+
+    const queryOptions = {
+      period1: startDate,
+      period2: endDate,
+      interval,
+    };
+
+    const result = await yahooFinance.historical(symbol, queryOptions);
+    
+    const data: HistoricalDataPoint[] = result.map(point => ({
+      date: point.date.toISOString(),
+      open: point.open || 0,
+      high: point.high || 0,
+      low: point.low || 0,
+      close: point.close || 0,
+      volume: point.volume || 0,
+    }));
+
+    console.log(`[Yahoo Finance] Successfully fetched ${data.length} historical data points for ${symbol}`);
+
+    return {
+      symbol,
+      period,
+      data,
+    };
+  } catch (error) {
+    console.error(`Failed to fetch historical data for ${symbol}:`, error);
+    
+    // Return empty data as fallback
+    return {
+      symbol,
+      period,
+      data: [],
+    };
+  }
 }
 
 export async function getNews(ticker?: string, limit: number = 10): Promise<NewsArticle[]> {
