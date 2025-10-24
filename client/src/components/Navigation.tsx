@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard, Palette } from "lucide-react";
+import { Settings, LogOut, LayoutDashboard, ListChecks, TrendingUp, History, Menu, HelpCircle, BookOpen, FileQuestion, Briefcase, Activity, Users, Trophy, Bell, User, MessageCircle, Grid3x3, Layout, ChevronDown, Keyboard, Palette, MoreHorizontal } from "lucide-react";
 import { apiJson } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -153,14 +153,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           <div className="flex items-center gap-4 lg:gap-6 h-full">
             {/* Logo */}
             <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
-                Athena AI Investing
+              <span className="text-lg lg:text-xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
+                Athena AI
               </span>
             </Link>
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-2 h-full">
-              {navLinks.map((link) => {
+            {/* Desktop Navigation Links - Priority based display */}
+            <div className="hidden md:flex items-center gap-1 h-full overflow-x-auto scrollbar-none">
+              {navLinks.slice(0, 5).map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
               return (
@@ -168,15 +168,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-2 h-10 px-4 rounded-full text-base transition-all relative ${
+                      className={`flex items-center gap-1.5 h-9 px-2 lg:px-3 rounded-full text-xs lg:text-sm transition-all relative flex-shrink-0 ${
                         active
                           ? "bg-primary/20 text-primary font-bold"
                           : "text-white font-medium hover:text-white hover:bg-white/10"
                       }`}
                       data-testid={`link-${link.label.toLowerCase()}`}
                     >
-                      <Icon className="w-5 h-5" />
-                      <span className="font-medium">{link.label}</span>
+                      <Icon className="w-4 h-4" />
+                      <span className="font-medium hidden lg:block">{link.label}</span>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs">
@@ -186,6 +186,37 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 </Tooltip>
               );
             })}
+            
+            {/* More menu for additional links */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-full hover:bg-white/10"
+                  data-testid="button-more-nav"
+                >
+                  <MoreHorizontal className="w-4 h-4 text-white" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-black/95 backdrop-blur-xl border-white/10">
+                {navLinks.slice(5).map((link) => {
+                  const Icon = link.icon;
+                  const active = isActive(link.href);
+                  return (
+                    <DropdownMenuItem
+                      key={link.href}
+                      onClick={() => setLocation(link.href)}
+                      className={`cursor-pointer ${active ? 'bg-primary/20 text-primary' : ''}`}
+                      data-testid={`dropdown-link-${link.label.toLowerCase()}`}
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {link.label}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
             </div>
           </div>
 
