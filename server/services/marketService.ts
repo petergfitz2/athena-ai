@@ -27,10 +27,13 @@ export async function getMarketIndices(): Promise<MarketIndex[]> {
       }
 
       try {
-        const quote = await yahooFinance.quote(symbol);
+        const result = await yahooFinance.quoteSummary(symbol, { modules: ['price'] });
+        const quote = result.price;
+        
+        if (!quote) throw new Error('No quote data');
         
         const index: MarketIndex = {
-          symbol: quote.symbol,
+          symbol: quote.symbol || symbol,
           name: quote.longName || quote.shortName || symbol,
           price: quote.regularMarketPrice || 0,
           change: quote.regularMarketChange || 0,
@@ -123,7 +126,10 @@ export async function getQuote(symbol: string): Promise<MarketQuote | null> {
 
   try {
     console.log(`[Yahoo Finance] Fetching quote for ${symbol}...`);
-    const quote = await yahooFinance.quote(symbol);
+    const result = await yahooFinance.quoteSummary(symbol, { modules: ['price'] });
+    const quote = result.price;
+    
+    if (!quote) throw new Error('No quote data');
     console.log(`[Yahoo Finance] Received data for ${symbol}:`, {
       symbol: quote?.symbol,
       price: quote?.regularMarketPrice,
@@ -235,7 +241,7 @@ export async function getHistoricalData(
 
     const result = await yahooFinance.historical(symbol, queryOptions);
     
-    const data: HistoricalDataPoint[] = result.map(point => ({
+    const data: HistoricalDataPoint[] = result.map((point: any) => ({
       date: point.date.toISOString(),
       open: point.open || 0,
       high: point.high || 0,

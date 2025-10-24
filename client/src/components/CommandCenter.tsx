@@ -117,6 +117,10 @@ export default function CommandCenter() {
   // News modal state
   const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsArticle | null>(null);
   const [newsModalOpen, setNewsModalOpen] = useState(false);
+  
+  // Stock detail modal state
+  const [selectedStock, setSelectedStock] = useState<string | null>(null);
+  const [stockDetailOpen, setStockDetailOpen] = useState(false);
 
   // Greeting based on time
   const getGreeting = () => {
@@ -175,6 +179,14 @@ export default function CommandCenter() {
 
   const { data: holdings = [] } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
+  });
+
+  // Fetch live quotes for all holdings
+  const holdingSymbols = holdings.map(h => h.symbol);
+  const { data: holdingQuotes = {} } = useQuery<Record<string, { price: number; change: number; changePercent: number }>>({
+    queryKey: ["/api/market/quotes-batch", holdingSymbols.join(',')],
+    enabled: holdingSymbols.length > 0,
+    refetchInterval: 60000, // Refetch every minute
   });
 
   const { data: newsFromAPI = [] } = useQuery<NewsArticle[]>({
@@ -815,7 +827,8 @@ export default function CommandCenter() {
             <CardContent>
               <div className="space-y-3">
                 {holdings.slice(0, 5).map((holding) => {
-                  const currentPrice = 100 * (1 + Math.random() * 0.2);
+                  const quote = holdingQuotes[holding.symbol];
+                  const currentPrice = quote?.price || parseFloat(holding.averageCost);
                   const avgCost = parseFloat(holding.averageCost);
                   const quantity = parseFloat(holding.quantity);
                   const totalValue = currentPrice * quantity;
@@ -823,7 +836,7 @@ export default function CommandCenter() {
                   const gainPercent = (gain / (avgCost * quantity)) * 100;
 
                   return (
-                    <div key={holding.id} className="flex items-center justify-between p-3 rounded-[16px] bg-white/5 hover-elevate active-elevate-2">
+                    <div key={holding.id} className="flex items-center justify-between p-3 rounded-[16px] bg-white/5 hover-elevate active-elevate-2 cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                           <span className="text-xs font-medium text-primary">
@@ -833,12 +846,16 @@ export default function CommandCenter() {
                         <div>
                           <p 
                             className="font-medium cursor-pointer hover:text-primary transition-colors"
-                            onClick={() => handleOpenTradeModal("buy", holding.symbol)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedStock(holding.symbol);
+                              setStockDetailOpen(true);
+                            }}
                             data-testid={`ticker-${holding.symbol}`}
                           >
                             {holding.symbol}
                           </p>
-                          <p className="text-xs text-muted-foreground">{quantity} shares</p>
+                          <p className="text-xs text-muted-foreground">{quantity} shares @ ${currentPrice.toFixed(2)}</p>
                         </div>
                       </div>
                       
@@ -1024,6 +1041,14 @@ export default function CommandCenter() {
           setNewsModalOpen(false);
           setSelectedNewsArticle(null);
         }}
+      />
+      
+      {/* Stock Detail Modal */}
+      <StockDetailModal
+        symbol={selectedStock}
+        open={stockDetailOpen}
+        onOpenChange={setStockDetailOpen}
+        onTrade={handleOpenTradeModal}
       />
       </div>
     </TooltipProvider>
