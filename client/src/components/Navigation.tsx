@@ -225,33 +225,19 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 ease: [0.25, 0.46, 0.45, 0.94] // Cubic-bezier for natural feel
               }}
             >
-              <motion.div 
-                className="relative"
-                animate={{
-                  scale: searchExpanded ? 1 : 0.98
-                }}
-                transition={{
-                  duration: 0.2
-                }}
-              >
-                <motion.div
-                  className="absolute left-3 top-1/2 -translate-y-1/2"
-                  animate={{
-                    scale: searchExpanded ? 1 : 1.1,
-                    opacity: searchExpanded ? 0.7 : 1
-                  }}
-                  transition={{
-                    duration: 0.2
-                  }}
-                >
-                  <Search className="w-4 h-4 text-muted-foreground" />
-                </motion.div>
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-all duration-200 ${
+                  searchExpanded ? "opacity-70 scale-100" : "opacity-100 scale-110"
+                }`} />
                 
                 <Input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setSearchQuery(newValue);
+                  }}
                   onFocus={() => {
                     setSearchFocused(true);
                     setSearchExpanded(true);
@@ -270,7 +256,12 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-70"
                   } placeholder:text-muted-foreground placeholder:transition-opacity placeholder:duration-300 focus:ring-2 focus:ring-primary focus:border-primary`}
                   data-testid="input-ticker-search"
-                  onClick={() => !searchExpanded && setSearchExpanded(true)}
+                  onClick={() => {
+                    if (!searchExpanded) {
+                      setSearchExpanded(true);
+                      setTimeout(() => searchInputRef.current?.focus(), 50);
+                    }
+                  }}
                 />
                 
                 <AnimatePresence>
@@ -294,7 +285,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                     </motion.button>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
               
               {/* Search Dropdown */}
               <SearchDropdown
