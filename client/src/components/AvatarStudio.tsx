@@ -23,21 +23,24 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
   const [appearance, setAppearance] = useState("");
 
   // Fetch preset avatars from API
-  const { data: presets, isLoading: presetsLoading } = useQuery({
+  const { data: presets = [], isLoading: presetsLoading } = useQuery<any[]>({
     queryKey: ['/api/avatars/presets'],
     enabled: open,
   });
 
   // Fetch user's avatar history
-  const { data: history } = useQuery({
+  const { data: history = [] } = useQuery<any[]>({
     queryKey: ['/api/avatars/history'],
     enabled: open,
   });
 
   // Select avatar mutation - use personaKey for presets
   const selectAvatar = useMutation({
-    mutationFn: (identifier: string) => 
-      apiRequest(`/api/avatars/${identifier}/select`, { method: 'POST' }),
+    mutationFn: async (identifier: string) => {
+      const response = await apiRequest('POST', `/api/avatars/${identifier}/select`);
+      if (!response.ok) throw new Error('Failed to select avatar');
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       queryClient.invalidateQueries({ queryKey: ['/api/avatars/history'] });
@@ -47,11 +50,11 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
 
   // Create custom avatar mutation
   const createCustom = useMutation({
-    mutationFn: (data: any) => 
-      apiRequest('/api/avatars/custom', { 
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('POST', '/api/avatars/custom', data);
+      if (!response.ok) throw new Error('Failed to create custom avatar');
+      return response.json();
+    },
     onSuccess: (avatar) => {
       selectAvatar.mutate(avatar.id);
     }
