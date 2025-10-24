@@ -12,7 +12,7 @@ import {
 import { apiJson } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useChatContext } from "@/contexts/ChatContext";
-import { useStockDetailModalContext } from "@/contexts/StockDetailModalContext";
+import { useStockDetailModal } from "@/contexts/StockDetailModalContext";
 import type { MarketQuote } from "@shared/schema";
 
 interface SearchResult {
@@ -97,7 +97,7 @@ export default function SearchDropdown({
   const [isQuestion, setIsQuestion] = useState(false);
   const [, setLocation] = useLocation();
   const { openPanelWithContext } = useChatContext();
-  const { openModal } = useStockDetailModalContext();
+  const { openModal } = useStockDetailModal();
 
   // Filter results based on search query
   useEffect(() => {
