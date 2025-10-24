@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import StockDetailModal from '@/components/StockDetailModal';
+import { StockDetailModalPro } from '@/components/StockDetailModalPro';
 
 interface StockDetailModalContextType {
   openModal: (symbol: string) => void;
@@ -39,7 +39,7 @@ export function StockDetailModalProvider({ children, onTrade }: StockDetailModal
     <StockDetailModalContext.Provider value={{ openModal, closeModal }}>
       {children}
       {selectedStock && (
-        <StockDetailModal
+        <StockDetailModalPro
           symbol={selectedStock}
           open={isOpen}
           onOpenChange={setIsOpen}
