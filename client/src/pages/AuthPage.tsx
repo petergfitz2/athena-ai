@@ -20,10 +20,10 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  // Redirect to mode selector if already logged in
+  // Redirect to command center if already logged in
   useEffect(() => {
     if (user) {
-      setLocation("/select-mode");
+      setLocation("/command-center");
     }
   }, [user, setLocation]);
 

@@ -45,11 +45,15 @@ function Router() {
   
   return (
     <Switch>
-      <Route path="/" component={AuthPage} />
+      <Route path="/">
+        {user ? <CommandCenter /> : <AuthPage />}
+      </Route>
       {/* Command Center is now the main dashboard */}
-      <Route path="/command-center" component={CommandCenterWrapper} />
+      <Route path="/command-center">
+        {user ? <CommandCenter /> : <Redirect to="/" />}
+      </Route>
       <Route path="/dashboard">
-        {user ? <Redirect to="/command-center" /> : <Redirect to="/" />}
+        {user ? <CommandCenter /> : <Redirect to="/" />}
       </Route>
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/watchlist" component={WatchlistPage} />
@@ -72,7 +76,7 @@ function Router() {
       <Route path="/hybrid" component={HybridMode} />
       <Route path="/terminal" component={TerminalMode} />
       <Route path="/select-mode">
-        {user ? <Redirect to="/command-center" /> : <Redirect to="/" />}
+        {user ? <CommandCenter /> : <Redirect to="/" />}
       </Route>
       {/* Help pages */}
       <Route path="/tutorials" component={TutorialsPage} />
