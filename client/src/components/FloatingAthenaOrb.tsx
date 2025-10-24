@@ -325,28 +325,28 @@ export default function FloatingAthenaOrb() {
                     )}
                   </div>
                   
-                  {/* Example prompts */}
+                  {/* Quick suggestions - click to try */}
                   <div className="flex flex-wrap gap-1">
                     <Badge 
                       variant="outline" 
-                      className="text-xs cursor-pointer hover:bg-white/10"
+                      className="text-xs cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => setInput("AAPL")}
                     >
-                      AAPL price
+                      📈 AAPL
                     </Badge>
                     <Badge 
                       variant="outline" 
-                      className="text-xs cursor-pointer hover:bg-white/10"
+                      className="text-xs cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => setInput("Buy 10 TSLA")}
                     >
-                      Trade stocks
+                      ⚡ Trade
                     </Badge>
                     <Badge 
                       variant="outline" 
-                      className="text-xs cursor-pointer hover:bg-white/10"
+                      className="text-xs cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => setInput("How to diversify?")}
                     >
-                      Get advice
+                      💡 Advice
                     </Badge>
                   </div>
                 </form>
