@@ -940,37 +940,21 @@ export default function CommandCenter() {
           
           {/* Input */}
           <div className="p-4 border-t border-white/10">
-            <div className="flex gap-2">
+            <div className="space-y-3">
+              <OmniBox 
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                placeholder="AAPL • Buy 10 MSFT • Ask anything..."
+              />
               <Button
                 onClick={isRecording ? stopRecording : startRecording}
                 variant={isRecording ? "destructive" : "ghost"}
-                size="icon"
-                className="rounded-full"
+                size="sm"
+                className="rounded-full w-full"
                 data-testid="button-sidebar-voice"
               >
-                {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              </Button>
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
-                placeholder="Ask about investments..."
-                className="flex-1 min-h-[40px] max-h-[100px] resize-none rounded-[20px]"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={() => handleSendMessage()}
-                disabled={!input.trim() || isLoading}
-                size="icon"
-                className="rounded-full"
-                data-testid="button-send-message"
-              >
-                <Send className="w-4 h-4" />
+                {isRecording ? <Square className="w-3 h-3 mr-2" /> : <Mic className="w-3 h-3 mr-2" />}
+                {isRecording ? "Stop Recording" : "Use Voice"}
               </Button>
             </div>
           </div>
