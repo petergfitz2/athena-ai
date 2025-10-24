@@ -12,6 +12,7 @@ import LeftChatPanel from "@/components/LeftChatPanel";
 import FloatingChatBubble from "@/components/FloatingChatBubble";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthPage from "@/pages/AuthPage";
+import PasswordResetPage from "@/pages/PasswordResetPage";
 import CommandCenter from "@/components/CommandCenter";
 import PortfolioPage from "@/pages/PortfolioPage";
 // Archived mode pages - kept for reference but not in main navigation
@@ -55,9 +56,19 @@ function Router() {
     <AnimatePresence mode="wait">
       <Switch location={location}>
         <Route path="/">
-          {/* Always show CommandCenter with demo data when not logged in */}
+          {/* Show AuthPage as home page when not logged in, CommandCenter when logged in */}
           <AnimatedPage key="home">
-            <CommandCenter />
+            {user ? <CommandCenter /> : <AuthPage />}
+          </AnimatedPage>
+        </Route>
+        <Route path="/auth">
+          <AnimatedPage key="auth">
+            <AuthPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/reset-password">
+          <AnimatedPage key="reset-password">
+            <PasswordResetPage />
           </AnimatedPage>
         </Route>
         {/* Command Center is now the main dashboard */}

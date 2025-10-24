@@ -2,6 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer } from "ws";
 import { storage } from "./storage";
+import { db } from "./db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { avatarPresets } from "./avatarPresets";
 import { passport } from "./auth";
 import bcrypt from "bcrypt";
@@ -206,6 +209,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } else {
       res.status(401).json({ error: "Not authenticated" });
+    }
+  });
+
+  // Password reset endpoints
+  app.post("/api/auth/request-password-reset", async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await storage.getUserByEmail(email);
+      
+      if (user) {
+        // Generate reset token
+        const crypto = require('crypto');
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+        
+        // Save token to database
+        await storage.createPasswordResetToken(user.id, token, expiresAt);
+        
+        // In production, send email with reset link
+        // For now, just return the token (in production, remove this)
+        console.log(`Password reset link: /reset-password?token=${token}`);
+      }
+      
+      // Always return success to prevent email enumeration
+      res.json({ success: true, message: "If the email exists, a reset link has been sent" });
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      res.status(500).json({ error: "Failed to process password reset request" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ error: "Token and new password are required" });
+      }
+      
+      // Get token from database
+      const resetToken = await storage.getPasswordResetToken(token);
+      
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired token" });
+      }
+      
+      // Check if token is expired
+      if (new Date() > new Date(resetToken.expiresAt)) {
+        return res.status(400).json({ error: "Token has expired" });
+      }
+      
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update user's password
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+      
+      // Mark token as used
+      await storage.markPasswordResetTokenAsUsed(token);
+      
+      res.json({ success: true, message: "Password has been reset successfully" });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
+  // Google OAuth endpoints
+  app.post("/api/auth/google", async (req, res) => {
+    try {
+      const { googleId, email, name, picture } = req.body;
+      
+      if (!googleId || !email) {
+        return res.status(400).json({ error: "Invalid Google authentication data" });
+      }
+      
+      // Check if user exists with this Google ID
+      let user = await storage.getUserByEmail(email);
+      
+      if (user) {
+        // Update user with Google ID if they don't have one
+        if (!user.googleId) {
+          await db.update(users)
+            .set({ 
+              googleId, 
+              authProvider: 'google',
+              profileImageUrl: picture || user.profileImageUrl 
+            })
+            .where(eq(users.id, user.id));
+        }
+      } else {
+        // Create new user with Google auth
+        const username = email.split('@')[0] + '_' + googleId.substring(0, 6);
+        user = await storage.createUser({
+          username,
+          email,
+          password: null, // No password for Google users
+          fullName: name || '',
+        });
+        
+        // Update with Google-specific fields
+        await db.update(users)
+          .set({ 
+            googleId, 
+            authProvider: 'google',
+            profileImageUrl: picture 
+          })
+          .where(eq(users.id, user.id));
+      }
+      
+      // Log the user in
+      req.login(user, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Failed to log in" });
+        }
+        res.json({
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.fullName,
+        });
+      });
+    } catch (error) {
+      console.error('Google auth error:', error);
+      res.status(500).json({ error: "Google authentication failed" });
     }
   });
 

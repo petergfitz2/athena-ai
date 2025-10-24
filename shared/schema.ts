@@ -40,7 +40,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"), // Made optional for Google auth users
   fullName: text("full_name"),
   accountBalance: decimal("account_balance", { precision: 18, scale: 2 }).notNull().default('0'),
   profileImageUrl: text("profile_image_url"),
@@ -49,6 +49,8 @@ export const users = pgTable("users", {
   emailNotifications: boolean("email_notifications").notNull().default(true),
   pushNotifications: boolean("push_notifications").notNull().default(true),
   activeAvatarId: varchar("active_avatar_id").references(() => avatars.id),
+  googleId: text("google_id").unique(), // For Google OAuth
+  authProvider: text("auth_provider").default('local'), // 'local' or 'google'
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
