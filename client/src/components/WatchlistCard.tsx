@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, X, TrendingUp, TrendingDown } from "lucide-react";
 import { apiJson, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { staggerContainer, staggerItem, listItemVariants } from "@/lib/animations";
+import AnimatedCounter from "./AnimatedCounter";
 
 interface WatchlistItem {
   id: string;

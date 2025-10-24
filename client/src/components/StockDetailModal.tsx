@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,8 @@ import { TrendingUp, TrendingDown, DollarSign, Activity, BarChart3, ArrowUpRight
 import { cn } from "@/lib/utils";
 import type { MarketQuote, HistoricalData } from "@shared/schema";
 import { format } from "date-fns";
+import AnimatedCounter from "./AnimatedCounter";
+import { modalVariants, backdropVariants, chartVariants, tabContentVariants } from "@/lib/animations";
 
 interface StockDetailModalProps {
   symbol: string | null;

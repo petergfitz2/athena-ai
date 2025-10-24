@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import AthenaTraderAvatar from "./AthenaTraderAvatar";
 import { TickerLink } from "./TickerLink";
+import { slideInVariants } from "@/lib/animations";
 
 interface ChatMessageProps {
   content: string;

@@ -1,6 +1,8 @@
+import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { staggerContainer, staggerItem, shimmerAnimation } from "@/lib/animations";
 
 export function PortfolioSkeleton() {
   return (
@@ -120,7 +122,31 @@ export function WatchlistSkeleton() {
   );
 }
 
-// Loading messages component
+// Enhanced Skeleton with shimmer effect
+export function ShimmerSkeleton({ className, ...props }: React.ComponentProps<typeof Skeleton>) {
+  return (
+    <motion.div
+      initial="initial"
+      animate="animate"
+      variants={shimmerAnimation}
+      className={cn(
+        "relative overflow-hidden",
+        className
+      )}
+    >
+      <Skeleton
+        {...props}
+        className={cn(
+          "bg-gradient-to-r from-transparent via-white/10 to-transparent",
+          "bg-[length:200%_100%]",
+          className
+        )}
+      />
+    </motion.div>
+  );
+}
+
+// Loading messages component with enhanced animation
 export function LoadingMessage({ message }: { message?: string }) {
   const messages = [
     "Analyzing market trends...",
@@ -134,16 +160,33 @@ export function LoadingMessage({ message }: { message?: string }) {
   const randomMessage = message || messages[Math.floor(Math.random() * messages.length)];
 
   return (
-    <div className="flex items-center justify-center p-12">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="flex items-center justify-center p-12"
+    >
       <div className="text-center space-y-4">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-primary/20 rounded-full animate-pulse" />
-          <div className="absolute inset-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-primary/20 rounded-full"
+          />
+          <motion.div 
+            animate={{ rotate: -360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full"
+          />
         </div>
-        <p className="text-muted-foreground font-light animate-pulse">
+        <motion.p 
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="text-muted-foreground font-light"
+        >
           {randomMessage}
-        </p>
+        </motion.p>
       </div>
-    </div>
+    </motion.div>
   );
 }

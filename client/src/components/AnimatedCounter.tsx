@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { motion, useAnimation } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { shouldReduceMotion } from "@/lib/animations";
 
 interface AnimatedCounterProps {
   value: number;
@@ -9,6 +11,7 @@ interface AnimatedCounterProps {
   suffix?: string;
   className?: string;
   formatValue?: (value: number) => string;
+  highlightOnChange?: boolean;
 }
 
 export default function AnimatedCounter({
@@ -18,18 +21,27 @@ export default function AnimatedCounter({
   prefix = "",
   suffix = "",
   className = "",
-  formatValue
+  formatValue,
+  highlightOnChange = true
 }: AnimatedCounterProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const previousValue = useRef(0);
   const animationRef = useRef<number>();
   const startTimeRef = useRef<number>();
+  const controls = useAnimation();
 
   useEffect(() => {
     // Cancel any ongoing animation
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
+    }
+
+    // Skip animations if user prefers reduced motion
+    if (shouldReduceMotion()) {
+      setDisplayValue(value);
+      previousValue.current = value;
+      return;
     }
 
     const startValue = previousValue.current;
@@ -44,6 +56,14 @@ export default function AnimatedCounter({
     }
 
     setIsAnimating(true);
+
+    // Trigger highlight animation
+    if (highlightOnChange) {
+      controls.start({
+        scale: [1, 1.05, 1],
+        transition: { duration: 0.3 }
+      });
+    }
 
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {
@@ -76,20 +96,23 @@ export default function AnimatedCounter({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [value, duration]);
+  }, [value, duration, highlightOnChange, controls]);
 
   const formattedValue = formatValue 
     ? formatValue(displayValue)
     : displayValue.toFixed(decimals);
 
   return (
-    <span className={cn(
-      "transition-colors duration-300",
-      isAnimating && "text-primary",
-      className
-    )}>
+    <motion.span 
+      animate={controls}
+      className={cn(
+        "inline-block transition-colors duration-300",
+        isAnimating && highlightOnChange && "text-primary",
+        className
+      )}
+    >
       {prefix}{formattedValue}{suffix}
-    </span>
+    </motion.span>
   );
 }
 

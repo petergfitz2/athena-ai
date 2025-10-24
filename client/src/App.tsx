@@ -1,4 +1,5 @@
 import { Switch, Route, useLocation, Redirect } from "wouter";
+import { AnimatePresence, motion } from "framer-motion";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -33,6 +34,7 @@ import AchievementsPage from "@/pages/AchievementsPage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
 import NewsAggregationPage from "@/pages/NewsAggregationPage";
 import NotFound from "@/pages/not-found";
+import AnimatedPage from "@/components/AnimatedPage";
 
 // Command Center is now the default - no mode selection needed
 function CommandCenterWrapper() {
@@ -47,50 +49,139 @@ function CommandCenterWrapper() {
 
 function Router() {
   const { user } = useAuth();
+  const [location] = useLocation();
   
   return (
-    <Switch>
-      <Route path="/">
-        {/* Always show CommandCenter with demo data when not logged in */}
-        <CommandCenter />
-      </Route>
-      {/* Command Center is now the main dashboard */}
-      <Route path="/command-center">
-        <CommandCenter />
-      </Route>
-      <Route path="/dashboard">
-        <CommandCenter />
-      </Route>
-      <Route path="/portfolio" component={PortfolioPage} />
-      <Route path="/watchlist" component={WatchlistPage} />
-      <Route path="/settings" component={SettingsPage} />
-      <Route path="/trades" component={TradesPage} />
-      <Route path="/analytics" component={AnalyticsPage} />
-      <Route path="/news" component={NewsAggregationPage} />
-      {/* Phase 2 Features */}
-      <Route path="/simulator" component={InvestmentSimulator} />
-      <Route path="/social">
-        {user ? <SocialTradingPage /> : <Redirect to="/" />}
-      </Route>
-      <Route path="/achievements">
-        {user ? <AchievementsPage /> : <Redirect to="/" />}
-      </Route>
-      <Route path="/leaderboard">
-        {user ? <LeaderboardPage /> : <Redirect to="/" />}
-      </Route>
-      {/* Archived mode pages - still accessible via URL but not in main navigation */}
-      <Route path="/athena" component={AthenaMode} />
-      <Route path="/hybrid" component={HybridMode} />
-      <Route path="/terminal" component={TerminalMode} />
-      <Route path="/select-mode">
-        {user ? <CommandCenter /> : <Redirect to="/" />}
-      </Route>
-      {/* Help pages */}
-      <Route path="/tutorials" component={TutorialsPage} />
-      <Route path="/faq" component={FAQPage} />
-      <Route path="/help" component={HelpPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <AnimatePresence mode="wait">
+      <Switch location={location}>
+        <Route path="/">
+          {/* Always show CommandCenter with demo data when not logged in */}
+          <AnimatedPage key="home">
+            <CommandCenter />
+          </AnimatedPage>
+        </Route>
+        {/* Command Center is now the main dashboard */}
+        <Route path="/command-center">
+          <AnimatedPage key="command-center">
+            <CommandCenter />
+          </AnimatedPage>
+        </Route>
+        <Route path="/dashboard">
+          <AnimatedPage key="dashboard">
+            <CommandCenter />
+          </AnimatedPage>
+        </Route>
+        <Route path="/portfolio">
+          <AnimatedPage key="portfolio">
+            <PortfolioPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/watchlist">
+          <AnimatedPage key="watchlist">
+            <WatchlistPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/settings">
+          <AnimatedPage key="settings">
+            <SettingsPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/trades">
+          <AnimatedPage key="trades">
+            <TradesPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/analytics">
+          <AnimatedPage key="analytics">
+            <AnalyticsPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/news">
+          <AnimatedPage key="news">
+            <NewsAggregationPage />
+          </AnimatedPage>
+        </Route>
+        {/* Phase 2 Features */}
+        <Route path="/simulator">
+          <AnimatedPage key="simulator">
+            <InvestmentSimulator />
+          </AnimatedPage>
+        </Route>
+        <Route path="/social">
+          {user ? (
+            <AnimatedPage key="social">
+              <SocialTradingPage />
+            </AnimatedPage>
+          ) : (
+            <Redirect to="/" />
+          )}
+        </Route>
+        <Route path="/achievements">
+          {user ? (
+            <AnimatedPage key="achievements">
+              <AchievementsPage />
+            </AnimatedPage>
+          ) : (
+            <Redirect to="/" />
+          )}
+        </Route>
+        <Route path="/leaderboard">
+          {user ? (
+            <AnimatedPage key="leaderboard">
+              <LeaderboardPage />
+            </AnimatedPage>
+          ) : (
+            <Redirect to="/" />
+          )}
+        </Route>
+        {/* Archived mode pages - still accessible via URL but not in main navigation */}
+        <Route path="/athena">
+          <AnimatedPage key="athena">
+            <AthenaMode />
+          </AnimatedPage>
+        </Route>
+        <Route path="/hybrid">
+          <AnimatedPage key="hybrid">
+            <HybridMode />
+          </AnimatedPage>
+        </Route>
+        <Route path="/terminal">
+          <AnimatedPage key="terminal">
+            <TerminalMode />
+          </AnimatedPage>
+        </Route>
+        <Route path="/select-mode">
+          {user ? (
+            <AnimatedPage key="select-mode">
+              <CommandCenter />
+            </AnimatedPage>
+          ) : (
+            <Redirect to="/" />
+          )}
+        </Route>
+        {/* Help pages */}
+        <Route path="/tutorials">
+          <AnimatedPage key="tutorials">
+            <TutorialsPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/faq">
+          <AnimatedPage key="faq">
+            <FAQPage />
+          </AnimatedPage>
+        </Route>
+        <Route path="/help">
+          <AnimatedPage key="help">
+            <HelpPage />
+          </AnimatedPage>
+        </Route>
+        <Route>
+          <AnimatedPage key="not-found">
+            <NotFound />
+          </AnimatedPage>
+        </Route>
+      </Switch>
+    </AnimatePresence>
   );
 }
 
