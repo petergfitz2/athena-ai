@@ -236,7 +236,7 @@ function TerminalModeContent() {
       <NavigationBreadcrumbs />
 
       {/* Portfolio Stats Bar - Responsive */}
-      <div className="flex-shrink-0 border-b border-white/10 px-4 sm:px-6 py-2 sm:py-3 mt-16">
+      <div className="flex-shrink-0 border-b border-white/10 px-4 sm:px-6 py-2 sm:py-3">
         <div className="flex items-center justify-between">
           <h1 className="text-lg sm:text-xl lg:text-2xl font-extralight text-foreground">Terminal</h1>
           <div className="flex items-center gap-3 sm:gap-6">

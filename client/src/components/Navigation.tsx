@@ -353,9 +353,8 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             </DropdownMenu>
           </div>
 
-          {/* Mobile Menu Button - positioned on the right for mobile */}
-          <div className="ml-auto md:hidden mr-2">
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          {/* Mobile Menu Button - Shows on Mobile Only */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
@@ -493,7 +492,6 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </div>
             </SheetContent>
           </Sheet>
-          </div>
         </div>
       </div>
       
