@@ -181,11 +181,24 @@ export default function CommandCenter() {
     queryKey: ["/api/holdings"],
   });
 
+  // Fetch watchlist data
+  const { data: watchlist = [] } = useQuery<Array<{ id: string; symbol: string; addedAt: string }>>({
+    queryKey: ["/api/watchlist"],
+  });
+
   // Fetch live quotes for all holdings
   const holdingSymbols = holdings.map(h => h.symbol);
   const { data: holdingQuotes = {} } = useQuery<Record<string, { price: number; change: number; changePercent: number }>>({
     queryKey: ["/api/market/quotes-batch", holdingSymbols.join(',')],
     enabled: holdingSymbols.length > 0,
+    refetchInterval: 60000, // Refetch every minute
+  });
+
+  // Fetch quotes for watchlist symbols
+  const watchlistSymbols = watchlist.map(w => w.symbol);
+  const { data: watchlistQuotes = {} } = useQuery<Record<string, { price: number; change: number; changePercent: number }>>({
+    queryKey: ["/api/market/quotes-batch", watchlistSymbols.join(',')],
+    enabled: watchlistSymbols.length > 0,
     refetchInterval: 60000, // Refetch every minute
   });
 
@@ -782,17 +795,18 @@ export default function CommandCenter() {
                       {article.tickers && article.tickers.length > 0 && (
                         <div className="flex gap-1 flex-wrap">
                           {article.tickers.slice(0, 3).map(ticker => (
-                            <Badge 
-                              key={ticker} 
-                              variant="outline" 
-                              className="text-xs cursor-pointer hover:bg-primary/20 transition-colors"
+                            <button
+                              key={ticker}
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleOpenTradeModal("buy", ticker);
+                                setSelectedStock(ticker);
+                                setStockDetailOpen(true);
                               }}
+                              data-testid={`ticker-${ticker}`}
                             >
-                              {ticker}
-                            </Badge>
+                              ${ticker}
+                            </button>
                           ))}
                         </div>
                       )}
@@ -907,6 +921,98 @@ export default function CommandCenter() {
                   data-testid="button-view-all-positions"
                 >
                   View All Positions
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Watchlist */}
+          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-1">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center justify-between">
+                <span className="font-medium">Watchlist</span>
+                <Badge variant="outline" className="text-xs">
+                  {watchlist.length} Watching
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {watchlist.slice(0, 5).map((item) => {
+                  const quote = watchlistQuotes[item.symbol];
+                  const price = quote?.price || 100;
+                  const change = quote?.change || 0;
+                  const changePercent = quote?.changePercent || 0;
+                  
+                  return (
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-2.5 rounded-[16px] bg-white/5 hover-elevate active-elevate-2 cursor-pointer"
+                      onClick={() => {
+                        setSelectedStock(item.symbol);
+                        setStockDetailOpen(true);
+                      }}
+                      data-testid={`watchlist-${item.symbol}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <button 
+                          className="font-medium text-primary hover:text-primary/80 underline underline-offset-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedStock(item.symbol);
+                            setStockDetailOpen(true);
+                          }}
+                          data-testid={`ticker-${item.symbol}`}
+                        >
+                          {item.symbol}
+                        </button>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-sm font-medium">${price.toFixed(2)}</p>
+                          <p className={cn(
+                            "text-xs",
+                            changePercent >= 0 ? "text-success" : "text-destructive"
+                          )}>
+                            {changePercent >= 0 ? "+" : ""}{changePercent.toFixed(2)}%
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="rounded-full h-7 px-2 hover:bg-primary/20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenTradeModal("buy", item.symbol);
+                          }}
+                          data-testid={`button-buy-${item.symbol}`}
+                        >
+                          Buy
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {watchlist.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No stocks in watchlist
+                  </p>
+                )}
+              </div>
+              
+              {watchlist.length > 5 && (
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 rounded-full"
+                  size="sm"
+                  onClick={() => {
+                    // Navigate to watchlist page
+                  }}
+                  data-testid="button-view-all-watchlist"
+                >
+                  View Full Watchlist
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               )}
