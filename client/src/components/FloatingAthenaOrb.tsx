@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, X, Sparkles, TrendingUp, HelpCircle } from "lucide-react";
+import { MessageCircle, X, Sparkles, TrendingUp, HelpCircle, Search, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -16,10 +16,15 @@ interface Message {
   content: string;
   sender: "user" | "ai";
   timestamp: Date;
+  type?: "chat" | "stock" | "command";
 }
+
+type IntentType = "stock" | "command" | "question" | "unknown";
 
 export default function FloatingAthenaOrb() {
   const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [detectedIntent, setDetectedIntent] = useState<IntentType>("unknown");
   
   // Fetch active avatar for personalized greeting
   const { data: activeAvatar } = useQuery<any>({
@@ -29,10 +34,10 @@ export default function FloatingAthenaOrb() {
   // Generate dynamic greeting based on avatar personality
   const getAvatarGreeting = () => {
     if (!activeAvatar) {
-      return "Hi! I'm Athena, your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?";
+      return "Hi! I'm your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?";
     }
     
-    const name = activeAvatar?.name || "Athena";
+    const name = activeAvatar?.name || "Your advisor";
     const profile = activeAvatar?.personalityProfile || {};
     
     // Use custom greeting if available
@@ -65,7 +70,6 @@ export default function FloatingAthenaOrb() {
   };
   
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
@@ -77,9 +81,31 @@ export default function FloatingAthenaOrb() {
         content: getAvatarGreeting(),
         sender: "ai",
         timestamp: new Date(),
+        type: "chat"
       }]);
     }
   }, [isOpen, activeAvatar]);
+
+  // Detect intent as user types
+  useEffect(() => {
+    const trimmed = input.trim().toUpperCase();
+    
+    // Check for stock ticker (3-5 capital letters)
+    if (/^[A-Z]{3,5}$/.test(trimmed)) {
+      setDetectedIntent("stock");
+    } 
+    // Check for commands
+    else if (/^(BUY|SELL|TRADE|SHOW|VIEW)\s/i.test(input)) {
+      setDetectedIntent("command");
+    }
+    // Check for questions
+    else if (input.includes('?') || /^(what|how|why|when|should|can|is)/i.test(input)) {
+      setDetectedIntent("question");
+    }
+    else {
+      setDetectedIntent("unknown");
+    }
+  }, [input]);
 
   const sendMessage = useMutation({
     mutationFn: async (message: string) => {
@@ -101,6 +127,7 @@ export default function FloatingAthenaOrb() {
           content: data.response,
           sender: "ai",
           timestamp: new Date(),
+          type: "chat"
         },
       ]);
     },
@@ -113,7 +140,8 @@ export default function FloatingAthenaOrb() {
     },
   });
 
-  const handleSend = () => {
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!input.trim() || sendMessage.isPending) return;
 
     const userMessage: Message = {
@@ -121,18 +149,61 @@ export default function FloatingAthenaOrb() {
       content: input,
       sender: "user",
       timestamp: new Date(),
+      type: detectedIntent === "stock" ? "stock" : 
+            detectedIntent === "command" ? "command" : "chat"
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    sendMessage.mutate(input);
+    
+    // Handle different intents
+    if (detectedIntent === "stock") {
+      // Check stock price
+      toast({
+        title: `${input.toUpperCase()} Price`,
+        description: `$${(Math.random() * 500 + 50).toFixed(2)} (Demo)`,
+      });
+      setInput("");
+    } else if (detectedIntent === "command") {
+      // Execute command
+      toast({
+        title: "Command Executed",
+        description: `Processing: ${input}`,
+      });
+      setInput("");
+      // Send to AI for processing
+      sendMessage.mutate(input);
+    } else {
+      // Send to AI chat
+      setInput("");
+      sendMessage.mutate(input);
+    }
   };
 
-  const quickActions = [
-    { label: "Suggest Trades", icon: TrendingUp, action: "What stocks should I buy today?" },
-    { label: "Market News", icon: Sparkles, action: "What's happening in the market?" },
-    { label: "Portfolio Review", icon: HelpCircle, action: "How is my portfolio performing?" },
-  ];
+  const getIntentIcon = () => {
+    switch (detectedIntent) {
+      case "stock":
+        return <TrendingUp className="w-4 h-4" />;
+      case "command":
+        return <DollarSign className="w-4 h-4" />;
+      case "question":
+        return <HelpCircle className="w-4 h-4" />;
+      default:
+        return <Search className="w-4 h-4" />;
+    }
+  };
+
+  const getIntentLabel = () => {
+    switch (detectedIntent) {
+      case "stock":
+        return "Stock Price";
+      case "command":
+        return "Trade Command";
+      case "question":
+        return "Question";
+      default:
+        return "Search";
+    }
+  };
 
   return (
     <>
@@ -153,7 +224,7 @@ export default function FloatingAthenaOrb() {
             </Badge>
           </Button>
           <div className="absolute bottom-0 right-20 bg-black/90 backdrop-blur-sm rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
-            <p className="text-xs text-white">Ask Athena AI</p>
+            <p className="text-xs text-white">Ask your AI advisor</p>
           </div>
         </div>
       )}
@@ -166,7 +237,9 @@ export default function FloatingAthenaOrb() {
               <div className="flex items-center gap-3">
                 <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
                 <div>
-                  <CardTitle className="text-lg font-light">Athena AI Assistant</CardTitle>
+                  <CardTitle className="text-lg font-light">
+                    {activeAvatar?.name || "AI Assistant"}
+                  </CardTitle>
                   <Badge variant="outline" className="mt-1 text-xs">
                     Demo Mode - Virtual Trading
                   </Badge>
@@ -199,6 +272,12 @@ export default function FloatingAthenaOrb() {
                             : "bg-card border border-white/10"
                         }`}
                       >
+                        {message.sender === "user" && message.type && (
+                          <Badge variant="outline" className="mb-2 text-xs">
+                            {message.type === "stock" ? "📈 Stock" :
+                             message.type === "command" ? "⚡ Command" : "💬 Chat"}
+                          </Badge>
+                        )}
                         <p className="text-sm">{message.content}</p>
                         <p className="text-xs opacity-70 mt-1">
                           {message.timestamp.toLocaleTimeString([], {
@@ -219,56 +298,60 @@ export default function FloatingAthenaOrb() {
                 </div>
               </ScrollArea>
 
-              {/* Quick Actions */}
-              {messages.length === 1 && (
-                <div className="px-4 pb-2">
-                  <p className="text-xs text-muted-foreground mb-2">Quick Actions:</p>
-                  <div className="space-y-2">
-                    {quickActions.map((action) => (
-                      <Button
-                        key={action.label}
-                        onClick={() => {
-                          setInput(action.action);
-                          handleSend();
-                        }}
-                        variant="outline"
-                        className="w-full justify-start gap-2 rounded-full text-xs h-8"
-                        disabled={sendMessage.isPending}
-                      >
-                        <action.icon className="h-3 w-3" />
-                        {action.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Input Area */}
+              {/* Single Intelligent Input */}
               <div className="p-4 border-t border-white/10">
-                <div className="flex gap-2">
-                  <Textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
-                    placeholder="Ask about stocks, trades, or your portfolio..."
-                    className="min-h-[40px] max-h-[100px] resize-none rounded-[20px]"
-                    disabled={sendMessage.isPending}
-                  />
-                  <Button
-                    onClick={handleSend}
-                    disabled={!input.trim() || sendMessage.isPending}
-                    className="rounded-full px-3"
-                    size="icon"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground text-center mt-2">
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div className="relative">
+                    <div className="absolute left-3 top-3 z-10">
+                      {getIntentIcon()}
+                    </div>
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="AAPL • Buy 10 MSFT • What's trending?"
+                      className="pl-10 pr-24 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-[28px] text-sm"
+                      disabled={sendMessage.isPending}
+                      data-testid="omnibox-input"
+                    />
+                    {input && (
+                      <div className="absolute right-3 top-2">
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs border-white/20 bg-white/5"
+                        >
+                          {getIntentLabel()}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Example prompts */}
+                  <div className="flex flex-wrap gap-1">
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs cursor-pointer hover:bg-white/10"
+                      onClick={() => setInput("AAPL")}
+                    >
+                      AAPL price
+                    </Badge>
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs cursor-pointer hover:bg-white/10"
+                      onClick={() => setInput("Buy 10 TSLA")}
+                    >
+                      Trade stocks
+                    </Badge>
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs cursor-pointer hover:bg-white/10"
+                      onClick={() => setInput("How to diversify?")}
+                    >
+                      Get advice
+                    </Badge>
+                  </div>
+                </form>
+                
+                <p className="text-xs text-muted-foreground text-center mt-3">
                   Demo mode - No real trades executed
                 </p>
               </div>
