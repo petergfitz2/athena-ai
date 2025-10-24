@@ -56,13 +56,13 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
     }
   };
 
+  // Core navigation items - always visible with text
   const navLinks = [
     { href: "/command-center", label: "Dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
     { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘P" },
     { href: "/watchlist", label: "Watchlist", icon: ListChecks, shortcut: "⌘W" },
     { href: "/trades", label: "Trades", icon: TrendingUp, shortcut: "⌘T" },
     { href: "/analytics", label: "Analytics", icon: Activity, shortcut: "⌘A" },
-    { href: "/leaderboard", label: "Leaderboard", icon: Trophy, shortcut: "⌘L" },
   ];
 
   const modes = [
@@ -176,7 +176,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       data-testid={`link-${link.label.toLowerCase()}`}
                     >
                       <Icon className="w-5 h-5" />
-                      <span className="font-medium hidden xl:block text-sm">{link.label.length > 8 ? link.label.slice(0, 6) + '..' : link.label}</span>
+                      <span className="font-medium text-sm">{link.label}</span>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs">
@@ -303,6 +303,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem
+                  onClick={() => setLocation("/leaderboard")}
+                  className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
+                  data-testid="menu-item-leaderboard"
+                >
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Leaderboard
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={() => setLocation("/tutorials")}
                   className="cursor-pointer hover-elevate active-elevate-2 rounded-lg"
                   data-testid="menu-item-tutorials"
@@ -427,6 +435,18 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   );
                 })}
                 <div className="border-t border-white/10 my-2"></div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setLocation("/leaderboard");
+                  }}
+                  className="justify-start gap-3 rounded-[20px] hover-elevate active-elevate-2"
+                  data-testid="mobile-menu-leaderboard"
+                >
+                  <Trophy className="w-5 h-5" />
+                  Leaderboard
+                </Button>
                 <Button
                   variant="ghost"
                   onClick={() => {
