@@ -41,7 +41,15 @@ export default function StockDetailModal({ symbol, open, onOpenChange, onTrade }
   // Fetch historical data
   const { data: historicalData, isLoading: chartLoading } = useQuery<HistoricalData>({
     queryKey: ['/api/market/historical', symbol, selectedPeriod],
+    queryFn: async () => {
+      if (!symbol) throw new Error('No symbol provided');
+      const response = await fetch(`/api/market/historical/${symbol}/${selectedPeriod}`);
+      if (!response.ok) throw new Error('Failed to fetch historical data');
+      return response.json();
+    },
     enabled: !!symbol && open,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   if (!symbol) return null;
