@@ -530,31 +530,43 @@ export default function CommandCenter() {
         "max-w-[1600px] mx-auto p-6 transition-all duration-300",
         sidebarOpen ? "lg:mr-[450px]" : ""
       )}>
-        {/* Single Unified OmniBox - FIRST THING USERS SEE */}
-        <div className="mb-6">
-          <div className="relative">
+        {/* Main OmniBox - Hidden when chat is open */}
+        {!sidebarOpen && (
+          <div className="mb-6">
             <OmniBox 
               onSendMessage={(message) => {
-                // Open chat sidebar if not open
-                if (!sidebarOpen) setSidebarOpen(true);
+                // Open chat sidebar
+                setSidebarOpen(true);
                 handleSendMessage(message);
               }}
               isLoading={isLoading}
-              placeholder={sidebarOpen 
-                ? "Chat with your AI advisor..." 
-                : "Try: AAPL • Buy 10 MSFT • What's the market outlook?"
-              }
+              placeholder="Try: AAPL • Buy 10 MSFT • What's the market outlook?"
             />
-            {sidebarOpen && (
-              <div className="absolute -bottom-6 left-0 flex items-center gap-2">
-                <Badge variant="outline" className="text-xs bg-green-400/10 border-green-400/30 text-green-400">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 animate-pulse" />
-                  Chat active - messages appear in sidebar →
-                </Badge>
-              </div>
-            )}
           </div>
-        </div>
+        )}
+        
+        {/* Chat Active Indicator */}
+        {sidebarOpen && (
+          <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-[20px] border border-primary/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <div>
+                  <p className="text-sm font-medium text-white">Chat with your AI advisor is active</p>
+                  <p className="text-xs text-white/60">Type in the chat panel on the right →</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => setSidebarOpen(false)}
+                variant="ghost"
+                size="sm"
+                className="rounded-full text-xs"
+              >
+                Close Chat
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Investment Dashboard - ACTUAL CONTENT */}
         <div className="mb-6">
@@ -951,27 +963,23 @@ export default function CommandCenter() {
             </div>
           </ScrollArea>
           
-          {/* Chat Status - No Input Here */}
+          {/* OmniBox Input - Now IN the sidebar */}
           <div className="p-4 border-t border-white/10">
-            <div className="bg-white/5 rounded-[20px] p-4 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <p className="text-sm font-medium text-white">Chat Active</p>
-              </div>
-              <p className="text-xs text-white/60 mb-3">
-                Type in the search bar above ↑
-              </p>
-              <Button
-                onClick={isRecording ? stopRecording : startRecording}
-                variant={isRecording ? "destructive" : "ghost"}
-                size="sm"
-                className="rounded-full"
-                data-testid="button-sidebar-voice"
-              >
-                {isRecording ? <Square className="w-3 h-3 mr-2" /> : <Mic className="w-3 h-3 mr-2" />}
-                {isRecording ? "Stop" : "Voice Input"}
-              </Button>
-            </div>
+            <OmniBox 
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              placeholder="Ask your AI advisor..."
+            />
+            <Button
+              onClick={isRecording ? stopRecording : startRecording}
+              variant={isRecording ? "destructive" : "ghost"}
+              size="sm"
+              className="rounded-full w-full mt-2"
+              data-testid="button-sidebar-voice"
+            >
+              {isRecording ? <Square className="w-3 h-3 mr-2" /> : <Mic className="w-3 h-3 mr-2" />}
+              {isRecording ? "Stop" : "Voice Input"}
+            </Button>
           </div>
         </div>
       </div>
