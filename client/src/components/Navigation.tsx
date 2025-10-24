@@ -28,6 +28,7 @@ import { useChatContext } from "@/contexts/ChatContext";
 import ModeSwitcherMenu from "./ModeSwitcherMenu";
 import AvatarStudio from "./AvatarStudio";
 import SearchDropdown from "./SearchDropdown";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
   TooltipContent,
@@ -48,8 +49,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
   const [avatarStudioOpen, setAvatarStudioOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = async () => {
     try {
@@ -116,8 +119,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
         switch (e.key.toLowerCase()) {
           case 'k':
             e.preventDefault();
-            const searchInput = document.querySelector('[data-testid="input-ticker-search"]') as HTMLInputElement;
-            searchInput?.focus();
+            setSearchExpanded(true);
+            setTimeout(() => {
+              searchInputRef.current?.focus();
+            }, 100);
             break;
           case 'd':
             e.preventDefault();
@@ -203,34 +208,93 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
 
           {/* Center - Search Bar and Navigation Links */}
           <div className="flex-1 flex items-center gap-3 justify-center px-2">
-            {/* Smart Search Bar - Responsive */}
-            <div ref={searchRef} className="relative w-full max-w-md md:mr-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            {/* Expandable Search Bar - Responsive */}
+            <motion.div 
+              ref={searchRef} 
+              className="relative md:mr-4"
+              initial={false}
+              animate={{
+                width: searchExpanded 
+                  ? typeof window !== 'undefined' && window.innerWidth < 768 
+                    ? "calc(100vw - 140px)" // Mobile: take most width
+                    : "400px" // Desktop: 400px expanded
+                  : "100px" // Collapsed: just icon and hint
+              }}
+              transition={{
+                duration: 0.25,
+                ease: [0.25, 0.46, 0.45, 0.94] // Cubic-bezier for natural feel
+              }}
+            >
+              <motion.div 
+                className="relative"
+                animate={{
+                  scale: searchExpanded ? 1 : 0.98
+                }}
+                transition={{
+                  duration: 0.2
+                }}
+              >
+                <motion.div
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  animate={{
+                    scale: searchExpanded ? 1 : 1.1,
+                    opacity: searchExpanded ? 0.7 : 1
+                  }}
+                  transition={{
+                    duration: 0.2
+                  }}
+                >
+                  <Search className="w-4 h-4 text-muted-foreground" />
+                </motion.div>
+                
                 <Input
+                  ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  placeholder="Search stocks... (⌘K)"
-                  className="w-full h-10 pl-10 pr-10 rounded-[20px] border-white/20 bg-white/5 
-                           placeholder:text-muted-foreground focus:ring-2 focus:ring-primary 
-                           focus:border-primary transition-all text-sm md:text-base"
+                  onFocus={() => {
+                    setSearchFocused(true);
+                    setSearchExpanded(true);
+                  }}
+                  onBlur={() => {
+                    setSearchFocused(false);
+                    // Only collapse if there's no text entered
+                    if (!searchQuery.trim()) {
+                      setSearchExpanded(false);
+                    }
+                  }}
+                  placeholder={searchExpanded ? "Search stocks... (⌘K)" : "⌘K"}
+                  className={`w-full h-10 pl-10 pr-10 rounded-[20px] transition-all duration-250 text-sm md:text-base ${
+                    searchExpanded 
+                      ? "border-white/30 bg-white/10 ring-2 ring-primary/50 placeholder:opacity-100" 
+                      : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-70"
+                  } placeholder:text-muted-foreground placeholder:transition-opacity placeholder:duration-300 focus:ring-2 focus:ring-primary focus:border-primary`}
                   data-testid="input-ticker-search"
+                  onClick={() => !searchExpanded && setSearchExpanded(true)}
                 />
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      setSearchDropdownOpen(false);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground 
-                             hover:text-foreground transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+                
+                <AnimatePresence>
+                  {searchQuery && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.15 }}
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchDropdownOpen(false);
+                        // Also collapse the search bar when clearing
+                        setSearchExpanded(false);
+                        searchInputRef.current?.blur();
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground 
+                               hover:text-foreground transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </motion.div>
               
               {/* Search Dropdown */}
               <SearchDropdown
@@ -239,12 +303,22 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 onClose={() => {
                   setSearchDropdownOpen(false);
                   setSearchQuery("");
+                  setSearchExpanded(false);
                 }}
               />
-            </div>
+            </motion.div>
 
-            {/* Navigation Links - Hidden on Mobile */}
-            <div className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-none">
+            {/* Navigation Links - Hidden on Mobile or when search is expanded */}
+            <motion.div 
+              className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-none"
+              animate={{
+                opacity: searchExpanded ? 0.3 : 1,
+                scale: searchExpanded ? 0.95 : 1,
+              }}
+              transition={{
+                duration: 0.2
+              }}
+            >
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const active = isActive(link.href);
@@ -271,7 +345,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   </Tooltip>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
 
           {/* Right Side - Mode Switcher and User Menu - ALWAYS VISIBLE */}
