@@ -516,6 +516,7 @@ export default function CommandCenter() {
                 {sidebarOpen && <X className="w-4 h-4 ml-2" />}
               </Button>
             </div>
+            </div>
           </div>
         </div>
         
@@ -1019,7 +1020,6 @@ export default function CommandCenter() {
           setSelectedNewsArticle(null);
         }}
       />
-      </div>
       </div>
     </TooltipProvider>
   );
