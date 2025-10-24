@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import PortfolioCard from "@/components/PortfolioCard";
 import { ProtectedRoute } from "@/lib/auth";
 import AddHoldingModal from "@/components/AddHoldingModal";
+import ExecuteTradeModal from "@/components/ExecuteTradeModal";
+import { EnhancedPortfolioCard } from "@/components/EnhancedPortfolioCard";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageCircle, ShoppingCart } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
-import type { PortfolioSummary } from "@shared/schema";
+import type { PortfolioSummary, MarketQuote } from "@shared/schema";
 
 interface Holding {
   id: string;
@@ -19,6 +20,8 @@ interface Holding {
 
 function PortfolioPageContent() {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [buyModalSymbol, setBuyModalSymbol] = useState<string | null>(null);
+  const [sellModalSymbol, setSellModalSymbol] = useState<string | null>(null);
   
   const { data: holdings = [], isLoading: holdingsLoading } = useQuery<Holding[]>({
     queryKey: ["/api/holdings"],
@@ -27,21 +30,22 @@ function PortfolioPageContent() {
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
   });
+  
+  // Batch fetch quotes for all holdings to avoid N+1 queries
+  const symbols = holdings.map(h => h.symbol);
+  const { data: quotes = {} } = useQuery<Record<string, MarketQuote>>({
+    queryKey: ["/api/market/quotes-batch", symbols],
+    queryFn: async () => {
+      if (symbols.length === 0) return {};
+      const response = await fetch(`/api/market/quotes-batch?symbols=${symbols.join(',')}`);
+      if (!response.ok) throw new Error("Failed to fetch quotes");
+      return response.json();
+    },
+    enabled: symbols.length > 0,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
   const isLoading = holdingsLoading || summaryLoading;
-
-  // Mock current prices - in a real app, this would come from a market data API
-  const getMockPrice = (symbol: string) => {
-    const prices: Record<string, number> = {
-      AAPL: 178.32,
-      MSFT: 378.91,
-      TSLA: 242.84,
-      NVDA: 495.32,
-      GOOGL: 141.80,
-      AMZN: 152.74,
-    };
-    return prices[symbol] || 100;
-  };
 
   // Use summary API data if available, otherwise fallback to calculated values
   const totalValue = summary?.totalValue || 0;
@@ -161,26 +165,21 @@ function PortfolioPageContent() {
             <div className="sticky top-0 z-10 bg-black/95 backdrop-blur-sm pb-4 -mt-4 pt-4 mb-4">
               <h2 className="text-4xl font-extralight text-foreground">Your Holdings</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {holdings.map((holding) => {
-                const currentPrice = getMockPrice(holding.symbol);
                 const quantity = parseFloat(holding.quantity);
                 const avgCost = parseFloat(holding.averageCost);
-                const totalValue = currentPrice * quantity;
-                const totalCost = avgCost * quantity;
-                const change = totalValue - totalCost;
-                const changePercent = (change / totalCost) * 100;
+                const quote = quotes[holding.symbol];
 
                 return (
-                  <PortfolioCard
+                  <EnhancedPortfolioCard
                     key={holding.id}
                     symbol={holding.symbol}
-                    name={holding.symbol}
                     shares={quantity}
-                    currentPrice={currentPrice}
-                    totalValue={totalValue}
-                    change={change}
-                    changePercent={changePercent}
+                    averageCost={avgCost}
+                    quote={quote} // Pass batched quote to avoid N+1 queries
+                    onBuy={(symbol) => setBuyModalSymbol(symbol)}
+                    onSell={(symbol) => setSellModalSymbol(symbol)}
                   />
                 );
               })}
@@ -191,6 +190,20 @@ function PortfolioPageContent() {
       </div>
       
       <AddHoldingModal open={showAddModal} onOpenChange={setShowAddModal} />
+      
+      {/* Trade Modals */}
+      <ExecuteTradeModal
+        open={!!buyModalSymbol}
+        onOpenChange={(open) => !open && setBuyModalSymbol(null)}
+        action="buy"
+        prefilledSymbol={buyModalSymbol || undefined}
+      />
+      <ExecuteTradeModal
+        open={!!sellModalSymbol}
+        onOpenChange={(open) => !open && setSellModalSymbol(null)}
+        action="sell"
+        prefilledSymbol={sellModalSymbol || undefined}
+      />
     </div>
   );
 }

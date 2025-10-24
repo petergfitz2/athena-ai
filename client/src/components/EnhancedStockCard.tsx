@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 import {
   ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown,
   ShoppingCart, Info, ChevronUp, ChevronDown
@@ -13,6 +14,7 @@ import type { MarketQuote } from "@shared/schema";
 
 interface EnhancedStockCardProps {
   symbol: string;
+  quote?: MarketQuote; // Optional quote to avoid N+1 queries
   onBuy?: (symbol: string) => void;
   onSell?: (symbol: string) => void;
   className?: string;
@@ -21,6 +23,7 @@ interface EnhancedStockCardProps {
 
 export function EnhancedStockCard({ 
   symbol, 
+  quote: quoteProp, // Accept quote as prop
   onBuy, 
   onSell,
   className,
@@ -28,11 +31,15 @@ export function EnhancedStockCard({
 }: EnhancedStockCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Fetch real-time quote
-  const { data: quote, isLoading } = useQuery<MarketQuote>({
+  // Only fetch quote if not provided as prop (avoid N+1 queries)
+  const { data: fetchedQuote, isLoading } = useQuery<MarketQuote>({
     queryKey: ['/api/market/quote', symbol],
     refetchInterval: 10000, // Refresh every 10 seconds
+    enabled: !quoteProp, // Only fetch if quote not provided
   });
+  
+  // Use provided quote or fetched quote
+  const quote = quoteProp || fetchedQuote;
 
   if (isLoading) {
     return (

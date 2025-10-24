@@ -260,6 +260,7 @@ function WatchlistPageContent() {
                 </Button>
                 <EnhancedStockCard
                   symbol={item.symbol}
+                  quote={quotes[item.symbol]} // Pass batched quote to avoid N+1 queries
                   onBuy={(symbol) => setBuyModalSymbol(symbol)}
                   className={updatedSymbols.has(item.symbol) ? 'animate-data-glow' : ''}
                 />
