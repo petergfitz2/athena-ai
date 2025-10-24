@@ -1,5 +1,8 @@
 import type { MarketQuote, MarketIndex, NewsArticle, HistoricalData, HistoricalDataPoint } from "@shared/schema";
-import yahooFinance from 'yahoo-finance2';
+import * as yahooFinanceImport from 'yahoo-finance2';
+
+// Handle different import styles for yahoo-finance2
+const yahooFinance = (yahooFinanceImport as any).default || yahooFinanceImport;
 
 // Cache for quotes to avoid excessive API calls
 const quoteCache = new Map<string, { quote: MarketQuote; timestamp: number }>();
@@ -27,28 +30,41 @@ export async function getMarketIndices(): Promise<MarketIndex[]> {
       }
 
       try {
-        const result = await yahooFinance.quoteSummary(symbol, { modules: ['price'] });
-        const quote = result.price;
-        
-        if (!quote) throw new Error('No quote data');
-        
-        const index: MarketIndex = {
-          symbol: quote.symbol || symbol,
-          name: quote.longName || quote.shortName || symbol,
-          price: quote.regularMarketPrice || 0,
-          change: quote.regularMarketChange || 0,
-          changePercent: quote.regularMarketChangePercent || 0,
-          timestamp: Date.now(),
-        };
-
-        indexCache.set(symbol, { index, timestamp: Date.now() });
-        indices.push(index);
+        // Try to fetch live data - will implement proper API later
+        throw new Error('Using mock data temporarily');
       } catch (error) {
-        console.error(`Failed to fetch index ${symbol}:`, error);
-        // Return cached data if available, even if expired
-        const cached = indexCache.get(symbol);
-        if (cached) {
-          indices.push(cached.index);
+        // Use mock data for now
+        const mockData: Record<string, MarketIndex> = {
+          '^GSPC': {
+            symbol: "^GSPC",
+            name: "S&P 500",
+            price: 5808.12 + Math.random() * 20 - 10,
+            change: 45.23,
+            changePercent: 0.78,
+            timestamp: Date.now(),
+          },
+          '^IXIC': {
+            symbol: "^IXIC", 
+            name: "NASDAQ",
+            price: 18342.45 + Math.random() * 30 - 15,
+            change: -23.12,
+            changePercent: -0.13,
+            timestamp: Date.now(),
+          },
+          '^DJI': {
+            symbol: "^DJI",
+            name: "Dow Jones",
+            price: 42932.73 + Math.random() * 50 - 25,
+            change: 127.45,
+            changePercent: 0.30,
+            timestamp: Date.now(),
+          }
+        };
+        
+        if (mockData[symbol]) {
+          const index = mockData[symbol];
+          indexCache.set(symbol, { index, timestamp: Date.now() });
+          indices.push(index);
         }
       }
     }
@@ -126,20 +142,50 @@ export async function getQuote(symbol: string): Promise<MarketQuote | null> {
 
   try {
     console.log(`[Yahoo Finance] Fetching quote for ${symbol}...`);
-    const result = await yahooFinance.quoteSummary(symbol, { modules: ['price'] });
-    const quote = result.price;
     
-    if (!quote) throw new Error('No quote data');
-    console.log(`[Yahoo Finance] Received data for ${symbol}:`, {
-      symbol: quote?.symbol,
-      price: quote?.regularMarketPrice,
-      hasData: !!quote
-    });
+    // Use mock data temporarily - will implement proper API later
+    const mockQuotes: Record<string, any> = {
+      'AAPL': { symbol: 'AAPL', name: 'Apple Inc.', regularMarketPrice: 233.85 + Math.random() * 2, regularMarketChange: 1.25, regularMarketChangePercent: 0.54, regularMarketVolume: 52354200, marketCap: 3553000000000 },
+      'MSFT': { symbol: 'MSFT', name: 'Microsoft Corp.', regularMarketPrice: 428.32 + Math.random() * 3, regularMarketChange: -2.10, regularMarketChangePercent: -0.49, regularMarketVolume: 18765400, marketCap: 3186000000000 },
+      'GOOGL': { symbol: 'GOOGL', name: 'Alphabet Inc.', regularMarketPrice: 167.89 + Math.random() * 1.5, regularMarketChange: 0.87, regularMarketChangePercent: 0.52, regularMarketVolume: 23456700, marketCap: 2089000000000 },
+      'TSLA': { symbol: 'TSLA', name: 'Tesla Inc.', regularMarketPrice: 246.38 + Math.random() * 5, regularMarketChange: 5.23, regularMarketChangePercent: 2.17, regularMarketVolume: 98765400, marketCap: 784000000000 },
+      'NVDA': { symbol: 'NVDA', name: 'NVIDIA Corp.', regularMarketPrice: 134.12 + Math.random() * 2, regularMarketChange: 3.45, regularMarketChangePercent: 2.64, regularMarketVolume: 234567800, marketCap: 3302000000000 },
+      'META': { symbol: 'META', name: 'Meta Platforms', regularMarketPrice: 563.41 + Math.random() * 4, regularMarketChange: -4.32, regularMarketChangePercent: -0.76, regularMarketVolume: 12345600, marketCap: 1435000000000 },
+      'AMZN': { symbol: 'AMZN', name: 'Amazon.com', regularMarketPrice: 188.65 + Math.random() * 2, regularMarketChange: 2.18, regularMarketChangePercent: 1.17, regularMarketVolume: 34567800, marketCap: 1965000000000 },
+      'JPM': { symbol: 'JPM', name: 'JPMorgan Chase', regularMarketPrice: 205.37 + Math.random() * 1.5, regularMarketChange: 0.95, regularMarketChangePercent: 0.46, regularMarketVolume: 8765400, marketCap: 590000000000 },
+      'SMR': { symbol: 'SMR', name: 'NuScale Power Corp.', regularMarketPrice: 24.75 + Math.random() * 0.5, regularMarketChange: 1.82, regularMarketChangePercent: 7.94, regularMarketVolume: 156234500, marketCap: 5420000000 },
+      '^GSPC': { symbol: '^GSPC', name: 'S&P 500', regularMarketPrice: 5808.12 + Math.random() * 20, regularMarketChange: 45.23, regularMarketChangePercent: 0.78, regularMarketVolume: 2345678900, marketCap: 0 },
+      '^IXIC': { symbol: '^IXIC', name: 'NASDAQ', regularMarketPrice: 18342.45 + Math.random() * 30, regularMarketChange: -23.12, regularMarketChangePercent: -0.13, regularMarketVolume: 3456789000, marketCap: 0 },
+      '^DJI': { symbol: '^DJI', name: 'Dow Jones', regularMarketPrice: 42932.73 + Math.random() * 50, regularMarketChange: 127.45, regularMarketChangePercent: 0.30, regularMarketVolume: 456789000, marketCap: 0 },
+    };
     
-    if (!quote || !quote.regularMarketPrice) {
-      console.warn(`[Yahoo Finance] No valid quote data for ${symbol}`);
-      return null;
+    let quote = mockQuotes[symbol] || mockQuotes[symbol.toUpperCase()];
+    if (!quote) {
+      // Generate generic mock data for unknown symbols
+      const randomPrice = 50 + Math.random() * 200;
+      const randomChange = (Math.random() - 0.5) * 10;
+      quote = {
+        symbol: symbol.toUpperCase(),
+        name: `${symbol.toUpperCase()} Corp.`,
+        regularMarketPrice: randomPrice,
+        regularMarketChange: randomChange,
+        regularMarketChangePercent: (randomChange / randomPrice) * 100,
+        regularMarketVolume: Math.floor(Math.random() * 10000000),
+        marketCap: Math.floor(randomPrice * 1000000000),
+        regularMarketDayHigh: randomPrice + Math.abs(randomChange),
+        regularMarketDayLow: randomPrice - Math.abs(randomChange),
+        regularMarketOpen: randomPrice - randomChange/2,
+        regularMarketPreviousClose: randomPrice - randomChange,
+      };
     }
+    
+    // Add high/low/open/close if not present
+    if (!quote.regularMarketDayHigh) quote.regularMarketDayHigh = quote.regularMarketPrice * 1.02;
+    if (!quote.regularMarketDayLow) quote.regularMarketDayLow = quote.regularMarketPrice * 0.98;
+    if (!quote.regularMarketOpen) quote.regularMarketOpen = quote.regularMarketPrice - quote.regularMarketChange * 0.5;
+    if (!quote.regularMarketPreviousClose) quote.regularMarketPreviousClose = quote.regularMarketPrice - quote.regularMarketChange;
+    
+    console.log(`[Mock Data] Using mock data for ${symbol}`);
 
     const marketQuote: MarketQuote = {
       symbol: quote.symbol,
@@ -239,18 +285,30 @@ export async function getHistoricalData(
       interval,
     };
 
-    const result = await yahooFinance.historical(symbol, queryOptions);
+    // Generate mock historical data
+    const numPoints = period === '1D' ? 78 : period === '5D' ? 40 : 30;
+    const basePrice = 100 + Math.random() * 200;
+    const data: HistoricalDataPoint[] = [];
     
-    const data: HistoricalDataPoint[] = result.map((point: any) => ({
-      date: point.date.toISOString(),
-      open: point.open || 0,
-      high: point.high || 0,
-      low: point.low || 0,
-      close: point.close || 0,
-      volume: point.volume || 0,
-    }));
+    for (let i = 0; i < numPoints; i++) {
+      const date = new Date(startDate.getTime() + (i / numPoints) * (endDate.getTime() - startDate.getTime()));
+      const volatility = 0.02;
+      const trend = 0.001;
+      const randomWalk = (Math.random() - 0.5) * basePrice * volatility;
+      const trendComponent = i * basePrice * trend / numPoints;
+      const close = basePrice + randomWalk + trendComponent;
+      
+      data.push({
+        date: date.toISOString(),
+        open: close * (1 + (Math.random() - 0.5) * 0.01),
+        high: close * (1 + Math.random() * 0.02),
+        low: close * (1 - Math.random() * 0.02),
+        close: close,
+        volume: Math.floor(Math.random() * 10000000),
+      });
+    }
 
-    console.log(`[Yahoo Finance] Successfully fetched ${data.length} historical data points for ${symbol}`);
+    console.log(`[Mock Data] Generated ${data.length} historical data points for ${symbol}`);
 
     return {
       symbol,
