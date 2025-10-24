@@ -10,7 +10,6 @@ import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
-import StockSearchBar from "@/components/StockSearchBar";
 import WelcomeTutorial from "@/components/WelcomeTutorial";
 import QuickStartGuide from "@/components/QuickStartGuide";
 import DemoModeBanner from "@/components/DemoModeBanner";
@@ -555,17 +554,6 @@ export default function CommandCenter() {
         "max-w-[1600px] mx-auto p-4 sm:p-6 transition-all duration-300",
         sidebarOpen ? "sm:mr-[400px] md:mr-[450px]" : ""
       )}>
-        {/* Stock Search Bar - Always visible for quick lookups */}
-        <div className="mb-6">
-          <StockSearchBar 
-            onSelectStock={(symbol) => {
-              // Open trade modal for selected stock
-              handleOpenTradeModal("buy", symbol);
-            }}
-            placeholder="Search stocks or companies (AAPL, Tesla, Microsoft)..."
-          />
-        </div>
-        
         {/* Chat Button - Opens AI advisor conversation */}
         {!sidebarOpen && (
           <div className="mb-6">
