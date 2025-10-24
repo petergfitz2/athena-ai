@@ -685,6 +685,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/avatars/active", requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const activeAvatar = await storage.getActiveAvatar(user.id);
+      
+      if (!activeAvatar) {
+        // Return default Athena avatar if none selected
+        return res.json({
+          name: "Athena",
+          imageUrl: "/avatars/athena-default.png",
+          personalityProfile: {
+            catchphrase: "Your AI Investment Advisor",
+            traits: ["intelligent", "professional"],
+            tradingStyle: "balanced",
+            tone: "professional"
+          }
+        });
+      }
+      
+      res.json(activeAvatar);
+    } catch (error) {
+      console.error("Error fetching active avatar:", error);
+      res.status(500).json({ error: "Failed to fetch active avatar" });
+    }
+  });
+
   app.get("/api/avatars/history", requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
