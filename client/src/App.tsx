@@ -28,6 +28,7 @@ import InvestmentSimulator from "@/pages/InvestmentSimulator";
 import SocialTradingPage from "@/pages/SocialTradingPage";
 import AchievementsPage from "@/pages/AchievementsPage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
+import NewsAggregationPage from "@/pages/NewsAggregationPage";
 import NotFound from "@/pages/not-found";
 
 // Command Center is now the default - no mode selection needed
@@ -62,6 +63,7 @@ function Router() {
       <Route path="/settings" component={SettingsPage} />
       <Route path="/trades" component={TradesPage} />
       <Route path="/analytics" component={AnalyticsPage} />
+      <Route path="/news" component={NewsAggregationPage} />
       {/* Phase 2 Features */}
       <Route path="/simulator" component={InvestmentSimulator} />
       <Route path="/social">
