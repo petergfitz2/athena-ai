@@ -52,9 +52,11 @@ export default function MarketOverview({ onTrade }: MarketOverviewProps) {
                 <p className="text-xs text-white/40">{index.name}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-light text-white">${index.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-              <p className={`text-xs ${index.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            <div className="text-right min-w-[100px]">
+              <p className="text-sm font-light text-white font-mono tabular-nums">
+                ${index.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className={`text-xs font-mono tabular-nums ${index.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                 {index.change >= 0 ? '+' : ''}{index.changePercent.toFixed(2)}%
               </p>
             </div>
