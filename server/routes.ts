@@ -11,6 +11,39 @@ import { processVoiceInput } from "./voice";
 import { ConversationAnalyzer } from "./conversationAnalyzer";
 import { getMarketIndices, getQuote, getBatchQuotes, getNews } from "./services/marketService";
 import { z } from "zod";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+// Ensure upload directory exists
+const uploadDir = path.join(process.cwd(), 'client/public/avatars/uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for avatar uploads
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `avatar-${uniqueSuffix}${path.extname(file.originalname)}`);
+  }
+});
+
+const upload = multer({
+  storage: multerStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: function (req, file, cb) {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.'));
+    }
+  }
+});
 
 // Middleware to require authentication
 function requireAuth(req: any, res: any, next: any) {
@@ -722,10 +755,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/avatars/custom", requireAuth, async (req, res) => {
+  app.post("/api/avatars/custom", requireAuth, upload.single('avatar'), async (req, res) => {
     try {
       const user = req.user as any;
       const { name, personality, tradingStyle, appearance } = req.body;
+      
+      // Get uploaded image URL or use default
+      let imageUrl = "/avatars/custom-placeholder.svg";
+      if (req.file) {
+        // The file path relative to the public directory
+        imageUrl = `/avatars/uploads/${req.file.filename}`;
+      }
       
       // Generate personality prompt for AI
       const personalityPrompt = `You are ${name}, a custom investment advisor. ${personality} Your trading style is ${tradingStyle}. ${appearance ? `Visual style: ${appearance}.` : ''} Embody these characteristics naturally in your responses.`;
@@ -738,30 +778,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (personality.toLowerCase().includes('experienced')) traits.push('experienced');
       if (personality.toLowerCase().includes('aggressive')) traits.push('aggressive');
       if (personality.toLowerCase().includes('conservative')) traits.push('conservative');
+      if (personality.toLowerCase().includes('humor') || personality.toLowerCase().includes('funny')) traits.push('humorous');
+      if (personality.toLowerCase().includes('serious')) traits.push('serious');
       if (traits.length === 0) traits.push('professional', 'knowledgeable');
+      
+      // Generate catchphrase based on personality
+      let catchphrase = `Let's make smart ${tradingStyle} investments together!`;
+      if (personality.toLowerCase().includes('wolf') || personality.toLowerCase().includes('aggressive')) {
+        catchphrase = "Money never sleeps!";
+      } else if (personality.toLowerCase().includes('conservative') || personality.toLowerCase().includes('safe')) {
+        catchphrase = "Slow and steady wins the race.";
+      } else if (personality.toLowerCase().includes('tech') || personality.toLowerCase().includes('startup')) {
+        catchphrase = "Disrupting the market, one trade at a time.";
+      } else if (personality.toLowerCase().includes('analytical') || personality.toLowerCase().includes('data')) {
+        catchphrase = "The numbers never lie.";
+      }
       
       // Create avatar record
       const avatar = await storage.createCustomAvatar({
         name: name || "Custom Avatar",
-        imageUrl: "/avatars/custom-placeholder.svg",
+        imageUrl,
         personalityProfile: {
           traits,
           tradingStyle,
           tone: tradingStyle === 'aggressive' ? 'peer' : tradingStyle === 'conservative' ? 'mentor' : 'casual',
           backstory: personality,
           personalityPrompt,
-          catchphrase: `Let's make smart ${tradingStyle} investments together!`
+          catchphrase,
+          greeting: `Hey! I'm ${name}. ${personality.split('.')[0]}.`,
+          jokeStyle: personality.toLowerCase().includes('humor') ? 'witty' : 'subtle',
+          researchStyle: tradingStyle === 'analytical' ? 'data-driven with extensive metrics' : 'balanced with clear insights',
+          encouragement: tradingStyle === 'aggressive' ? "That's what I'm talking about! Big moves!" : "Well done! Smart investing pays off."
         },
         voiceStyle: null,
         isPreset: false,
         generationParams: { prompt: personalityPrompt, style: tradingStyle, mood: appearance }
       } as any);
       
-      // Create user avatar association
+      // Create user avatar association  
       await storage.createUserAvatar({
         userId: user.id,
         avatarId: avatar.id,
-        customPrompt: prompt,
+        customPrompt: personalityPrompt,
         tradingStyle,
         isActive: false
       } as any);

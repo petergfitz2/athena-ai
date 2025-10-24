@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { User, Sparkles, Check } from "lucide-react";
+import { User, Sparkles, Check, Upload, Image as ImageIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface AvatarStudioProps {
   open: boolean;
@@ -21,6 +22,10 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
   const [personality, setPersonality] = useState("");
   const [tradingStyle, setTradingStyle] = useState("balanced");
   const [appearance, setAppearance] = useState("");
+  const [avatarImage, setAvatarImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   // Fetch preset avatars from API
   const { data: presets = [], isLoading: presetsLoading } = useQuery<any[]>({
@@ -48,15 +53,79 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
     }
   });
 
-  // Create custom avatar mutation
+  // Handle file selection
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file (JPEG, PNG, GIF, etc.)",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setAvatarImage(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Create custom avatar mutation with image upload
   const createCustom = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/avatars/custom', data);
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('personality', data.personality);
+      formData.append('tradingStyle', data.tradingStyle);
+      formData.append('appearance', data.appearance || '');
+      
+      if (avatarImage) {
+        formData.append('avatar', avatarImage);
+      }
+      
+      const response = await fetch('/api/avatars/custom', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      
       if (!response.ok) throw new Error('Failed to create custom avatar');
       return response.json();
     },
     onSuccess: (avatar) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/avatars/active'] });
+      setCustomName("");
+      setPersonality("");
+      setTradingStyle("balanced");
+      setAppearance("");
+      setAvatarImage(null);
+      setImagePreview("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       selectAvatar.mutate(avatar.id);
+      toast({
+        title: "Avatar created!",
+        description: "Your custom avatar has been created and selected.",
+      });
     }
   });
 
@@ -158,6 +227,55 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="avatar-image">Avatar Image</Label>
+                  <div className="mt-1 space-y-2">
+                    {imagePreview ? (
+                      <div className="relative w-32 h-32 mx-auto">
+                        <img 
+                          src={imagePreview} 
+                          alt="Avatar preview" 
+                          className="w-full h-full rounded-full object-cover border-2 border-white/20"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute -top-2 -right-2 rounded-full h-8 w-8 p-0"
+                          onClick={() => {
+                            setAvatarImage(null);
+                            setImagePreview("");
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = "";
+                            }
+                          }}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    ) : (
+                      <div 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-32 h-32 mx-auto border-2 border-dashed border-white/20 rounded-full flex flex-col items-center justify-center cursor-pointer hover:border-white/40 transition-colors"
+                      >
+                        <Upload className="w-8 h-8 text-white/40 mb-2" />
+                        <span className="text-xs text-white/60">Upload Image</span>
+                      </div>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      data-testid="input-avatar-image"
+                    />
+                    <p className="text-xs text-muted-foreground text-center">
+                      JPEG, PNG, or GIF up to 5MB
+                    </p>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="name">Avatar Name</Label>
                   <Input 
