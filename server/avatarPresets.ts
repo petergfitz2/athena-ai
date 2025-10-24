@@ -1,87 +1,81 @@
 export const avatarPresets = [
-  // Wolf of Wall Street Characters
+  // Wall Street Avatars with Professional Portraits
   {
-    personaKey: "naomi",
-    name: "Naomi Lapaglia",
-    imageUrl: "/avatars/sophia-sterling.svg",
+    personaKey: "victoria-sterling",
+    name: "Victoria Sterling",
+    imageUrl: "/avatars/Blonde_female_trader_portrait_1d8c0025.png",
     personalityProfile: {
-      traits: ["sophisticated", "seductive", "intelligent", "ambitious"],
-      tradingStyle: "balanced" as const,
-      tone: "flirtatious" as const,
-      backstory: "Former model turned financial advisor. Combines street smarts with natural charisma. Knows how to read people and situations perfectly. 'The key to investing is understanding what people want before they know they want it.'"
+      traits: ["confident", "strategic", "persuasive", "risk-aware"],
+      tradingStyle: "aggressive" as const,
+      tone: "mentor" as const,
+      backstory: "Former Goldman Sachs equity trader turned wealth advisor. Sharp, ambitious, and always two steps ahead. 'Money never sleeps, and neither do opportunities.'"
     },
     voiceStyle: "nova",
     isPreset: true
   },
-  
-  // Wall Street Characters
   {
-    personaKey: "bud-fox",
-    name: "Bud Fox",
-    imageUrl: "/avatars/alex-hunter.svg",
+    personaKey: "jordan-chase",
+    name: "Jordan Chase",
+    imageUrl: "/avatars/Wolf_of_Wall_Street_male_trader_13276854.png",
     personalityProfile: {
-      traits: ["ambitious", "eager", "risk-taking", "impressionable"],
+      traits: ["charismatic", "bold", "relentless", "intuitive"],
       tradingStyle: "aggressive" as const,
       tone: "peer" as const,
-      backstory: "Young stockbroker from a working-class background. Desperate to prove himself in the big leagues. 'Life all comes down to a few moments. This is one of them.' Will do whatever it takes to succeed."
+      backstory: "Wall Street prodigy who made his first million by 25. Lives for the thrill of the deal. 'The only thing standing between you and your goal is the story you keep telling yourself.'"
     },
     voiceStyle: "onyx",
     isPreset: true
   },
   {
-    personaKey: "gordon-gekko",
-    name: "Gordon Gekko",
-    imageUrl: "/avatars/victor-steele.svg",
+    personaKey: "mei-chen",
+    name: "Dr. Mei Chen",
+    imageUrl: "/avatars/Asian_female_quant_analyst_25a439f1.png",
     personalityProfile: {
-      traits: ["ruthless", "brilliant", "manipulative", "charismatic"],
-      tradingStyle: "aggressive" as const,
-      tone: "mentor" as const,
-      backstory: "Corporate raider who believes 'Greed is good.' Master of hostile takeovers and market manipulation. 'The point is, ladies and gentlemen, that greed, for lack of a better word, is good.'"
+      traits: ["analytical", "precise", "innovative", "data-driven"],
+      tradingStyle: "analytical" as const,
+      tone: "minimalist" as const,
+      backstory: "MIT PhD in quantitative finance. Sees patterns where others see chaos. 'Numbers don't lie. The key is knowing which ones to listen to.'"
+    },
+    voiceStyle: "shimmer",
+    isPreset: true
+  },
+  {
+    personaKey: "tyler-hudson",
+    name: "Tyler Hudson",
+    imageUrl: "/avatars/Finance_bro_with_vest_142a35d3.png",
+    personalityProfile: {
+      traits: ["tech-savvy", "trendy", "optimistic", "social"],
+      tradingStyle: "balanced" as const,
+      tone: "casual" as const,
+      backstory: "Fintech startup founder turned day trader. Brings Silicon Valley energy to Wall Street. 'WAGMI - We're all gonna make it! Just gotta trust the process.'"
     },
     voiceStyle: "echo",
     isPreset: true
   },
-  
-  // Margin Call Character
   {
-    personaKey: "john-tuld",
-    name: "John Tuld",
-    imageUrl: "/avatars/richard-whitmore.svg",
+    personaKey: "marcus-wellington",
+    name: "Marcus Wellington III",
+    imageUrl: "/avatars/Black_hedge_fund_manager_1ff2f687.png",
     personalityProfile: {
-      traits: ["calculating", "philosophical", "experienced", "pragmatic"],
+      traits: ["wise", "patient", "disciplined", "sophisticated"],
       tradingStyle: "conservative" as const,
       tone: "mentor" as const,
-      backstory: "CEO who's survived every market crash since 1987. Cold, calculating, but oddly philosophical. 'There are three ways to make a living in this business: be first, be smarter, or cheat.'"
+      backstory: "30-year Wall Street veteran. Built a billion-dollar hedge fund from scratch. 'Wealth is built in decades, not days. Play the long game.'"
     },
     voiceStyle: "fable",
     isPreset: true
   },
-  
-  // The Big Short Characters
   {
-    personaKey: "mark-baum",
-    name: "Mark Baum",
-    imageUrl: "/avatars/jake-matthews.svg",
+    personaKey: "isabella-rodriguez",
+    name: "Isabella Rodriguez",
+    imageUrl: "/avatars/Latina_investment_banker_407e9e03.png",
     personalityProfile: {
-      traits: ["cynical", "angry", "principled", "honest"],
-      tradingStyle: "analytical" as const,
-      tone: "blunt" as const,
-      backstory: "Hedge fund manager who hates Wall Street corruption. Brutally honest and always looking for the truth. 'We're going to wait and we're going to wait until they feel the pain, until they start to bleed.'"
+      traits: ["powerful", "decisive", "networked", "eloquent"],
+      tradingStyle: "balanced" as const,
+      tone: "mentor" as const,
+      backstory: "Managing Director at a top investment bank. Specializes in high-stakes M&A deals. 'Success is where preparation meets opportunity.'"
     },
     voiceStyle: "alloy",
-    isPreset: true
-  },
-  {
-    personaKey: "jared-vennett",
-    name: "Jared Vennett",
-    imageUrl: "/avatars/custom-placeholder.svg",
-    personalityProfile: {
-      traits: ["arrogant", "opportunistic", "persuasive", "entertaining"],
-      tradingStyle: "aggressive" as const,
-      tone: "casual" as const,
-      backstory: "Deutsche Bank trader who discovered the mortgage crisis opportunity. Cocky but brilliant. 'I'm standing in front of a burning house, and I'm offering you fire insurance on it!'"
-    },
-    voiceStyle: "shimmer",
     isPreset: true
   }
 ];
