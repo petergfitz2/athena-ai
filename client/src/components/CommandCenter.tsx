@@ -11,6 +11,7 @@ import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
+import OmniBox from "@/components/OmniBox";
 import WelcomeTutorial from "@/components/WelcomeTutorial";
 import QuickStartGuide from "@/components/QuickStartGuide";
 import DemoModeBanner from "@/components/DemoModeBanner";
@@ -529,56 +530,17 @@ export default function CommandCenter() {
         "max-w-[1600px] mx-auto p-6 transition-all duration-300",
         sidebarOpen ? "lg:mr-[450px]" : ""
       )}>
-        {/* Prominent Search Bar - FIRST THING USERS SEE */}
+        {/* Single Unified OmniBox - FIRST THING USERS SEE */}
         <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search stocks or ask Athena anything..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && searchInput.trim()) {
-                  // Use smart contextual detection
-                  if (isLikelyStockTicker(searchInput)) {
-                    handleTickerSearch(searchInput);
-                  } else {
-                    // Default to AI chat for conversational input
-                    if (!sidebarOpen) setSidebarOpen(true);
-                    handleSendMessage(searchInput);
-                  }
-                  setSearchInput("");
-                }
-              }}
-              className="w-full pl-12 pr-4 h-14 text-lg rounded-full bg-white/5 border-white/20 text-foreground placeholder:text-white/40 focus:border-primary focus:bg-white/8 transition-all"
-              data-testid="input-main-search"
-              autoFocus
-            />
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="rounded-full text-xs text-muted-foreground hover:text-foreground"
-                onClick={() => {
-                  if (searchInput.trim()) {
-                    // Use smart contextual detection
-                    if (isLikelyStockTicker(searchInput)) {
-                      handleTickerSearch(searchInput);
-                    } else {
-                      // Default to AI chat for conversational input
-                      if (!sidebarOpen) setSidebarOpen(true);
-                      handleSendMessage(searchInput);
-                    }
-                    setSearchInput("");
-                  }
-                }}
-                data-testid="button-search-submit"
-              >
-                Press Enter
-              </Button>
-            </div>
-          </div>
+          <OmniBox 
+            onSendMessage={(message) => {
+              // Open chat sidebar if not open
+              if (!sidebarOpen) setSidebarOpen(true);
+              handleSendMessage(message);
+            }}
+            isLoading={isLoading}
+            placeholder="Try: AAPL • Buy 10 MSFT • What's the market outlook?"
+          />
         </div>
 
         {/* Investment Dashboard - ACTUAL CONTENT */}
@@ -833,26 +795,6 @@ export default function CommandCenter() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Ticker Search Bar */}
-              <div className="mb-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    placeholder="Search Stocks (e.g., AAPL, GOOGL, $F)"
-                    value={tickerSearch}
-                    onChange={(e) => setTickerSearch(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && tickerSearch.trim()) {
-                        handleTickerSearch(tickerSearch);
-                      }
-                    }}
-                    className="pl-10 rounded-full bg-white/5 border-white/20 text-foreground placeholder:text-white/30 h-10 focus:border-primary/50 focus:bg-white/8"
-                    data-testid="input-ticker-search"
-                  />
-                </div>
-              </div>
-              
               <div className="space-y-3">
                 {holdings.slice(0, 5).map((holding) => {
                   const currentPrice = 100 * (1 + Math.random() * 0.2);
