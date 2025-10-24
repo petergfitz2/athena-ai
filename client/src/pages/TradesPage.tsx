@@ -11,6 +11,7 @@ import type { Trade } from "@shared/schema";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
+import { TickerLink } from "@/components/TickerLink";
 
 function TradesPageContent() {
   const { toast } = useToast();
@@ -220,7 +221,9 @@ function TradesPageContent() {
                       </div>
                       <div>
                         <div className="flex items-center gap-3 mb-1">
-                          <CardTitle className="text-2xl font-light">{trade.symbol}</CardTitle>
+                          <CardTitle className="text-2xl font-light">
+                            <TickerLink symbol={trade.symbol} />
+                          </CardTitle>
                           <Badge variant={trade.type === 'buy' ? "default" : "destructive"}>
                             {trade.type.toUpperCase()}
                           </Badge>
