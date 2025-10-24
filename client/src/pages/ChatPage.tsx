@@ -47,7 +47,7 @@ function ChatPageContent() {
     // Generate greeting based on personality traits
     if (profile.backstory?.toLowerCase().includes('wolf') || 
         profile.traits?.includes('aggressive')) {
-      return `${name} here. Show me your portfolio - let's make some real money.`;
+      return `Hey! I'm ${name}. Sell me this pen!\n\nJust kidding. Show me your portfolio - let's make some real money.`;
     }
     
     if (profile.traits?.includes('analytical') || 
@@ -218,9 +218,14 @@ function ChatPageContent() {
       <div className="max-w-[1400px] mx-auto h-[calc(100vh-6rem)] lg:h-[calc(100vh-8rem)] flex flex-col">
         {/* Header */}
         <div className="mb-8 lg:mb-10">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight mb-3 lg:mb-4">
-            Chat
-          </h1>
+          <div className="flex items-end gap-6 mb-3 lg:mb-4">
+            <div>
+              <p className="text-sm lg:text-base text-muted-foreground mb-2">Athena AI</p>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight text-foreground tracking-tight">
+                {activeAvatar?.name || "Chat"}
+              </h1>
+            </div>
+          </div>
           <p className="text-lg lg:text-xl text-muted-foreground font-light">
             Talk to your AI investment advisor
           </p>
@@ -281,6 +286,13 @@ function ChatPageContent() {
 }
 
 function StopLoadingState() {
+  // Fetch active avatar for thinking message
+  const { data: activeAvatar } = useQuery<any>({
+    queryKey: ['/api/avatars/active']
+  });
+  
+  const avatarName = activeAvatar?.name || "Athena";
+  
   return (
     <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[28px]">
       <div className="flex gap-1">
@@ -288,7 +300,7 @@ function StopLoadingState() {
         <div className="w-2 h-2 bg-primary rounded-full animate-pulse animation-delay-150" />
         <div className="w-2 h-2 bg-primary rounded-full animate-pulse animation-delay-300" />
       </div>
-      <span className="text-sm text-muted-foreground font-light">Athena is thinking...</span>
+      <span className="text-sm text-muted-foreground font-light">{avatarName} is thinking...</span>
     </div>
   );
 }

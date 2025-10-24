@@ -18,7 +18,8 @@ interface AvatarStudioProps {
 }
 
 export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
-  const [customName, setCustomName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [personality, setPersonality] = useState("");
   const [tradingStyle, setTradingStyle] = useState("balanced");
   const [appearance, setAppearance] = useState("");
@@ -92,7 +93,11 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
   const createCustom = useMutation({
     mutationFn: async (data: any) => {
       const formData = new FormData();
-      formData.append('name', data.name);
+      // Combine first and last name, or use just first name
+      const fullName = data.lastName ? `${data.firstName} ${data.lastName}` : data.firstName;
+      formData.append('name', fullName);
+      formData.append('firstName', data.firstName);
+      formData.append('lastName', data.lastName || '');
       formData.append('personality', data.personality);
       formData.append('tradingStyle', data.tradingStyle);
       formData.append('appearance', data.appearance || '');
@@ -112,7 +117,8 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
     },
     onSuccess: (avatar) => {
       queryClient.invalidateQueries({ queryKey: ['/api/avatars/active'] });
-      setCustomName("");
+      setFirstName("");
+      setLastName("");
       setPersonality("");
       setTradingStyle("balanced");
       setAppearance("");
@@ -283,17 +289,40 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="name" className="text-white">Avatar Name</Label>
-                  <Input 
-                    id="name"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    placeholder="e.g., Morgan Blake"
-                    className="mt-1 !bg-white/5 border-white/10 !text-white placeholder:!text-white/40 focus:!bg-white/10"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' }}
-                    data-testid="input-avatar-name"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName" className="text-white">First Name *</Label>
+                    <Input 
+                      id="firstName"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value.slice(0, 20))}
+                      placeholder="e.g., Morgan"
+                      maxLength={20}
+                      className="mt-1 !bg-white/5 border-white/10 !text-white placeholder:!text-white/40 focus:!bg-white/10"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' }}
+                      data-testid="input-first-name"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {firstName.length}/20 characters
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="lastName" className="text-white">Last Name (Optional)</Label>
+                    <Input 
+                      id="lastName"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value.slice(0, 20))}
+                      placeholder="e.g., Blake"
+                      maxLength={20}
+                      className="mt-1 !bg-white/5 border-white/10 !text-white placeholder:!text-white/40 focus:!bg-white/10"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' }}
+                      data-testid="input-last-name"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {lastName.length}/20 characters
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -350,12 +379,13 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
 
                 <Button 
                   onClick={() => createCustom.mutate({ 
-                    name: customName, 
+                    firstName, 
+                    lastName,
                     personality, 
                     tradingStyle, 
                     appearance 
                   })}
-                  disabled={!personality || createCustom.isPending}
+                  disabled={!firstName || !personality || createCustom.isPending}
                   className="w-full rounded-[28px]"
                   style={{ position: 'relative', zIndex: 20 }}
                   data-testid="button-create-custom-avatar"
