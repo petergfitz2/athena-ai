@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import avatarImage from "@assets/generated_images/Professional_AI_assistant_avatar_Amanda_7849a892.png";
+import { useQuery } from "@tanstack/react-query";
+import defaultAvatarImage from "@assets/generated_images/Professional_AI_assistant_avatar_Amanda_7849a892.png";
 
 interface AthenaTraderAvatarProps {
   size?: "mini" | "small" | "medium" | "large" | "full";
@@ -24,6 +25,18 @@ export default function AthenaTraderAvatar({
   isTyping = false,
   className = "",
 }: AthenaTraderAvatarProps) {
+  // Fetch active avatar data
+  const { data: activeAvatar } = useQuery<{
+    name: string;
+    imageUrl: string;
+    personalityProfile: {
+      catchphrase?: string;
+      [key: string]: any;
+    };
+  }>({
+    queryKey: ['/api/avatars/active'],
+    refetchInterval: 10000, // Refresh every 10 seconds to catch updates
+  });
 
   const sizeClasses = {
     mini: "w-12 h-12",
@@ -55,6 +68,11 @@ export default function AthenaTraderAvatar({
   };
 
   const statusConfig = getStatusConfig();
+
+  // Get avatar details
+  const avatarName = activeAvatar?.name || "Athena";
+  const avatarImageUrl = activeAvatar?.imageUrl || defaultAvatarImage;
+  const avatarCatchphrase = activeAvatar?.personalityProfile?.catchphrase || "Your AI Investment Advisor";
 
   // Determine current time-based status
   const getCurrentStatus = () => {
@@ -121,8 +139,8 @@ export default function AthenaTraderAvatar({
             {/* Avatar Image */}
             <div className="absolute inset-2 flex items-center justify-center">
               <img 
-                src={avatarImage}
-                alt="Athena - Professional AI Trader"
+                src={avatarImageUrl}
+                alt={`${avatarName} - AI Investment Advisor`}
                 className={cn(
                   "rounded-full object-cover",
                   imageSizes[size],
@@ -170,14 +188,21 @@ export default function AthenaTraderAvatar({
         <div className="mt-3 text-center space-y-1">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-primary/20 to-purple-600/20 border border-white/10 backdrop-blur-md">
             <span className="text-sm font-light text-foreground tracking-wide">
-              Athena
+              {avatarName}
             </span>
             {size !== "small" && (
               <Badge variant="outline" className="text-[10px] border-white/20">
-                AI Trader
+                AI Advisor
               </Badge>
             )}
           </div>
+          
+          {/* Catchphrase/Tagline */}
+          {size !== "small" && (
+            <p className="text-xs text-muted-foreground italic max-w-[200px]">
+              "{avatarCatchphrase}"
+            </p>
+          )}
           
           {/* Status Text */}
           {showStatus && (
