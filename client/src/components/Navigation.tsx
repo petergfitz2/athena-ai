@@ -213,7 +213,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setSearchFocused(true)}
                   placeholder="Search stocks... (⌘K)"
-                  className="w-full h-10 pl-10 pr-10 rounded-[20px] border-white/10 bg-white/5 
+                  className="w-full h-10 pl-10 pr-10 rounded-[20px] border-white/20 bg-white/5 
                            placeholder:text-muted-foreground focus:ring-2 focus:ring-primary 
                            focus:border-primary transition-all text-sm md:text-base"
                   data-testid="input-ticker-search"

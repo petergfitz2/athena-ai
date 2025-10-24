@@ -1,7 +1,6 @@
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
-import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import AchievementSystem from "@/components/AchievementSystem";
 
 export default function AchievementsPage() {
@@ -9,7 +8,6 @@ export default function AchievementsPage() {
     <div className="min-h-screen bg-black">
       <Navigation />
       <NavigationBreadcrumbs />
-      <FloatingAthenaOrb />
       
       <div className="px-6 sm:px-10 lg:px-16 py-8 lg:py-12">
         <div className="max-w-[1600px] mx-auto">

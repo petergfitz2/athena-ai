@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useVoice } from "@/hooks/useVoice";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
-import FloatingAthenaOrb from "@/components/FloatingAthenaOrb";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
@@ -489,7 +488,6 @@ export default function CommandCenter() {
         {/* Navigation Bar */}
         <Navigation />
         <NavigationBreadcrumbs />
-        <FloatingAthenaOrb />
         
         {/* Welcome Tutorial */}
         <WelcomeTutorial />
