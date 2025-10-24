@@ -532,15 +532,28 @@ export default function CommandCenter() {
       )}>
         {/* Single Unified OmniBox - FIRST THING USERS SEE */}
         <div className="mb-6">
-          <OmniBox 
-            onSendMessage={(message) => {
-              // Open chat sidebar if not open
-              if (!sidebarOpen) setSidebarOpen(true);
-              handleSendMessage(message);
-            }}
-            isLoading={isLoading}
-            placeholder="Try: AAPL • Buy 10 MSFT • What's the market outlook?"
-          />
+          <div className="relative">
+            <OmniBox 
+              onSendMessage={(message) => {
+                // Open chat sidebar if not open
+                if (!sidebarOpen) setSidebarOpen(true);
+                handleSendMessage(message);
+              }}
+              isLoading={isLoading}
+              placeholder={sidebarOpen 
+                ? "Chat with your AI advisor..." 
+                : "Try: AAPL • Buy 10 MSFT • What's the market outlook?"
+              }
+            />
+            {sidebarOpen && (
+              <div className="absolute -bottom-6 left-0 flex items-center gap-2">
+                <Badge variant="outline" className="text-xs bg-green-400/10 border-green-400/30 text-green-400">
+                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 animate-pulse" />
+                  Chat active - messages appear in sidebar →
+                </Badge>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Investment Dashboard - ACTUAL CONTENT */}
@@ -938,23 +951,25 @@ export default function CommandCenter() {
             </div>
           </ScrollArea>
           
-          {/* Input */}
+          {/* Chat Status - No Input Here */}
           <div className="p-4 border-t border-white/10">
-            <div className="space-y-3">
-              <OmniBox 
-                onSendMessage={handleSendMessage}
-                isLoading={isLoading}
-                placeholder="AAPL • Buy 10 MSFT • Ask anything..."
-              />
+            <div className="bg-white/5 rounded-[20px] p-4 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <p className="text-sm font-medium text-white">Chat Active</p>
+              </div>
+              <p className="text-xs text-white/60 mb-3">
+                Type in the search bar above ↑
+              </p>
               <Button
                 onClick={isRecording ? stopRecording : startRecording}
                 variant={isRecording ? "destructive" : "ghost"}
                 size="sm"
-                className="rounded-full w-full"
+                className="rounded-full"
                 data-testid="button-sidebar-voice"
               >
                 {isRecording ? <Square className="w-3 h-3 mr-2" /> : <Mic className="w-3 h-3 mr-2" />}
-                {isRecording ? "Stop Recording" : "Use Voice"}
+                {isRecording ? "Stop" : "Voice Input"}
               </Button>
             </div>
           </div>
