@@ -1,24 +1,27 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import StockDetailModal from "./StockDetailModal";
+import type { MarketIndex } from "@shared/schema";
 
-type MarketIndex = {
-  symbol: string;
-  name: string;
-  value: number;
-  change: number;
-  changePercent: number;
-};
+interface MarketOverviewProps {
+  onTrade?: (action: 'buy' | 'sell', symbol: string) => void;
+}
 
-export default function MarketOverview() {
+export default function MarketOverview({ onTrade }: MarketOverviewProps) {
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+
   const { data: indices = [], isLoading } = useQuery<MarketIndex[]>({
     queryKey: ['/api/market/indices'],
-    select: () => [
-      { symbol: 'SPY', name: 'S&P 500', value: 4783.45, change: 23.31, changePercent: 0.49 },
-      { symbol: 'DIA', name: 'Dow Jones', value: 37863.80, change: 211.02, changePercent: 0.56 },
-      { symbol: 'QQQ', name: 'NASDAQ', value: 16734.12, change: -19.07, changePercent: -0.11 },
-    ]
+    refetchInterval: 60000, // Refetch every minute
   });
+
+  const handleIndexClick = (symbol: string) => {
+    setSelectedSymbol(symbol);
+    setDetailModalOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -36,33 +39,47 @@ export default function MarketOverview() {
   }
 
   return (
-    <Card className="bg-white/5 border-white/10 p-6 rounded-[28px]">
-      <h3 className="text-lg font-light text-white mb-4">Market Indices</h3>
-      
-      <div className="space-y-3">
-        {indices.map((index) => (
-          <div key={index.symbol} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className={`p-1.5 rounded-lg ${index.change >= 0 ? 'bg-green-400/10' : 'bg-red-400/10'}`}>
-                {index.change >= 0 ? 
-                  <TrendingUp className="w-4 h-4 text-green-400" /> : 
-                  <TrendingDown className="w-4 h-4 text-red-400" />
-                }
+    <>
+      <Card className="bg-white/5 border-white/10 p-6 rounded-[28px]">
+        <h3 className="text-lg font-light text-white mb-4">Market Indices</h3>
+        
+        <div className="space-y-3">
+          {indices.map((index) => (
+            <div 
+              key={index.symbol} 
+              className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover-elevate active-elevate-2 cursor-pointer transition-all"
+              onClick={() => handleIndexClick(index.symbol)}
+              data-testid={`index-${index.symbol.toLowerCase()}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-1.5 rounded-lg ${index.change >= 0 ? 'bg-green-400/10' : 'bg-red-400/10'}`}>
+                  {index.change >= 0 ? 
+                    <TrendingUp className="w-4 h-4 text-green-400" /> : 
+                    <TrendingDown className="w-4 h-4 text-red-400" />
+                  }
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{index.symbol}</p>
+                  <p className="text-xs text-white/40">{index.name}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-white">{index.symbol}</p>
-                <p className="text-xs text-white/40">{index.name}</p>
+              <div className="text-right">
+                <p className="text-sm font-light text-white">${index.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <p className={`text-xs ${index.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {index.change >= 0 ? '+' : ''}{index.changePercent.toFixed(2)}%
+                </p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-light text-white">${index.value.toLocaleString()}</p>
-              <p className={`text-xs ${index.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {index.change >= 0 ? '+' : ''}{index.changePercent.toFixed(2)}%
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Card>
+          ))}
+        </div>
+      </Card>
+
+      <StockDetailModal
+        symbol={selectedSymbol}
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        onTrade={onTrade}
+      />
+    </>
   );
 }

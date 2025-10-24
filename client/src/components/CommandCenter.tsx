@@ -18,6 +18,8 @@ import DemoModeBanner from "@/components/DemoModeBanner";
 import KeyboardShortcutsGuide from "@/components/KeyboardShortcutsGuide";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import NewsDetailModal from "@/components/NewsDetailModal";
+import MarketOverview from "@/components/MarketOverview";
+import StockDetailModal from "@/components/StockDetailModal";
 import AnimatedCounter, { formatCurrency, formatPercent } from "@/components/AnimatedCounter";
 import { LoadingMessage, MarketDataSkeleton, PortfolioSkeleton } from "@/components/LoadingSkeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -617,6 +619,9 @@ export default function CommandCenter() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Market Indices - Live Data */}
+          <MarketOverview onTrade={handleOpenTradeModal} />
 
           {/* AI Insights */}
           <Card className="bg-gradient-to-br from-primary/20 to-purple-600/20 border-white/10 rounded-[20px]">
