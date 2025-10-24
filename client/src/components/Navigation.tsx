@@ -148,19 +148,19 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
       }`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left Side - Logo and Navigation Links */}
-          <div className="flex items-center gap-4 lg:gap-6 h-full">
-            {/* Logo */}
+        <div className="flex items-center justify-between h-16 gap-4">
+          {/* Left Side - Logo only */}
+          <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center h-10 hover-elevate active-elevate-2 px-2 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-lg lg:text-xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
+              <span className="text-lg font-bold tracking-tight text-white whitespace-nowrap leading-none">
                 Athena AI
               </span>
             </Link>
+          </div>
 
-            {/* Desktop Navigation Links - Priority based display */}
-            <div className="hidden md:flex items-center gap-1 h-full overflow-x-auto scrollbar-none">
-              {navLinks.slice(0, 5).map((link) => {
+          {/* Center - Navigation Links */}
+          <div className="hidden md:flex items-center gap-1 flex-1 justify-center overflow-x-auto scrollbar-none max-w-2xl">
+            {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
               return (
@@ -168,15 +168,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                   <TooltipTrigger asChild>
                     <Link 
                       href={link.href}
-                      className={`flex items-center gap-1.5 h-9 px-2 lg:px-3 rounded-full text-xs lg:text-sm transition-all relative flex-shrink-0 ${
+                      className={`flex items-center gap-1.5 h-9 px-2 rounded-full text-xs transition-all relative flex-shrink-0 ${
                         active
                           ? "bg-primary/20 text-primary font-bold"
                           : "text-white font-medium hover:text-white hover:bg-white/10"
                       }`}
                       data-testid={`link-${link.label.toLowerCase()}`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span className="font-medium hidden lg:block">{link.label}</span>
+                      <Icon className="w-3 h-3" />
+                      <span className="font-medium hidden xl:block text-xs">{link.label.length > 8 ? link.label.slice(0, 6) + '..' : link.label}</span>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="text-xs">
@@ -186,57 +186,22 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 </Tooltip>
               );
             })}
-            
-            {/* More menu for additional links */}
+          </div>
+
+          {/* Right Side - Mode Switcher and User Menu - ALWAYS VISIBLE */}
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+            {/* Mode Switcher - Icon only to save space */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 rounded-full hover:bg-white/10"
-                  data-testid="button-more-nav"
-                >
-                  <MoreHorizontal className="w-4 h-4 text-white" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-black/95 backdrop-blur-xl border-white/10">
-                {navLinks.slice(5).map((link) => {
-                  const Icon = link.icon;
-                  const active = isActive(link.href);
-                  return (
-                    <DropdownMenuItem
-                      key={link.href}
-                      onClick={() => setLocation(link.href)}
-                      className={`cursor-pointer ${active ? 'bg-primary/20 text-primary' : ''}`}
-                      data-testid={`dropdown-link-${link.label.toLowerCase()}`}
-                    >
-                      <Icon className="w-4 h-4 mr-2" />
-                      {link.label}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            </div>
-          </div>
-
-          {/* Right Side - Mode Switcher and User Menu */}
-          <div className="hidden md:flex items-center gap-3 h-full">
-            {/* Mode Switcher Dropdown - consistent height */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-2 h-10 px-4 rounded-full text-white bg-white/10 hover:bg-white/20"
+                  className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20"
                   data-testid="button-mode-switcher"
                 >
-                  {currentMode === "athena" && <MessageCircle className="w-5 h-5 text-white" />}
-                  {currentMode === "hybrid" && <Layout className="w-5 h-5 text-white" />}
-                  {currentMode === "terminal" && <Grid3x3 className="w-5 h-5 text-white" />}
-                  <span className="text-base font-semibold text-white">
-                    {modes.find(m => m.id === currentMode)?.label || "Select Mode"}
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-white" />
+                  {currentMode === "athena" && <MessageCircle className="w-4 h-4 text-white" />}
+                  {currentMode === "hybrid" && <Layout className="w-4 h-4 text-white" />}
+                  {currentMode === "terminal" && <Grid3x3 className="w-4 h-4 text-white" />}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -283,12 +248,13 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Menu - consistent height and alignment */}
+            {/* User Menu - Icon only to ensure it fits */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 h-10 px-3 rounded-full bg-white/10 hover:bg-white/20 text-white"
+                  size="icon"
+                  className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 p-0"
                   data-testid="button-user-menu"
                 >
                   <Avatar className="w-7 h-7">
@@ -296,9 +262,6 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden lg:block text-base font-semibold text-white">
-                    {user?.username}
-                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -385,15 +348,16 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           </div>
 
           {/* Mobile Menu Button - Shows on Mobile Only */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <div className="md:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="md:hidden rounded-full hover-elevate active-elevate-2 bg-white/10"
+                  className="rounded-full hover-elevate active-elevate-2 bg-white/10 h-9 w-9"
                   data-testid="button-mobile-menu"
                 >
-                  <Menu className="w-5 h-5 text-white" />
+                  <Menu className="w-4 h-4 text-white" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-black/95 backdrop-blur-xl border-white/10">
@@ -523,6 +487,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
       </div>
       
