@@ -37,7 +37,11 @@ export async function generateAIResponse(
     avatarName = activeAvatar.name;
     const profile = activeAvatar.personalityProfile as any;
     
-    avatarContext = `
+    // Use the detailed personality prompt if available
+    if (profile.personalityPrompt) {
+      avatarContext = profile.personalityPrompt;
+    } else {
+      avatarContext = `
 You are ${avatarName}, an investment advisor with the following characteristics:
 - Personality traits: ${profile.traits?.join(', ') || 'professional, knowledgeable'}
 - Trading style: ${profile.tradingStyle || 'balanced'}
@@ -46,6 +50,24 @@ ${profile.backstory ? `- Background: ${profile.backstory}` : ''}
 
 Embody these characteristics in your responses while maintaining professionalism and accuracy.
 `;
+    }
+    
+    // Add specific personality elements if available
+    if (profile.greeting && userMessage.toLowerCase().includes('hello') || userMessage.toLowerCase().includes('hi')) {
+      avatarContext += `\n\nYour typical greeting: "${profile.greeting}"`;
+    }
+    if (profile.jokeStyle) {
+      avatarContext += `\n\nYour humor style: ${profile.jokeStyle}`;
+    }
+    if (profile.researchStyle) {
+      avatarContext += `\n\nWhen analyzing companies: ${profile.researchStyle}`;
+    }
+    if (profile.encouragement) {
+      avatarContext += `\n\nWhen celebrating wins: ${profile.encouragement}`;
+    }
+    if (profile.catchphrase) {
+      avatarContext += `\n\nYour signature catchphrase: "${profile.catchphrase}"`;
+    }
     
     // Adjust temperature based on trading style
     if (profile.tradingStyle === 'aggressive') {

@@ -701,22 +701,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user as any;
       const { name, personality, tradingStyle, appearance } = req.body;
       
-      // Generate prompt for AI
-      const prompt = `Professional trader avatar: ${personality}. Style: ${tradingStyle}. Appearance: ${appearance}`;
+      // Generate personality prompt for AI
+      const personalityPrompt = `You are ${name}, a custom investment advisor. ${personality} Your trading style is ${tradingStyle}. ${appearance ? `Visual style: ${appearance}.` : ''} Embody these characteristics naturally in your responses.`;
+      
+      // Extract traits from personality description (simple approach)
+      const traits = [];
+      if (personality.toLowerCase().includes('confident')) traits.push('confident');
+      if (personality.toLowerCase().includes('analytical')) traits.push('analytical');
+      if (personality.toLowerCase().includes('friendly')) traits.push('friendly');
+      if (personality.toLowerCase().includes('experienced')) traits.push('experienced');
+      if (personality.toLowerCase().includes('aggressive')) traits.push('aggressive');
+      if (personality.toLowerCase().includes('conservative')) traits.push('conservative');
+      if (traits.length === 0) traits.push('professional', 'knowledgeable');
       
       // Create avatar record
       const avatar = await storage.createCustomAvatar({
         name: name || "Custom Avatar",
         imageUrl: "/avatars/custom-placeholder.svg",
         personalityProfile: {
-          traits: personality.split(',').map((t: string) => t.trim()),
+          traits,
           tradingStyle,
-          tone: "professional",
-          backstory: `A custom trader persona tailored to your preferences.`
+          tone: tradingStyle === 'aggressive' ? 'peer' : tradingStyle === 'conservative' ? 'mentor' : 'casual',
+          backstory: personality,
+          personalityPrompt,
+          catchphrase: `Let's make smart ${tradingStyle} investments together!`
         },
         voiceStyle: null,
         isPreset: false,
-        generationParams: { prompt, style: tradingStyle, mood: appearance }
+        generationParams: { prompt: personalityPrompt, style: tradingStyle, mood: appearance }
       } as any);
       
       // Create user avatar association

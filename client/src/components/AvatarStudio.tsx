@@ -86,8 +86,7 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                 {presets?.map((avatar: any) => (
                   <Card 
                     key={avatar.personaKey} 
-                    className="bg-white/5 border-white/10 hover-elevate cursor-pointer backdrop-blur-xl rounded-[28px] overflow-hidden"
-                    onClick={() => selectAvatar.mutate(avatar.personaKey)}
+                    className="bg-white/5 border-white/10 backdrop-blur-xl rounded-[28px] overflow-hidden"
                     data-testid={`card-preset-${avatar.personaKey}`}
                   >
                     <div className="h-48 relative overflow-hidden">
@@ -117,12 +116,32 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                           </span>
                         ))}
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Trading Style:</span>
-                        <span className="text-foreground capitalize font-medium">
-                          {avatar.personalityProfile.tradingStyle}
-                        </span>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">Trading Style:</span>
+                          <span className="text-foreground capitalize font-medium">
+                            {avatar.personalityProfile.tradingStyle}
+                          </span>
+                        </div>
+                        {avatar.personalityProfile.catchphrase && (
+                          <div className="pt-2 border-t border-white/10">
+                            <p className="italic text-primary/80 text-xs">
+                              "{avatar.personalityProfile.catchphrase}"
+                            </p>
+                          </div>
+                        )}
                       </div>
+                      <Button 
+                        className="w-full mt-4 rounded-[28px]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          selectAvatar.mutate(avatar.personaKey);
+                        }}
+                        disabled={selectAvatar.isPending}
+                        data-testid={`button-select-${avatar.personaKey}`}
+                      >
+                        Select {avatar.name.split(' ')[0]}
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -152,16 +171,19 @@ export default function AvatarStudio({ open, onClose }: AvatarStudioProps) {
                 </div>
 
                 <div>
-                  <Label htmlFor="personality">Personality Traits</Label>
+                  <Label htmlFor="personality">Personality Description</Label>
                   <Textarea
                     id="personality"
                     value={personality}
                     onChange={(e) => setPersonality(e.target.value)}
-                    placeholder="Describe the personality: confident, analytical, friendly, experienced..."
+                    placeholder="Describe their personality and background. Example: Former hedge fund manager who made millions in the 2008 crash. Speaks with confidence and uses market metaphors. Loves to share war stories from trading floors..."
                     className="mt-1 bg-white/5 border-white/10"
-                    rows={3}
+                    rows={4}
                     data-testid="input-personality-traits"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This will shape how your advisor speaks to you - their jokes, greetings, and investing philosophy
+                  </p>
                 </div>
 
                 <div>
