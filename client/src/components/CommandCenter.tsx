@@ -10,10 +10,8 @@ import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
-import WelcomeTutorial from "@/components/WelcomeTutorial";
-import QuickStartGuide from "@/components/QuickStartGuide";
+import OnboardingDrawer from "@/components/OnboardingDrawer";
 import DemoModeBanner from "@/components/DemoModeBanner";
-import KeyboardShortcutsGuide from "@/components/KeyboardShortcutsGuide";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import NewsDetailModal from "@/components/NewsDetailModal";
 import MarketOverview from "@/components/MarketOverview";
@@ -488,17 +486,11 @@ export default function CommandCenter() {
         <Navigation />
         <NavigationBreadcrumbs />
         
-        {/* Welcome Tutorial */}
-        <WelcomeTutorial />
-        
-        {/* Quick Start Guide */}
-        <QuickStartGuide />
-        
-        {/* Keyboard Shortcuts Guide */}
-        <KeyboardShortcutsGuide />
+        {/* Consolidated Onboarding Drawer */}
+        <OnboardingDrawer />
         
         {/* Header with Avatar and Greeting */}
-        <div className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-white/10">
+        <div className="sticky top-20 z-30 bg-black/80 backdrop-blur-xl border-b border-white/10">
           <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
