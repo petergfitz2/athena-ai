@@ -557,17 +557,12 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
             
               <div className="flex items-center gap-3">
                 {!user && <DemoModeBanner inline />}
-                {/* Avatar as the Interface Button */}
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="relative cursor-pointer transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-full"
-                  data-testid="button-athena-avatar"
-                  title={sidebarOpen ? "Close chat" : "Talk to Athena"}
-                >
+                {/* Avatar Display (not clickable) */}
+                <div className="relative rounded-full">
                   <div className="w-10 h-10">
                     <AthenaTraderAvatar size="mini" showStatus={true} showName={false} />
                   </div>
-                </button>
+                </div>
               </div>
             </div>
           </div>
