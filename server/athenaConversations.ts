@@ -178,79 +178,52 @@ export function detectConversationIntent(message: string): string {
 export function generateStockResponse(ticker: string): string {
   const stock = STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA.NVDA;
   const isPositive = stock.change > 0;
+  const emoji = isPositive ? '🚀' : '📉';
   
-  return `📊 ${stock.ticker} Quick Snapshot
+  return `$${stock.ticker}'s ${isPositive ? 'absolutely crushing it' : 'taking a breather'} right now ${emoji}
 
 Current: $${stock.price.toFixed(2)} (${isPositive ? '+' : ''}${stock.changePercent.toFixed(1)}% today)
 52-week: $${stock.fiftyTwoWeekLow}-$${stock.fiftyTwoWeekHigh}
-Market cap: $${stock.marketCap}
 
-🎯 Key Signals:
-• Momentum: ${stock.momentum}/10 (${getMomentumDescription(stock.momentum)})
-• ${stock.technicalSignal}
+🎯 Why it's moving:
+• ${stock.catalyst}
 • Volume ${stock.volumeComparison}
+• ${stock.technicalSignal}
 
-📈 Recent Catalyst:
-${stock.catalyst}
-
-⚠️ Things to Watch:
-${stock.risks.map(r => `• ${r}`).join('\n')}`;
+⚠️ One thing: ${stock.risks[0]}`;
 }
 
 export function generatePortfolioResponse(holdings: any[]): string {
   // Calculate portfolio metrics
-  const totalValue = 54120;
-  const todayChange = 1285;
+  const totalValue = 125850;
+  const todayChange = 3020;
   const todayChangePercent = 2.4;
-  const allTimeGain = 8120;
-  const allTimeGainPercent = 17.6;
+  const allTimeGain = 15850;
+  const allTimeGainPercent = 14.4;
   
-  return `📊 Portfolio Health Check
+  return `📊 Your portfolio's looking solid!
 
-Total Value: $${totalValue.toLocaleString()}
-Today: +$${todayChange.toLocaleString()} (+${todayChangePercent}%)
-All-Time: +$${allTimeGain.toLocaleString()} (+${allTimeGainPercent}%)
+Total: $${totalValue.toLocaleString()}
+Today: +$${todayChange.toLocaleString()} (+${todayChangePercent}%) 🔥
+All-time: +$${allTimeGain.toLocaleString()} (+${allTimeGainPercent}%)
 
-🎯 Allocation Breakdown:
-• Tech: 68% (AAPL, MSFT, NVDA, META)
-• Auto: 13% (TSLA)
-• Cash: 9% ($5,000)
-
-⚡ Strength: Tech concentration has driven strong returns, outperforming S&P by 4.2%
-
-⚠️ Risk Area: Heavy tech concentration (68%) exposes you to sector-specific volatility. Consider diversifying into healthcare or financials.
-
-📈 Performance vs Benchmarks:
-• You: +17.6% YTD
-• S&P 500: +13.4%
-• NASDAQ: +15.2%
-
-You're beating both major indices - nice work! 🎯`;
+💡 Quick take:
+• Your tech bets are paying off (NVDA, MSFT killing it)
+• You're heavy on tech though - 65% of portfolio
+• Biggest winner: META (+35%)`;
 }
 
 export function generateMarketResponse(): string {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  
-  return `📊 Market Pulse - ${timeStr}
+  return `📊 Market's having a good day
 
-📈 Major Indices:
 • S&P 500: 4,521 (+0.8%)
-• NASDAQ: 14,168 (+1.2%)
-• Dow Jones: 35,285 (-0.3%)
+• NASDAQ: 14,108 (+1.2%)  
+• Tech leading the way
 
-🔥 Today's Movers:
-• NVDA: +3.2% - AI optimism continues
-• TSLA: -2.1% - Profit taking after rally
-• AAPL: +1.5% - iPhone 15 demand strong
-
-⚡ Market Sentiment: Bullish
-Tech leads as Fed signals pause on rate hikes. Risk-on sentiment returning to growth stocks.
-
-📅 This Week's Catalysts:
-• Fed Minutes - Wednesday
-• CPI Data - Thursday
-• Options Expiry - Friday`;
+🔥 Top movers:
+• $NVDA +3.2% - AI hype continues
+• $TSLA -2.1% - Profit taking
+• $AAPL +1.5% - iPhone demand strong`;
 }
 
 export function generateTradeResponse(message: string, step: number = 1): {
@@ -271,56 +244,34 @@ export function generateTradeResponse(message: string, step: number = 1): {
   
   if (step === 1 && ticker) {
     return {
-      response: `Got it! Let's build your ${ticker} trade.\n\nYour available cash: $5,000\n\nHow much would you like to invest?`,
-      quickReplies: ["$500", "$1,000", "$2,500", "All $5,000"],
+      response: `Let's get you some ${ticker}! 💸\n\nYou've got $5,000 cash available.\nHow much you thinking?`,
+      quickReplies: ["$500", "$1,000", "$2,500", "All in baby ($5,000)"],
       nextStep: 2
     };
   }
   
   if (step === 2) {
-    // Parse amount from message
-    const amount = 2000; // Default for demo
+    const amount = 2000;
     const stock = STOCK_DATA[ticker] || STOCK_DATA.NVDA;
     const shares = Math.floor(amount / stock.price);
     
     return {
-      response: `Perfect. Here's your trade preview:
-
-📝 Order Details:
-• ${ticker}: BUY ${shares} shares @ $${stock.price.toFixed(2)}
-• Total cost: $${(shares * stock.price).toFixed(2)}
-• Order type: Market (executes immediately)
-
-💼 Portfolio Impact:
-• New ${ticker} position: ${((shares * stock.price / 54120) * 100).toFixed(1)}% of portfolio
-• Tech allocation: 68% → 72%
-• Cash after: $${(5000 - shares * stock.price).toFixed(2)}
-
-Ready to execute?`,
-      quickReplies: ["✅ Confirm Trade", "Edit Amount", "Cancel"],
+      response: `📝 Quick preview:\n\n${ticker}: ${shares} shares @ $${stock.price.toFixed(2)}\nTotal: $${(shares * stock.price).toFixed(2)}\n\nLooks good?`,
+      quickReplies: ["✅ Send it!", "Change amount", "Actually, nevermind"],
       nextStep: 3
     };
   }
   
   if (step === 3) {
     return {
-      response: `✅ Trade Executed!
-
-• Bought ${10} shares of ${ticker}
-• Avg price: $${STOCK_DATA[ticker]?.price.toFixed(2) || "495.23"}
-• Total: $${(10 * (STOCK_DATA[ticker]?.price || 495.23)).toFixed(2)}
-• Order #ATH-${Math.floor(Math.random() * 100000)}
-
-📊 Updated Portfolio:
-Value: $56,073 (+$1,953)
-Today's P&L: +$3,238 (+6.1%)`,
-      quickReplies: ["Set Stop Loss", "View Position", "Trade Something Else", "Done"]
+      response: `✅ Boom! You're in!\n\nBought 10 shares of ${ticker} at $${STOCK_DATA[ticker]?.price.toFixed(2) || "495.23"}\n\nYour portfolio just went up +$1,953 today 🚀`,
+      quickReplies: ["Set stop loss", "View position", "Trade more", "I'm done"]
     };
   }
   
   return {
-    response: "I can help you place a trade. Which stock would you like to trade?",
-    quickReplies: ["NVDA", "AAPL", "TSLA", "MSFT", "GOOGL"]
+    response: "What are we trading today? 📈",
+    quickReplies: ["$NVDA", "$AAPL", "$TSLA", "$MSFT"]
   };
 }
 
@@ -336,27 +287,21 @@ function getMomentumDescription(momentum: number): string {
 export function generateQuickReplies(intent: string): string[] {
   switch (intent) {
     case "stock_research":
-      return ["Buy this stock", "Compare to peers", "Show me other tech stocks", "View detailed analysis"];
+      return ["Show me technicals", "Compare to peers", "What are the risks?", "I want to buy"];
     case "portfolio_analysis":
-      return ["Show top performers", "Explore diversification", "Check risk score", "View transactions"];
+      return ["Explore diversification", "See detailed breakdown", "Top performers", "I'm good"];
     case "trade_execution":
-      return ["$500", "$1,000", "$2,500", "Custom amount"];
+      return ["$500", "$1,000", "$2,500", "All in baby ($5,000)"];
     case "market_overview":
-      return ["Show my holdings", "Explore trending stocks", "Check sector performance", "View news"];
+      return ["Show my stocks performance", "Explore trending", "What's the sentiment?", "Any news?"];
     default:
-      return ["What's happening with NVDA?", "How's my portfolio?", "Show trending stocks", "Help me build a trade"];
+      return ["What's happening with NVDA?", "How's my portfolio?", "Market update", "I want to trade"];
   }
 }
 
 // Enhanced error response with Athena personality
 export function generateErrorResponse(): string {
-  return `🤔 I'm not quite sure what you mean.
+  return `Hmm, not sure I caught that 🤔
 
-I can help you with:
-• Stock research ("Tell me about AAPL")
-• Portfolio analysis ("How am I doing?")
-• Trade execution ("Buy 10 shares of NVDA")
-• Market overview ("What's moving today?")
-
-Try rephrasing, or pick one of the options above!`;
+Try something like "What's NVDA doing?" or "How's my portfolio?"`;
 }
