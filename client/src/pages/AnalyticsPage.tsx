@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import BackButton from "@/components/BackButton";
 import { TickerLink } from "@/components/TickerLink";
+import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
 
 interface CorrelationData {
   pairs: Array<{
@@ -77,6 +78,11 @@ function AnalyticsPageContent() {
               Advanced portfolio analysis and risk insights
             </p>
           </div>
+        </div>
+
+        {/* Advanced Performance & Risk Analytics */}
+        <div className="mb-8">
+          <AdvancedAnalytics />
         </div>
 
         {/* Correlation Analysis */}
