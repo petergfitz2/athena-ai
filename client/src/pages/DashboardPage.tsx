@@ -523,6 +523,7 @@ function SimplifiedDashboardContent() {
       {selectedNewsArticle && (
         <NewsDetailModal
           article={selectedNewsArticle}
+          open={!!selectedNewsArticle}
           onClose={() => setSelectedNewsArticle(null)}
         />
       )}
