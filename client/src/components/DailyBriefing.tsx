@@ -31,6 +31,9 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
   const [expanded, setExpanded] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   
+  // Mock user name - in real app, this would come from user context
+  const userName = "Peter";
+  
   // Check if briefing was already shown today
   useEffect(() => {
     const lastDismissed = localStorage.getItem('athena_briefing_dismissed');
@@ -168,7 +171,7 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
           {/* Quick Summary */}
           <div className="bg-primary/10 rounded-[20px] p-3 border border-primary/20">
             <p className="text-sm font-light leading-relaxed">
-              Your portfolio is worth <span className="font-medium text-foreground">{formatCurrency(portfolioImpact.totalValue)}</span>, 
+              Hi {userName}, your portfolio is worth <span className="font-medium text-foreground">{formatCurrency(portfolioImpact.totalValue)}</span>, 
               {portfolioImpact.dayChange >= 0 ? (
                 <>up <span className="font-medium text-success">+{formatCurrency(portfolioImpact.dayChange)}</span></>
               ) : (
