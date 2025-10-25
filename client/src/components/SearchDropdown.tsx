@@ -14,17 +14,7 @@ import { useLocation } from "wouter";
 import { useChatContext } from "@/contexts/ChatContext";
 import { useStockDetailModal } from "@/contexts/StockDetailModalContext";
 import type { MarketQuote } from "@shared/schema";
-
-interface SearchResult {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  marketCap?: number;
-  type: "stock" | "etf" | "crypto";
-}
+import { stockDatabase, type StockData } from "@/data/stockData";
 
 interface SearchDropdownProps {
   searchQuery: string;
@@ -33,167 +23,13 @@ interface SearchDropdownProps {
   onResultClick?: (symbol: string) => void;
 }
 
-// Mock search results for demo - expanded list for better search
-const mockSearchResults: SearchResult[] = [
-  { 
-    symbol: "AAPL", 
-    name: "Apple Inc.", 
-    price: 178.45, 
-    change: 2.34, 
-    changePercent: 1.33, 
-    volume: 54234567,
-    marketCap: 2.8e12,
-    type: "stock" 
-  },
-  { 
-    symbol: "MSFT", 
-    name: "Microsoft Corporation", 
-    price: 378.91, 
-    change: -1.23, 
-    changePercent: -0.32, 
-    volume: 23456789,
-    marketCap: 2.9e12,
-    type: "stock" 
-  },
-  { 
-    symbol: "GOOGL", 
-    name: "Alphabet Inc.", 
-    price: 141.80, 
-    change: 0.56, 
-    changePercent: 0.40, 
-    volume: 18765432,
-    marketCap: 1.8e12,
-    type: "stock" 
-  },
-  { 
-    symbol: "TSLA", 
-    name: "Tesla Inc.", 
-    price: 242.84, 
-    change: 5.67, 
-    changePercent: 2.39, 
-    volume: 87654321,
-    marketCap: 770e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "NVDA", 
-    name: "NVIDIA Corporation", 
-    price: 495.32, 
-    change: 12.45, 
-    changePercent: 2.58, 
-    volume: 45678901,
-    marketCap: 1.2e12,
-    type: "stock" 
-  },
-  { 
-    symbol: "F", 
-    name: "Ford Motor Company", 
-    price: 10.84, 
-    change: -0.12, 
-    changePercent: -1.09, 
-    volume: 52341234,
-    marketCap: 43.2e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "GM", 
-    name: "General Motors Company", 
-    price: 38.92, 
-    change: 0.45, 
-    changePercent: 1.17, 
-    volume: 12345678,
-    marketCap: 44.8e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "AMZN", 
-    name: "Amazon.com Inc.", 
-    price: 147.34, 
-    change: 1.89, 
-    changePercent: 1.30, 
-    volume: 34567890,
-    marketCap: 1.5e12,
-    type: "stock" 
-  },
-  { 
-    symbol: "META", 
-    name: "Meta Platforms Inc.", 
-    price: 322.45, 
-    change: -3.21, 
-    changePercent: -0.99, 
-    volume: 21345678,
-    marketCap: 820e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "JPM", 
-    name: "JPMorgan Chase & Co.", 
-    price: 155.67, 
-    change: 0.89, 
-    changePercent: 0.57, 
-    volume: 9876543,
-    marketCap: 450e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "BAC", 
-    name: "Bank of America Corporation", 
-    price: 32.45, 
-    change: -0.23, 
-    changePercent: -0.70, 
-    volume: 43215678,
-    marketCap: 260e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "WMT", 
-    name: "Walmart Inc.", 
-    price: 162.89, 
-    change: 1.12, 
-    changePercent: 0.69, 
-    volume: 7654321,
-    marketCap: 440e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "DIS", 
-    name: "The Walt Disney Company", 
-    price: 92.34, 
-    change: -1.45, 
-    changePercent: -1.54, 
-    volume: 11234567,
-    marketCap: 168e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "NFLX", 
-    name: "Netflix Inc.", 
-    price: 437.89, 
-    change: 5.67, 
-    changePercent: 1.31, 
-    volume: 4567890,
-    marketCap: 195e9,
-    type: "stock" 
-  },
-  { 
-    symbol: "AMD", 
-    name: "Advanced Micro Devices Inc.", 
-    price: 138.45, 
-    change: 3.21, 
-    changePercent: 2.37, 
-    volume: 54321098,
-    marketCap: 224e9,
-    type: "stock" 
-  },
-];
-
 export default function SearchDropdown({ 
   searchQuery, 
   isOpen, 
   onClose, 
   onResultClick 
 }: SearchDropdownProps) {
-  const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
+  const [filteredResults, setFilteredResults] = useState<StockData[]>([]);
   const [isQuestion, setIsQuestion] = useState(false);
   const [, setLocation] = useLocation();
   const { openPanelWithContext } = useChatContext();
@@ -221,13 +57,13 @@ export default function SearchDropdown({
       return;
     }
 
-    // Filter stocks by symbol or name - smart matching
-    const filtered = mockSearchResults.filter(result => {
-      const symbolMatch = result.symbol.toLowerCase().includes(query);
-      const nameMatch = result.name.toLowerCase().includes(query);
+    // Filter stocks by symbol or name - smart matching with performance optimization
+    const filtered = stockDatabase.filter(stock => {
+      const symbolMatch = stock.symbol.toLowerCase().includes(query);
+      const nameMatch = stock.name.toLowerCase().includes(query);
       
       // Also match individual words in company names
-      const nameWords = result.name.toLowerCase().split(' ');
+      const nameWords = stock.name.toLowerCase().split(' ');
       const queryWords = query.split(' ').filter(w => w.length > 0);
       
       // Check if any query word matches any name word
@@ -259,7 +95,7 @@ export default function SearchDropdown({
       // Finally sort by market cap (larger companies first)
       return (b.marketCap || 0) - (a.marketCap || 0);
     })
-    .slice(0, 6);
+    .slice(0, 8); // Show up to 8 results for better coverage
 
     setFilteredResults(filtered);
   }, [searchQuery]);
@@ -286,7 +122,7 @@ export default function SearchDropdown({
     onClose();
   };
 
-  const handleAskAthena = (result: SearchResult) => {
+  const handleAskAthena = (result: StockData) => {
     const contextMessage = `Tell me about ${result.name} (${result.symbol})'s recent performance and whether it's a good investment opportunity.`;
     openPanelWithContext(contextMessage);
     onClose();
