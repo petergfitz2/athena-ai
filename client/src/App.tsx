@@ -206,8 +206,6 @@ function App() {
               <StockDetailModalProvider>
                 <TooltipProvider>
                   <div className="dark">
-                    <LeftChatPanel />
-                    <FloatingChatBubble />
                     <Toaster />
                     <Router />
                   </div>
