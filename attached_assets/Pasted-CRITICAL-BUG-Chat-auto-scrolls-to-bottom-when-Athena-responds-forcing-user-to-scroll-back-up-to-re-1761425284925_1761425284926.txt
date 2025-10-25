@@ -1,0 +1,74 @@
+CRITICAL BUG: Chat auto-scrolls to bottom when Athena responds, forcing user to scroll back up to read the message from the beginning.
+
+CURRENT BROKEN BEHAVIOR:
+1. User asks "How's AAPL?"
+2. Athena starts responding with a long message
+3. Chat immediately scrolls to the BOTTOM of the message
+4. User has to scroll back UP to read from the beginning
+5. This is a terrible UX - breaks the reading flow
+
+REQUIRED CORRECT BEHAVIOR:
+1. User asks "How's AAPL?"
+2. Athena starts responding
+3. Chat scrolls to show the TOP/BEGINNING of Athena's new message
+4. Message appears from top to bottom naturally
+5. Chat stays stable while message generates (no jumping around)
+6. User can read message naturally from top to bottom
+7. User can manually scroll down if they want to see more
+
+TECHNICAL IMPLEMENTATION:
+
+The issue is likely in the chat scroll behavior. You need to:
+
+1. WHEN NEW MESSAGE STARTS:
+```javascript
+   // Scroll to show the START of the new message, not the end
+   const lastMessage = chatContainer.lastElementChild;
+   lastMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+```
+
+2. WHILE MESSAGE IS GENERATING:
+```javascript
+   // Don't auto-scroll during generation
+   // Keep the scroll position stable
+   // Only scroll if user is already manually at the bottom
+   
+   const isUserAtBottom = 
+     chatContainer.scrollHeight - chatContainer.scrollTop === chatContainer.clientHeight;
+   
+   if (isUserAtBottom) {
+     // User is already at bottom, okay to auto-scroll
+     chatContainer.scrollTop = chatContainer.scrollHeight;
+   } else {
+     // User has scrolled up, don't move their position
+     // Let them read at their own pace
+   }
+```
+
+3. AFTER MESSAGE COMPLETES:
+```javascript
+   // Don't force scroll
+   // User will scroll manually if they want to see more
+```
+
+4. EXCEPTION - SHORT MESSAGES:
+   If message is very short (less than 3 lines), it's okay to center it or 
+   show it fully. But for long messages, always start at the top.
+
+EXAMPLE USER FLOW:
+User: "How's AAPL?"
+[Chat scrolls smoothly to show TOP of Athena's response]
+Athena: "📊 AAPL showing solid performance
+         
+         Current: $178.50 (+1.2% today)
+         52-week: $164-$198
+         
+         🎯 What's driving it:
+         • Strong iPhone 15 demand..."
+[User can read naturally from top to bottom]
+[If message is long, user scrolls down themselves to continue reading]
+
+PRIORITY: HIGH - This breaks the core chat experience.
+
+Find the scroll behavior in the chat component and fix it so messages 
+always start visible at the TOP, not jumping to the BOTTOM.

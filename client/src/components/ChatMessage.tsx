@@ -108,6 +108,7 @@ export default function ChatMessage({ content, role, timestamp, quickReplies, on
         "flex w-full gap-2",
         isUser ? "justify-end" : "justify-start"
       )}
+      data-message-id={`message-${timestamp || Date.now()}`}
     >
       {/* No avatar in messages - only in header for cleaner design */}
       
