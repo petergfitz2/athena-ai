@@ -112,6 +112,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes - using Replit Auth
   // Replit Auth handles login/callback/logout routes automatically
   
+  // Development bypass route - ONLY for development
+  app.post('/api/auth/dev-bypass', async (req: any, res) => {
+    // Only allow in development
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ error: 'Dev bypass not allowed in production' });
+    }
+    
+    console.log('[DEV BYPASS] Creating fake user session');
+    
+    // Create a fake user session
+    const fakeUser = {
+      claims: {
+        sub: 'dev-user-123',
+        email: 'dev@athena.test',
+        first_name: 'Dev',
+        last_name: 'User',
+        profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dev',
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + 86400
+      },
+      access_token: 'dev-token-' + Date.now(),
+      refresh_token: 'dev-refresh-' + Date.now(),
+      expires_at: Math.floor(Date.now() / 1000) + 86400 // 24 hours from now
+    };
+    
+    // Upsert the dev user in the database
+    try {
+      await storage.upsertUser({
+        id: fakeUser.claims.sub,
+        email: fakeUser.claims.email,
+        firstName: fakeUser.claims.first_name,
+        lastName: fakeUser.claims.last_name,
+        profileImageUrl: fakeUser.claims.profile_image_url
+      });
+      
+      // Log the user in
+      req.login(fakeUser, (err: any) => {
+        if (err) {
+          console.error('[DEV BYPASS] Login error:', err);
+          return res.status(500).json({ error: 'Failed to create dev session' });
+        }
+        console.log('[DEV BYPASS] User logged in successfully');
+        res.json({ success: true, user: fakeUser.claims });
+      });
+    } catch (error) {
+      console.error('[DEV BYPASS] Failed to create user:', error);
+      res.status(500).json({ error: 'Failed to create dev user' });
+    }
+  });
+  
   // Get current user endpoint
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {

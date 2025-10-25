@@ -36,6 +36,34 @@ export default function AuthPage() {
       console.log("Opened login in new tab");
     }
   };
+  
+  // Development bypass - skip OAuth for quick testing
+  const handleDevBypass = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("[DEV MODE] Bypassing authentication...");
+    
+    try {
+      const response = await fetch("/api/auth/dev-bypass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include"
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("[DEV MODE] Login successful:", data);
+        // Redirect to dashboard
+        window.location.href = "/dashboard";
+      } else {
+        const error = await response.json();
+        console.error("[DEV MODE] Failed:", error);
+        alert("Dev bypass failed: " + error.error);
+      }
+    } catch (err) {
+      console.error("[DEV MODE] Error:", err);
+      alert("Dev bypass error: " + err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -151,6 +179,18 @@ export default function AuthPage() {
             >
               <LogIn className="w-5 h-5 mr-2" />
               Get Started
+            </Button>
+            
+            {/* Development Bypass Button - ONLY for development */}
+            <Button
+              onClick={handleDevBypass}
+              className="w-full rounded-[28px] h-14 text-base font-medium bg-gradient-to-r from-yellow-600/80 to-orange-600/80 hover:from-yellow-600 hover:to-orange-600 shadow-xl shadow-orange-600/20 mb-4 cursor-pointer relative z-50 pointer-events-auto border-2 border-yellow-500/50"
+              size="lg"
+              data-testid="button-dev-bypass"
+              type="button"
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Skip Login (Dev Mode)
             </Button>
             
             {/* Alternative login method */}
