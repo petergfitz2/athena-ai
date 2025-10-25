@@ -105,6 +105,25 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
     "3 of your holdings report earnings this week",
   ];
 
+  // Generate dynamic summary based on market conditions
+  const getMarketSummary = () => {
+    const marketsUp = [marketSummary.sp500, marketSummary.nasdaq, marketSummary.dow].filter(m => m.change > 0).length;
+    const marketTrend = marketsUp >= 2 ? "positive momentum" : marketsUp === 1 ? "mixed signals" : "bearish pressure";
+    const marketTrendClass = marketsUp >= 2 ? "text-success" : marketsUp === 1 ? "text-warning" : "text-destructive";
+    
+    const topSector = marketSummary.nasdaq.change > marketSummary.dow.change ? "tech" : "industrials";
+    const returnClass = portfolioImpact.expectedReturn >= 0 ? "text-primary" : "text-destructive";
+    
+    return {
+      trend: marketTrend,
+      trendClass: marketTrendClass,
+      sector: topSector,
+      returnClass: returnClass
+    };
+  };
+
+  const summary = getMarketSummary();
+
   if (dismissed) return null;
 
   return (
@@ -149,6 +168,16 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
         </CardHeader>
 
         <CardContent className="p-4 space-y-4">
+          {/* Quick Summary */}
+          <div className="bg-primary/10 rounded-[20px] p-3 border border-primary/20">
+            <p className="text-sm font-light leading-relaxed">
+              Markets are showing <span className={cn("font-medium", summary.trendClass)}>{summary.trend}</span> with {summary.sector} leading. 
+              Your portfolio is positioned for a <span className={cn("font-medium", summary.returnClass)}>
+                {portfolioImpact.expectedReturn >= 0 ? "+" : ""}{portfolioImpact.expectedReturn}%
+              </span> expected return today with {portfolioImpact.riskLevel} risk exposure.
+            </p>
+          </div>
+
           {/* Market Overview */}
           <div>
             <h3 className="text-sm font-light mb-2 flex items-center gap-2">
