@@ -131,7 +131,7 @@ export default function AuthPage() {
               onClick={handleLogin}
               className="w-full rounded-[28px] h-14 text-base font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 shadow-xl shadow-primary/20 mb-6"
               size="lg"
-              data-testid="button-auth-login"
+              data-testid="button-get-started"
             >
               <LogIn className="w-5 h-5 mr-2" />
               Get Started
@@ -145,33 +145,33 @@ export default function AuthPage() {
                 </p>
               </div>
               
-              {/* Supported Providers */}
+              {/* Supported Providers - Informational Only */}
               <div className="bg-white/5 rounded-[20px] p-6 border border-white/10">
-                <p className="text-sm text-center text-muted-foreground mb-4">
-                  Sign in with your preferred account:
+                <p className="text-sm text-center text-muted-foreground mb-2">
+                  Clicking "Get Started" will let you sign in with:
                 </p>
                 <div className="flex justify-center gap-6">
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 opacity-70">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                      <SiGoogle className="w-6 h-6 text-white" />
+                      <SiGoogle className="w-6 h-6 text-white/80" />
                     </div>
                     <span className="text-xs text-muted-foreground">Google</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 opacity-70">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                      <SiGithub className="w-6 h-6 text-white" />
+                      <SiGithub className="w-6 h-6 text-white/80" />
                     </div>
                     <span className="text-xs text-muted-foreground">GitHub</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 opacity-70">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                      <SiApple className="w-6 h-6 text-white" />
+                      <SiApple className="w-6 h-6 text-white/80" />
                     </div>
                     <span className="text-xs text-muted-foreground">Apple</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 opacity-70">
                     <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                      <span className="text-white font-semibold">@</span>
+                      <span className="text-white/80 font-semibold">@</span>
                     </div>
                     <span className="text-xs text-muted-foreground">Email</span>
                   </div>
@@ -210,7 +210,22 @@ export default function AuthPage() {
             {/* Footer */}
             <div className="mt-8 pt-6 border-t border-white/10">
               <p className="text-xs text-center text-muted-foreground">
-                By continuing, you agree to our Terms of Service and Privacy Policy
+                By continuing, you agree to our{" "}
+                <a 
+                  href="/terms" 
+                  className="underline hover:text-primary transition-colors"
+                  data-testid="link-terms-of-service"
+                >
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a 
+                  href="/privacy" 
+                  className="underline hover:text-primary transition-colors"
+                  data-testid="link-privacy-policy"
+                >
+                  Privacy Policy
+                </a>
               </p>
             </div>
           </GlassCard>
