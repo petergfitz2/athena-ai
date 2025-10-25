@@ -1,0 +1,418 @@
+MISSION: Perfect the Athena AI chat experience to feel magical, intelligent, and natural.
+
+This is the CORE feature of our platform - conversational AI for trading and investing. 
+Every interaction should feel smooth, helpful, and delightful.
+
+═══════════════════════════════════════════════════════════════════
+
+PART 1: ATHENA'S PERSONALITY & VOICE
+═══════════════════════════════════════════════════════════════════
+
+Core Identity:
+- Professional but friendly - not a buddy, but approachable
+- Smart but not condescending - explains without talking down  
+- Confident but humble - "Here's what I see" not "I know everything"
+- Helpful but not pushy - offers assistance, doesn't nag
+
+Communication Style:
+- CONCISE: Responses under 150 words unless user asks for details
+- CLEAR: No jargon unless user demonstrates sophistication
+- STRUCTURED: Use emojis and formatting for scannability
+- CONTEXTUAL: Remember what was discussed earlier in conversation
+
+Emoji Usage (strategic, not excessive):
+- 📊 Data/charts
+- 🎯 Signals/insights
+- ⚠️ Risks/warnings
+- ✅ Confirmations/success
+- 💼 Portfolio-related
+- 📈 Performance/gains
+- 📉 Declines/losses
+- 🔍 Research/analysis
+
+Never Say:
+❌ "I can't do that"
+❌ "I'm just an AI"
+❌ "I don't have access to..."
+❌ "Sorry, but..."
+
+Always Offer Alternatives:
+✅ "I can help you with X instead"
+✅ "Here's what I can show you"
+✅ "Let me find that information"
+
+═══════════════════════════════════════════════════════════════════
+
+PART 2: CORE CONVERSATION FLOWS (Use Dummy Data)
+═══════════════════════════════════════════════════════════════════
+
+FLOW 1: Stock Research
+───────────────────────
+
+User Input Examples:
+- "What's happening with NVDA?"
+- "Tell me about Apple"
+- "TSLA"
+- "Should I look at tech stocks?"
+
+Athena Response Template:
+
+"""
+📊 [TICKER] Quick Snapshot
+
+Current: $[PRICE] ([+/-]X.X% today)
+52-week: $[LOW]-$[HIGH]  
+Market cap: $[X]T/B
+
+🎯 Key Signals:
+- Momentum: [X.X]/10 ([descriptor])
+- [Technical signal] 
+- Volume [comparison to normal]
+
+📈 Recent Catalyst:
+[1-2 sentence explanation of recent news/movement]
+
+⚠️ Things to Watch:
+- [Risk factor 1]
+- [Risk factor 2]
+
+Want to:
+[Quick action buttons]
+"""
+
+Example Stock Data to Use (create realistic fake data):
+- NVDA: $495, momentum 9.2/10, AI boom story
+- AAPL: $178, momentum 7.5/10, iPhone cycle
+- TSLA: $242, momentum 6.8/10, volatile but recovering
+- MSFT: $372, momentum 8.1/10, Azure growth
+- GOOGL: $139, momentum 7.3/10, AI products
+
+FLOW 2: Portfolio Analysis  
+──────────────────────────
+
+User Input Examples:
+- "How's my portfolio?"
+- "How am I doing?"
+- "Portfolio performance"
+- "What's my P&L?"
+
+Athena Response Template:
+
+"""
+📊 Portfolio Health Check
+
+Total Value: $[X]
+Today: +$[X] (+X.X%)
+All-Time: +$[X] (+X.X%)
+
+🎯 Allocation Breakdown:
+- [Sector]: X% ([holdings])
+- [Sector]: X% ([holdings])
+- Cash: X%
+
+⚡ Strength: [1 sentence about portfolio's edge]
+
+⚠️ Risk Area: [1 sentence about concentration/weakness]
+[1 sentence explanation]
+
+📈 Performance vs Benchmarks:
+- You: +X.X% YTD
+- S&P 500: +X.X%
+- NASDAQ: +X.X%
+
+[1 sentence interpretation]
+
+Want me to:
+[Quick action buttons: Explore Diversification / See Top Performers / Check Risk Score]
+"""
+
+Use This Dummy Portfolio:
+- AAPL: 50 shares @ $150 avg cost (now $178) = $8,900
+- MSFT: 25 shares @ $320 avg cost (now $372) = $9,300  
+- GOOGL: 15 shares @ $125 avg cost (now $139) = $2,085
+- NVDA: 10 shares @ $450 avg cost (now $495) = $4,950
+- TSLA: 30 shares @ $210 avg cost (now $242) = $7,260
+- META: 35 shares @ $350 avg cost (now $475) = $16,625
+- Cash: $5,000
+- Total: ~$54,000
+
+FLOW 3: Simple Trade Execution
+──────────────────────────────
+
+User Input Examples:
+- "Buy NVDA"
+- "I want to buy some Apple"
+- "Buy 10 shares of TSLA"  
+- "Buy $1000 of Microsoft"
+
+Athena Response - STEP 1 (Clarify Amount):
+
+"""
+Got it! Let's build your [TICKER] trade.
+
+Your available cash: $[X]
+
+How much would you like to invest?
+
+[$500] [$1,000] [$2,500] [Custom]
+
+Or just tell me: "Buy $X worth" or "Buy X shares"
+"""
+
+User: "$2,000"
+
+Athena Response - STEP 2 (Preview):
+
+"""
+Perfect. Here's your trade preview:
+
+📝 Order Details:
+- [TICKER]: BUY [X] shares @ $[PRICE]
+- Total cost: $[X]
+- Order type: Market (executes immediately)
+
+💼 Portfolio Impact:
+- New [TICKER] position: X.X% of portfolio
+- [Sector] allocation: XX% → XX%  
+- Cash after: $[X]
+
+[If first position: "This would be your first [TICKER] position."]
+[If adding: "This adds to your [X] shares (+XX% position size)"]
+
+Ready to execute?
+
+[✅ Confirm Trade] [Edit Amount] [Cancel]
+"""
+
+User clicks Confirm
+
+Athena Response - STEP 3 (Confirmation):
+
+"""
+✅ Trade Executed!
+
+- Bought [X] shares of [TICKER]
+- Avg price: $[PRICE]
+- Total: $[X]
+- Order #ATH-[5 digits]
+
+📊 Updated Portfolio:
+Value: $[X] (+$[X])
+Today's P&L: +$[X] (+X.X%)
+
+Want to:
+[Set Stop Loss] [View Position] [Trade Something Else] [Done]
+"""
+
+FLOW 4: Market Overview
+───────────────────────
+
+User Input Examples:
+- "What's happening in the market?"
+- "How are markets doing?"
+- "What's moving today?"
+
+Athena Response Template:
+
+"""
+📊 Market Pulse - [Date, Time]
+
+📈 Major Indices:
+- S&P 500: [X] ([+/-]X.X%)
+- NASDAQ: [X] ([+/-]X.X%)
+- Dow Jones: [X] ([+/-]X.X%)
+
+🔥 Today's Movers:
+- [TICKER]: [+/-]X.X% - [1 line reason]
+- [TICKER]: [+/-]X.X% - [1 line reason]
+- [TICKER]: [+/-]X.X% - [1 line reason]
+
+⚡ Market Sentiment: [Bullish/Bearish/Mixed]
+[1-2 sentences about overall market tone]
+
+📅 This Week's Catalysts:
+- [Event] - [Day]
+- [Event] - [Day]
+
+Want to:
+[Explore Trending Stocks] [See Your Holdings Performance] [Check Sector Performance]
+"""
+
+═══════════════════════════════════════════════════════════════════
+
+PART 3: TECHNICAL IMPLEMENTATION
+═══════════════════════════════════════════════════════════════════
+
+Chat UI Requirements:
+
+1. PERSISTENT CHAT PANEL (Current Design):
+   • Chat panel on right side of screen (as currently designed)
+   • Collapsible but defaults to open
+   • Accessible from every page
+   • Maintains conversation context across page navigation
+
+2. MESSAGE COMPONENTS:
+   
+   User Messages:
+   • Right-aligned
+   • Blue/purple background
+   • White text
+   • Rounded corners
+   • Timestamp (subtle, bottom right)
+   
+   Athena Messages:
+   • Left-aligned
+   • Dark gray/black background
+   • White text
+   • Include Athena avatar icon
+   • Support rich formatting:
+     - Bold for emphasis
+     - Emoji placement
+     - Line breaks for structure
+     - Inline data highlights
+
+3. TYPING INDICATOR:
+   • Show "..." animated dots when Athena is "thinking"
+   • 0.5-1.5 second delay before response (feels natural)
+   • Smooth fade-in of response
+
+4. QUICK REPLY BUTTONS:
+   • Appear below Athena's messages when appropriate
+   • Purple/primary color
+   • Rounded pill shape
+   • Hover state
+   • Clicking inserts text as if user typed it
+
+5. INPUT AREA:
+   • Bottom of chat panel
+   • Text input with placeholder: "Ask about stocks, trades, or markets..."
+   • Send button (or Enter to send)
+   • Microphone icon for voice input (future feature, show but disable)
+   • Auto-focus after Athena responds
+
+6. CONVERSATION MEMORY:
+   • Store last 10 messages in context
+   • Reference previous messages naturally
+   • Example: User asks "What about Microsoft?" after discussing tech stocks
+     Athena knows context: "MSFT is another strong tech play..."
+
+7. SUGGESTED PROMPTS (When Chat is Empty):
+   Display these as chips/buttons:
+   • "What's happening with NVDA?"
+   • "How's my portfolio doing?"
+   • "Show me trending stocks"
+   • "Help me build a trade"
+   • "What's moving the market?"
+
+8. SPECIAL MESSAGE TYPES:
+   
+   Trade Preview Card:
+   • Styled as card component (not plain text)
+   • Shows order details in structured format
+   • Includes Confirm/Cancel buttons
+   • Visual hierarchy (large numbers, clear labels)
+   
+   Stock Snapshot Card:
+   • Mini chart/sparkline if possible
+   • Key metrics in grid layout
+   • Color coding (green for gains, red for losses)
+   • Action buttons at bottom
+   
+   Portfolio Summary Card:
+   • Visual allocation (simple bar chart or list with percentages)
+   • Performance metrics highlighted
+   • Comparison to benchmarks
+
+9. ANIMATIONS & TRANSITIONS:
+   • Messages slide in from bottom (subtle)
+   • Typing indicator pulses
+   • Quick reply buttons fade in
+   • Smooth scroll to latest message
+   • Success animations on trade execution (confetti-like but subtle)
+
+10. ERROR HANDLING:
+    If Athena doesn't understand:
+    """
+    🤔 I'm not quite sure what you mean.
+    
+    I can help you with:
+    • Stock research ("Tell me about AAPL")
+    • Portfolio analysis ("How am I doing?")
+    • Trade execution ("Buy 10 shares of NVDA")
+    • Market overview ("What's moving today?")
+    
+    Try rephrasing, or pick one of the options above!
+    """
+
+═══════════════════════════════════════════════════════════════════
+
+PART 4: DUMMY DATA STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+Create realistic fake data for:
+
+Market Data:
+- Major indices (S&P 500, NASDAQ, Dow)
+- Individual stocks (AAPL, MSFT, GOOGL, NVDA, TSLA, META, AMZN, TSLA)
+- Prices that update slightly on each refresh (simulate movement)
+- Realistic 52-week ranges
+- Market caps
+
+Portfolio Data (as specified earlier):
+- 6-7 holdings with shares, avg cost, current price
+- Total portfolio value
+- P&L calculations
+- Sector allocations
+
+Signals/Momentum Data:
+- Momentum scores (1-10 scale)
+- Technical indicators (RSI, moving averages)
+- Volume comparisons
+- Pattern recognition ("Bull flag detected")
+
+News/Catalysts (fake but realistic):
+- "Earnings beat expectations by 15%"
+- "FDA approval for new drug"
+- "Fed signals rate cut in Q2"
+- "Strong iPhone 15 demand in China"
+
+═══════════════════════════════════════════════════════════════════
+
+PART 5: TESTING & VALIDATION
+═══════════════════════════════════════════════════════════════════
+
+After implementation, test these conversation flows:
+
+1. "What's happening with NVDA?"
+   → Should show stock snapshot with signals
+
+2. "How's my portfolio?"
+   → Should show portfolio summary with performance
+
+3. "Buy 10 shares of AAPL"
+   → Should walk through: clarify amount → preview → confirm → execute
+
+4. "What's moving the market?"
+   → Should show market overview
+
+5. Multi-turn conversation:
+   • "Tell me about tech stocks"
+   • "What about NVDA specifically?"
+   • "Buy it" (should remember NVDA from context)
+
+6. Error handling:
+   • "asdfgh" → Should handle gracefully with suggestions
+
+═══════════════════════════════════════════════════════════════════
+
+PRIORITY: Focus on making 4-5 conversation flows feel PERFECT rather than supporting every possible query.
+
+Start with:
+1. Stock research (NVDA, AAPL)
+2. Portfolio analysis  
+3. Simple trade execution
+4. Market overview
+
+Make it feel ALIVE - smooth animations, natural language, context awareness.
+
+Build this incrementally and show me progress after each major piece.
