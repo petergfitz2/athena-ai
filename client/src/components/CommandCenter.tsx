@@ -120,6 +120,18 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages]);
   
+  // Add keyboard shortcut to close chat with Esc
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [sidebarOpen]);
+  
   // Trade modal state
   const [tradeModalOpen, setTradeModalOpen] = useState(false);
   const [tradeAction, setTradeAction] = useState<"buy" | "sell">("buy");
@@ -952,10 +964,11 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                 onClick={() => setSidebarOpen(false)}
                 variant="ghost"
                 size="icon"
-                className="rounded-full flex-shrink-0"
+                className="rounded-full flex-shrink-0 hover:bg-white/10 transition-all"
                 data-testid="button-close-sidebar"
+                title="Close chat (Esc)"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5 text-white/60 hover:text-white" />
               </Button>
             </div>
           </div>
