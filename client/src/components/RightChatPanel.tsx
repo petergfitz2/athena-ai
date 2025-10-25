@@ -116,13 +116,13 @@ export default function RightChatPanel() {
     setIsPanelOpen(false);
   };
 
-  // Don't render panel if it's not open
+  // CRITICAL: Don't render ANYTHING if panel is not explicitly opened
   if (!isPanelOpen) {
-    return null;
+    return null;  // No panel, no collapsed bar, nothing!
   }
 
   // Handle collapsed state with a minimal vertical bar on the right
-  if (isCollapsed) {
+  if (isPanelOpen && isCollapsed) {
     return (
       <AnimatePresence>
         <motion.div
