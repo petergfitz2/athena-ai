@@ -586,19 +586,19 @@ export default function CommandCenter() {
             <AIInsights />
 
             {/* Quick Actions */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-3 sm:pb-4">
-              <CardTitle className="font-medium text-base sm:text-lg">Quick Actions</CardTitle>
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300">
+            <CardHeader className="pb-4 sm:pb-6">
+              <CardTitle className="font-light text-lg sm:text-xl">Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <CardContent className="px-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {quickActions.map((action) => (
                   <Tooltip key={action.label}>
                     <TooltipTrigger asChild>
                       <Button
                         onClick={action.action}
                         variant="outline"
-                        className="rounded-[16px] h-16 sm:h-20 flex flex-col gap-1 sm:gap-2 hover-elevate active-elevate-2 p-2 sm:p-3"
+                        className="rounded-[20px] h-20 sm:h-24 flex flex-col gap-2 hover-elevate active-elevate-2 p-3 sm:p-4 backdrop-blur-xl bg-white/5 border-white/10"
                         data-testid={`button-quick-${action.label.toLowerCase()}`}
                       >
                         <action.icon className={cn("w-5 h-5 sm:w-6 sm:h-6", action.color)} />
@@ -620,14 +620,14 @@ export default function CommandCenter() {
           </Card>
 
             {/* Market Pulse - News Feed */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-4">
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300">
+            <CardHeader className="pb-4 sm:pb-6">
               <CardTitle className="flex items-center justify-between">
-                <span className="font-medium">Market Pulse</span>
-                <Activity className="w-5 h-5 text-primary" />
+                <span className="font-light text-lg sm:text-xl">Market Pulse</span>
+                <Activity className="w-5 h-5 text-primary animate-pulse" />
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4 px-6">
               {news.slice(0, 4).map((article) => {
                 const getSentimentBadgeVariant = (sentiment?: string) => {
                   if (!sentiment) return "outline";
@@ -724,10 +724,10 @@ export default function CommandCenter() {
             {/* Tertiary Section - Full-width Cards */}
             <div className="space-y-8">
             {/* Active Positions */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-3 sm:pb-4">
-              <CardTitle className="flex items-center justify-between text-base sm:text-lg">
-                <span className="font-medium">Active Positions</span>
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+            <CardHeader className="p-6 pb-4">
+              <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
+                <span className="font-light">Active Positions</span>
                 <Badge variant="outline" className="text-xs">
                   {holdings.length} Holdings
                 </Badge>
@@ -827,10 +827,10 @@ export default function CommandCenter() {
             </Card>
 
             {/* Watchlist */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-4">
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+            <CardHeader className="p-6 pb-4">
               <CardTitle className="flex items-center justify-between">
-                <span className="font-medium">Watchlist</span>
+                <span className="font-light text-lg sm:text-xl">Watchlist</span>
                 <Badge variant="outline" className="text-xs">
                   {watchlist.length} Watching
                 </Badge>
