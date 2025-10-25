@@ -296,6 +296,18 @@ export default function CommandCenter() {
   useEffect(() => {
     localStorage.setItem('athena_expanded_view', expandedView.toString());
   }, [expandedView]);
+  
+  // ESC key handler for closing the chat sidebar
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && sidebarOpen) {
+        setSidebarOpen(false);
+      }
+    };
+    
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [sidebarOpen]);
 
   const handleSendMessage = async (messageText?: string) => {
     const text = messageText || input;
