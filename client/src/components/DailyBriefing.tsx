@@ -129,12 +129,12 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
       "p-4 sm:p-6"
     )}>
       <Card className={cn(
-        "w-full max-w-2xl max-h-[90vh] bg-gradient-to-br border-white/20 shadow-2xl rounded-[28px] overflow-hidden flex flex-col",
+        "w-full max-w-2xl max-h-[85vh] bg-gradient-to-br border-white/20 shadow-2xl rounded-[28px] overflow-hidden flex flex-col",
         "animate-in slide-in-from-bottom duration-500",
         timeData.theme
       )}>
         {/* Header with Avatar */}
-        <CardHeader className="relative pb-3 border-b border-white/10">
+        <CardHeader className="relative pb-3 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <AthenaTraderAvatar size="small" showStatus={false} showName={false} />
@@ -164,7 +164,7 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="p-4 space-y-4">
+        <CardContent className="p-4 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
           {/* Quick Summary */}
           <div className="bg-primary/10 rounded-[20px] p-3 border border-primary/20">
             <p className="text-sm font-light leading-relaxed">
@@ -325,7 +325,7 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
         </CardContent>
 
         {/* Footer Actions */}
-        <div className="p-3 border-t border-white/10 flex items-center justify-between">
+        <div className="p-3 border-t border-white/10 flex items-center justify-between flex-shrink-0">
           <Button
             onClick={() => setExpanded(!expanded)}
             variant="ghost"
