@@ -933,13 +933,13 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
       
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[400px] md:w-[450px] lg:w-[480px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-2xl border-l border-white/20 transform transition-all duration-500 z-[200] shadow-2xl shadow-primary/10",
+        "fixed right-0 top-0 h-full w-full sm:w-[400px] md:w-[450px] lg:w-[480px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform transition-all duration-500 z-[200] shadow-2xl shadow-black/20",
         sidebarOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="flex flex-col h-full">
-          {/* Enhanced Chat Header */}
-          <div className="p-6 border-b border-white/20 bg-gradient-to-r from-primary/10 to-purple-600/10 backdrop-blur-xl">
-            <div className="flex items-center justify-between gap-3">
+          {/* Refined Chat Header - Minimalist Luxury */}
+          <div className="p-8 border-b border-white/10 bg-gradient-to-r from-white/[0.02] to-white/[0.04] backdrop-blur-md">
+            <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4 min-w-0">
                 <div className="flex-shrink-0">
                   <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
