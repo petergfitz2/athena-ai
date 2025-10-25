@@ -97,23 +97,13 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      {/* Show avatar for AI messages */}
-      {!isUser && (
-        <div className="flex-shrink-0">
-          <AthenaTraderAvatar
-            size="small"
-            showName={false}
-            showStatus={false}
-            className="mt-2"
-          />
-        </div>
-      )}
+      {/* No avatar in messages - only in header for cleaner design */}
       
       <div className="flex flex-col max-w-[85%] md:max-w-[75%]">
-        {/* Show avatar name for AI messages */}
-        {!isUser && activeAvatar && (
-          <p className="text-sm text-muted-foreground mb-2 ml-2">
-            {activeAvatar.name}
+        {/* Subtle name label for AI messages */}
+        {!isUser && (
+          <p className="text-xs font-light text-white/40 mb-1.5 ml-3">
+            Athena AI
           </p>
         )}
         
