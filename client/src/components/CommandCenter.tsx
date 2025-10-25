@@ -90,12 +90,20 @@ export default function CommandCenter() {
   const [location, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showBriefing, setShowBriefing] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true); // AI chat open by default for AI-native experience
+  const [showBriefing, setShowBriefing] = useState(false); // Skip briefing when chat is primary
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
-    content: "Good morning! I'm analyzing today's market opportunities for you. How can I help optimize your portfolio?",
+    content: `👋 Hi Peter! Welcome to your AI-powered investment command center.
+
+I'm Athena, your personal investment advisor. I can help you:
+• Analyze any stock instantly - just mention a ticker like AAPL or TSLA
+• Execute trades with simple commands like "buy 100 shares of NVDA"
+• Get real-time market insights and personalized recommendations
+• Research companies and sectors with institutional-grade analysis
+
+Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }]);
   const [input, setInput] = useState("");
@@ -912,22 +920,22 @@ export default function CommandCenter() {
         </div>
       </div>
       
-      {/* Athena Chat Sidebar */}
+      {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[380px] lg:w-[420px] xl:w-[450px] bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 z-50",
+        "fixed right-0 top-0 h-full w-full sm:w-[480px] lg:w-[550px] xl:w-[600px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-2xl border-l border-white/20 transform transition-all duration-500 z-50 shadow-2xl shadow-primary/10",
         sidebarOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="flex flex-col h-full">
-          {/* Chat Header */}
-          <div className="p-4 border-b border-white/10">
+          {/* Enhanced Chat Header */}
+          <div className="p-6 border-b border-white/20 bg-gradient-to-r from-primary/10 to-purple-600/10 backdrop-blur-xl">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center gap-4 min-w-0">
                 <div className="flex-shrink-0">
                   <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-medium">Athena AI</h3>
-                  <p className="text-xs text-muted-foreground truncate">Your Investment Advisor</p>
+                  <h3 className="text-xl font-light text-white">Athena AI</h3>
+                  <p className="text-sm text-white/70 truncate">Institutional-Grade AI Investment Advisor</p>
                 </div>
               </div>
               <Button
@@ -957,10 +965,10 @@ export default function CommandCenter() {
             </div>
           </ScrollArea>
           
-          {/* Chat Input - Simple and focused */}
-          <div className="p-4 border-t border-white/10">
+          {/* Enhanced Chat Input - AI-First Design */}
+          <div className="p-6 border-t border-white/20 bg-gradient-to-t from-black/50 to-transparent">
             <div className="space-y-3">
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -970,36 +978,46 @@ export default function CommandCenter() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Ask about investments, strategies, or any stock..."
-                  className="flex-1 min-h-[60px] max-h-[120px] resize-none rounded-[20px] bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  placeholder="Ask me anything: 'Analyze TSLA' • 'Buy 100 shares of AAPL' • 'What's moving the market today?'"
+                  className="flex-1 min-h-[80px] max-h-[150px] resize-none rounded-[24px] bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/50 text-base px-5 py-4 focus:border-primary/50 focus:ring-2 focus:ring-primary/30 transition-all"
                   disabled={isLoading}
                   data-testid="textarea-chat-message"
                   autoFocus
                 />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   <Button
                     onClick={() => handleSendMessage()}
                     disabled={!input.trim() || isLoading}
                     size="icon"
-                    className="rounded-full h-10 w-10"
+                    className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
                     data-testid="button-send-chat"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-5 h-5" />
                   </Button>
                   <Button
                     onClick={isRecording ? stopRecording : startRecording}
-                    variant={isRecording ? "destructive" : "ghost"}
+                    variant={isRecording ? "destructive" : "outline"}
                     size="icon"
-                    className="rounded-full h-10 w-10"
+                    className={cn(
+                      "rounded-full h-12 w-12 transition-all",
+                      isRecording 
+                        ? "bg-destructive animate-pulse shadow-lg shadow-destructive/25" 
+                        : "bg-white/10 border-white/20 hover:bg-white/15"
+                    )}
                     data-testid="button-voice-chat"
                   >
-                    {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   </Button>
                 </div>
               </div>
-              <p className="text-xs text-center text-white/40">
-                You can discuss any stock naturally - "What do you think about AAPL?"
-              </p>
+              <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center gap-1 text-xs text-white/50">
+                  <Sparkles className="w-3 h-3 text-primary" />
+                  <span>Powered by GPT-4</span>
+                </div>
+                <span className="text-white/30">•</span>
+                <span className="text-xs text-white/50">Press Enter to send, Shift+Enter for new line</span>
+              </div>
             </div>
           </div>
         </div>
