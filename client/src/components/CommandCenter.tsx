@@ -561,25 +561,16 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                 {/* Unified Conversation Interface */}
                 <Button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
-                  variant={sidebarOpen ? "default" : "outline"}
-                  size="default"
                   className={cn(
-                    "rounded-full min-h-[48px] px-5 backdrop-blur-xl transition-all duration-200",
+                    "rounded-[20px] px-4 py-2 transition-all duration-300 flex items-center gap-2",
                     sidebarOpen 
-                      ? "bg-primary shadow-lg shadow-primary/25 border-primary hover:bg-primary/90" 
-                      : "bg-white/10 border-white/20 hover:bg-white/15 hover:border-white/30"
+                      ? "bg-white/10 text-white border border-white/20 hover:bg-white/15" 
+                      : "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20"
                   )}
                   data-testid="button-athena-chat"
                 >
-                  <MessageCircle className="w-5 h-5" />
-                  <span className="ml-2 font-semibold">
-                    {sidebarOpen ? "Close" : "Talk to Athena"}
-                  </span>
-                  {!sidebarOpen && (
-                    <Badge variant="secondary" className="ml-2 px-1.5 py-0.5 text-[10px] bg-primary/20 text-primary border-primary/30">
-                      AI
-                    </Badge>
-                  )}
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Talk to Athena</span>
                 </Button>
               </div>
             </div>
