@@ -179,16 +179,23 @@ export function generateStockResponse(ticker: string): string {
   const stock = STOCK_DATA[ticker.toUpperCase()] || STOCK_DATA.NVDA;
   const isPositive = stock.change > 0;
   
-  return `${stock.ticker}: $${stock.price.toFixed(2)} (${isPositive ? '+' : ''}${stock.changePercent.toFixed(1)}%)
+  return `📊 ${stock.ticker} showing ${getMomentumDescription(stock.momentum)} momentum
 
+Current: $${stock.price.toFixed(2)} (${isPositive ? '+' : ''}${stock.changePercent.toFixed(1)}% today)
 52-week range: $${stock.fiftyTwoWeekLow}-$${stock.fiftyTwoWeekHigh}
 
-What's driving it:
+🎯 What's driving it:
 • ${stock.catalyst}
 • Volume ${stock.volumeComparison}
-• ${stock.technicalSignal}
 
-Risk to consider: ${stock.risks[0]}`;
+📈 Technical signals:
+• Momentum: ${getMomentumDescription(stock.momentum)}
+• ${stock.technicalSignal}
+• ${isPositive ? 'Trading above' : 'Testing'} key support levels
+
+⚠️ What to watch:
+• ${stock.risks[0]}
+• ${stock.risks[1] || 'Market volatility considerations'}`;
 }
 
 export function generatePortfolioResponse(holdings: any[]): string {
@@ -275,18 +282,18 @@ export function generateTradeResponse(message: string, step: number = 1): {
 }
 
 function getMomentumDescription(momentum: number): string {
-  if (momentum >= 9) return "extremely bullish";
-  if (momentum >= 7.5) return "very strong";
-  if (momentum >= 6) return "positive";
-  if (momentum >= 4) return "neutral";
-  if (momentum >= 2) return "weak";
-  return "bearish";
+  if (momentum >= 9) return "very strong uptrend";
+  if (momentum >= 7.5) return "strong uptrend";
+  if (momentum >= 6) return "moderate uptrend";
+  if (momentum >= 4) return "sideways movement";
+  if (momentum >= 2) return "weak trend";
+  return "downward trend";
 }
 
 export function generateQuickReplies(intent: string): string[] {
   switch (intent) {
     case "stock_research":
-      return ["View technicals", "Compare to peers", "Show risks", "Research further"];
+      return ["Show detailed chart", "Compare to AMD/INTC", "View analyst ratings", "Check my position"];
     case "portfolio_analysis":
       return ["Diversification analysis", "Detailed breakdown", "Top performers", "Done"];
     case "trade_execution":
