@@ -50,7 +50,7 @@ interface ChatProviderProps {
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);  // Always start closed
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("chatPanelCollapsed");
     return saved ? JSON.parse(saved) : false;
@@ -104,6 +104,11 @@ export function ChatProvider({ children }: ChatProviderProps) {
     // Default professional greeting
     return `Hi! I'm ${name}, your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?`;
   }, [activeAvatar]);
+
+  // Ensure panel starts closed on mount (explicit initialization)
+  useEffect(() => {
+    setIsPanelOpen(false);
+  }, []);
 
   // Initialize welcome message when panel first opens
   useEffect(() => {
