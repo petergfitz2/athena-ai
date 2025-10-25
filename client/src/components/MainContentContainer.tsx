@@ -9,18 +9,25 @@ interface MainContentContainerProps {
 export default function MainContentContainer({ children, className }: MainContentContainerProps) {
   const { isPanelOpen, isCollapsed } = useChatContext();
   
-  // Add left margin on desktop when chat panel is open and not collapsed
+  // Add margin when chat panel is open and not collapsed
   const shouldShift = isPanelOpen && !isCollapsed;
   
   return (
     <div 
       className={cn(
-        "transition-[margin] duration-300 ease-in-out",
-        shouldShift ? "md:ml-[400px]" : "",
+        "w-full overflow-x-hidden",
         className
       )}
     >
-      {children}
+      <div
+        className={cn(
+          "transition-[margin] duration-[0.3s] ease-in-out",
+          shouldShift ? "md:ml-[420px]" : "",
+          "min-h-screen"
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }

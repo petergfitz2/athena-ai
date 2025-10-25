@@ -130,7 +130,7 @@ export default function LeftChatPanel() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -100, opacity: 0 }}
           transition={{ type: "spring", damping: 25 }}
-          className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-1 z-30 bg-gradient-to-b from-primary/30 to-primary/10 
+          className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-1 z-40 bg-gradient-to-b from-primary/30 to-primary/10 
                      hover:w-2 cursor-pointer transition-all duration-200"
           onClick={handleExpand}
           data-testid="button-expand-chat-bar"
@@ -163,11 +163,13 @@ export default function LeftChatPanel() {
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         className="fixed md:left-0 md:top-[64px] md:bottom-0 
                    left-0 right-0 bottom-0 
-                   md:w-[400px] w-full
+                   md:w-[420px] w-full
                    md:max-h-[calc(100vh-64px)] max-h-[85vh]
-                   z-30 bg-black/95 backdrop-blur-xl 
+                   z-40 bg-black/95 backdrop-blur-xl 
                    md:border-r border-t md:border-t-0 border-white/10 
-                   flex flex-col shadow-2xl
+                   flex flex-col
+                   md:shadow-[10px_0_40px_rgba(0,0,0,0.25)]
+                   shadow-2xl
                    md:rounded-none rounded-t-[28px]"
         data-testid="left-chat-panel"
       >
