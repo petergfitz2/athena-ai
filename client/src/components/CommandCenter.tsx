@@ -542,7 +542,6 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           <div className="w-full max-w-7xl mx-auto px-6 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-light text-white">
                     {getGreeting()}
