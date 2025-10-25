@@ -33,12 +33,24 @@ export default function LeftChatPanel() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Smart auto-scroll - only scrolls if user is already at bottom
   useEffect(() => {
     if (scrollAreaRef.current) {
       const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollElement) {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
+        // Check if user is near bottom (within 100px)
+        const isNearBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight < 100;
+        
+        // Only auto-scroll if user is already near bottom
+        if (isNearBottom) {
+          // Use smooth scrolling for better UX
+          scrollElement.scrollTo({
+            top: scrollElement.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+        // If user has scrolled up, keep their position stable
+        // This allows reading while messages are generating
       }
     }
   }, [messages]);
