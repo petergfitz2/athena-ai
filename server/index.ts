@@ -1,9 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import pg from "pg";
 import { registerRoutes } from "./routes";
-import { setupAuth } from "./auth";
+import { setupAuth } from "./replitAuth";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -20,42 +17,6 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false }));
-
-// Setup session store (PostgreSQL if DATABASE_URL available, otherwise in-memory)
-let sessionStore;
-if (process.env.DATABASE_URL) {
-  const PgStore = connectPgSimple(session);
-  const pgPool = new pg.Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
-  sessionStore = new PgStore({
-    pool: pgPool,
-    createTableIfMissing: true,
-    tableName: 'session',
-  });
-  log('Using PostgreSQL session store');
-} else {
-  log('WARNING: DATABASE_URL not found, using in-memory session store (sessions will not persist across restarts)');
-}
-
-// Session middleware
-app.use(
-  session({
-    ...(sessionStore && { store: sessionStore }),
-    secret: process.env.SESSION_SECRET || "athena-secret-key-change-in-production",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days for better mobile persistence
-      sameSite: 'lax', // 'lax' is better for mobile browsers than 'strict'
-    },
-  })
-);
-
-// Setup authentication
-setupAuth(app);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -88,6 +49,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Setup Replit authentication
+  await setupAuth(app);
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

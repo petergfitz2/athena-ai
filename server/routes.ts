@@ -6,8 +6,7 @@ import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { avatarPresets } from "./avatarPresets";
-import { passport } from "./auth";
-import bcrypt from "bcrypt";
+import { isAuthenticated } from "./replitAuth";
 import { insertUserSchema, insertHoldingSchema, insertTradeSchema, type PortfolioSummary } from "@shared/schema";
 import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { processVoiceInput } from "./voice";
@@ -68,13 +67,7 @@ interface DemoConversation {
 // Store demo conversations in memory (resets on server restart)
 const demoConversations: Map<string, DemoConversation> = new Map();
 
-// Middleware to require authentication
-function requireAuth(req: any, res: any, next: any) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401).json({ error: "Unauthorized" });
-}
+// Use isAuthenticated from replitAuth for protected routes
 
 // Helper function to generate mode change reason
 function getModeChangeReason(
@@ -116,224 +109,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error('Error initializing preset avatars:', err);
   });
 
-  // Authentication routes
-  app.post("/api/auth/register", async (req, res, next) => {
+  // Authentication routes - using Replit Auth
+  // Replit Auth handles login/callback/logout routes automatically
+  
+  // Get current user endpoint
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const { username, email, password, fullName } = insertUserSchema.parse(req.body);
-
-      // Check if user already exists
-      const existingUser = await storage.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(400).json({ error: "Username already exists" });
-      }
-
-      const existingEmail = await storage.getUserByEmail(email);
-      if (existingEmail) {
-        return res.status(400).json({ error: "Email already exists" });
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Create user
-      const user = await storage.createUser({
-        username,
-        email,
-        password: hashedPassword,
-        fullName,
-      });
-
-      // Log the user in
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.json({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName,
-        });
-      });
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: error.errors });
-      }
-      next(error);
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  app.post("/api/auth/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: any, info: any) => {
-      if (err) {
-        return res.status(500).json({ error: "Authentication error" });
-      }
-      if (!user) {
-        return res.status(401).json({ error: info?.message || "Invalid credentials" });
-      }
-      req.login(user, (loginErr) => {
-        if (loginErr) {
-          return res.status(500).json({ error: "Login failed" });
-        }
-        res.json({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName,
-        });
-      });
-    })(req, res, next);
-  });
-
-  app.post("/api/auth/logout", (req, res) => {
-    req.logout((err) => {
-      if (err) {
-        return res.status(500).json({ error: "Logout failed" });
-      }
-      req.session.destroy((err) => {
-        if (err) {
-          return res.status(500).json({ error: "Session destruction failed" });
-        }
-        res.clearCookie('connect.sid');
-        res.json({ success: true });
-      });
-    });
-  });
-
-  app.get("/api/auth/me", (req, res) => {
-    if (req.isAuthenticated()) {
-      const user = req.user as any;
+  // Note: Logout is handled by Replit Auth at /api/logout
+  
+  app.get("/api/auth/me", (req: any, res) => {
+    if (req.isAuthenticated() && req.user) {
+      const user = req.user;
       res.json({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        fullName: user.fullName,
+        id: user.claims.sub,
+        email: user.claims.email,
+        firstName: user.claims.first_name,
+        lastName: user.claims.last_name,
+        profileImageUrl: user.claims.profile_image_url,
       });
     } else {
       res.status(401).json({ error: "Not authenticated" });
-    }
-  });
-
-  // Password reset endpoints
-  app.post("/api/auth/request-password-reset", async (req, res) => {
-    try {
-      const { email } = req.body;
-      const user = await storage.getUserByEmail(email);
-      
-      if (user) {
-        // Generate reset token
-        const crypto = require('crypto');
-        const token = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
-        
-        // Save token to database
-        await storage.createPasswordResetToken(user.id, token, expiresAt);
-        
-        // In production, send email with reset link
-        // For now, just return the token (in production, remove this)
-        console.log(`Password reset link: /reset-password?token=${token}`);
-      }
-      
-      // Always return success to prevent email enumeration
-      res.json({ success: true, message: "If the email exists, a reset link has been sent" });
-    } catch (error) {
-      console.error('Password reset request error:', error);
-      res.status(500).json({ error: "Failed to process password reset request" });
-    }
-  });
-
-  app.post("/api/auth/reset-password", async (req, res) => {
-    try {
-      const { token, newPassword } = req.body;
-      
-      if (!token || !newPassword) {
-        return res.status(400).json({ error: "Token and new password are required" });
-      }
-      
-      // Get token from database
-      const resetToken = await storage.getPasswordResetToken(token);
-      
-      if (!resetToken) {
-        return res.status(400).json({ error: "Invalid or expired token" });
-      }
-      
-      // Check if token is expired
-      if (new Date() > new Date(resetToken.expiresAt)) {
-        return res.status(400).json({ error: "Token has expired" });
-      }
-      
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      
-      // Update user's password
-      await storage.updateUserPassword(resetToken.userId, hashedPassword);
-      
-      // Mark token as used
-      await storage.markPasswordResetTokenAsUsed(token);
-      
-      res.json({ success: true, message: "Password has been reset successfully" });
-    } catch (error) {
-      console.error('Password reset error:', error);
-      res.status(500).json({ error: "Failed to reset password" });
-    }
-  });
-
-  // Google OAuth endpoints
-  app.post("/api/auth/google", async (req, res) => {
-    try {
-      const { googleId, email, name, picture } = req.body;
-      
-      if (!googleId || !email) {
-        return res.status(400).json({ error: "Invalid Google authentication data" });
-      }
-      
-      // Check if user exists with this Google ID
-      let user = await storage.getUserByEmail(email);
-      
-      if (user) {
-        // Update user with Google ID if they don't have one
-        if (!user.googleId) {
-          await db.update(users)
-            .set({ 
-              googleId, 
-              authProvider: 'google',
-              profileImageUrl: picture || user.profileImageUrl 
-            })
-            .where(eq(users.id, user.id));
-        }
-      } else {
-        // Create new user with Google auth
-        const username = email.split('@')[0] + '_' + googleId.substring(0, 6);
-        user = await storage.createUser({
-          username,
-          email,
-          password: null, // No password for Google users
-          fullName: name || '',
-        });
-        
-        // Update with Google-specific fields
-        await db.update(users)
-          .set({ 
-            googleId, 
-            authProvider: 'google',
-            profileImageUrl: picture 
-          })
-          .where(eq(users.id, user.id));
-      }
-      
-      // Log the user in
-      req.login(user, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Failed to log in" });
-        }
-        res.json({
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName,
-        });
-      });
-    } catch (error) {
-      console.error('Google auth error:', error);
-      res.status(500).json({ error: "Google authentication failed" });
     }
   });
 
@@ -378,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/holdings", requireAuth, async (req, res) => {
+  app.post("/api/holdings", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const holdingData = insertHoldingSchema.parse({
@@ -395,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/holdings/:id", requireAuth, async (req, res) => {
+  app.patch("/api/holdings/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const holding = await storage.updateHolding(id, req.body);
@@ -408,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/holdings/:id", requireAuth, async (req, res) => {
+  app.delete("/api/holdings/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const success = await storage.deleteHolding(id);
@@ -422,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Trade routes
-  app.get("/api/trades", requireAuth, async (req, res) => {
+  app.get("/api/trades", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       let trades = await storage.getUserTrades(user.id);
@@ -475,7 +279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/trades/pending", requireAuth, async (req, res) => {
+  app.get("/api/trades/pending", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const trades = await storage.getPendingTrades(user.id);
@@ -485,7 +289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trades", requireAuth, async (req, res) => {
+  app.post("/api/trades", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const tradeData = insertTradeSchema.parse({
@@ -503,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/trades/:id/status", requireAuth, async (req, res) => {
+  app.patch("/api/trades/:id/status", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -523,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Execute trade (buy/sell with order types)
-  app.post("/api/trades/execute", requireAuth, async (req, res) => {
+  app.post("/api/trades/execute", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const schema = z.object({
@@ -841,7 +645,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/watchlist", requireAuth, async (req, res) => {
+  app.post("/api/watchlist", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const { symbol } = req.body;
@@ -852,7 +656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/watchlist/:id", requireAuth, async (req, res) => {
+  app.delete("/api/watchlist/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
       const success = await storage.removeFromWatchlist(id);
@@ -1018,7 +822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI Trade Suggestions endpoint
-  app.get("/api/ai/trade-suggestions", requireAuth, async (req, res) => {
+  app.get("/api/ai/trade-suggestions", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const holdings = await storage.getUserHoldings(user.id);
@@ -1059,7 +863,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/avatars/active", requireAuth, async (req, res) => {
+  app.get("/api/avatars/active", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const activeAvatar = await storage.getActiveAvatar(user.id);
@@ -1085,7 +889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/avatars/history", requireAuth, async (req, res) => {
+  app.get("/api/avatars/history", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const history = await storage.getUserAvatarHistory(user.id);
@@ -1096,7 +900,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/avatars/custom", requireAuth, upload.single('avatar'), async (req, res) => {
+  app.post("/api/avatars/custom", isAuthenticated, upload.single('avatar'), async (req, res) => {
     try {
       const user = req.user as any;
       const { name, personality, tradingStyle, appearance } = req.body;
@@ -1172,7 +976,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/avatars/:id/select", requireAuth, async (req, res) => {
+  app.post("/api/avatars/:id/select", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const avatarIdentifier = req.params.id;
@@ -1217,7 +1021,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Voice Chat endpoint
-  app.post("/api/voice/chat", requireAuth, async (req, res) => {
+  app.post("/api/voice/chat", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const { audio } = req.body;
@@ -1363,7 +1167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/market/quotes", requireAuth, async (req, res) => {
+  app.get("/api/market/quotes", isAuthenticated, async (req, res) => {
     try {
       const user = req.user as any;
       const holdings = await storage.getUserHoldings(user.id);
@@ -1531,7 +1335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Account management routes
-  app.post("/api/account/deposit", requireAuth, async (req, res) => {
+  app.post("/api/account/deposit", isAuthenticated, async (req, res) => {
     try {
       const schema = z.object({
         amount: z.string().or(z.number()),
@@ -1564,7 +1368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/account/withdraw", requireAuth, async (req, res) => {
+  app.post("/api/account/withdraw", isAuthenticated, async (req, res) => {
     try {
       const schema = z.object({
         amount: z.string().or(z.number()),
@@ -1603,7 +1407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User profile routes
-  app.patch("/api/user/profile", requireAuth, async (req, res) => {
+  app.patch("/api/user/profile", isAuthenticated, async (req, res) => {
     try {
       const schema = z.object({
         fullName: z.string().optional(),
@@ -1624,7 +1428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/user/password", requireAuth, async (req, res) => {
+  app.patch("/api/user/password", isAuthenticated, async (req, res) => {
     try {
       const schema = z.object({
         currentPassword: z.string(),
@@ -1660,7 +1464,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Portfolio visualization routes
-  app.get("/api/portfolio/performance", requireAuth, async (req, res) => {
+  app.get("/api/portfolio/performance", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
       const holdings = await storage.getUserHoldings(userId);
@@ -1690,7 +1494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/portfolio/sectors", requireAuth, async (req, res) => {
+  app.get("/api/portfolio/sectors", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
       let holdings = await storage.getUserHoldings(userId);
@@ -1759,7 +1563,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/portfolio/risk-metrics", requireAuth, async (req, res) => {
+  app.get("/api/portfolio/risk-metrics", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
       const holdings = await storage.getUserHoldings(userId);
@@ -1848,7 +1652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Analytics routes
-  app.get("/api/analytics/correlation", requireAuth, async (req, res) => {
+  app.get("/api/analytics/correlation", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
       const holdings = await storage.getUserHoldings(userId);
@@ -1928,7 +1732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/factors", requireAuth, async (req, res) => {
+  app.get("/api/analytics/factors", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
       const holdings = await storage.getUserHoldings(userId);
@@ -1974,7 +1778,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/regime", requireAuth, async (req, res) => {
+  app.get("/api/analytics/regime", isAuthenticated, async (req, res) => {
     try {
       // Get market indices to determine regime
       const indices = await getMarketIndices();
@@ -2019,7 +1823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/stress-test", requireAuth, async (req, res) => {
+  app.get("/api/analytics/stress-test", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
       const holdings = await storage.getUserHoldings(userId);
