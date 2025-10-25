@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiJson } from "@/lib/queryClient";
@@ -111,6 +111,14 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [expandedView, setExpandedView] = useState(localStorage.getItem('athena_expanded_view') === 'true');
   const [searchInput, setSearchInput] = useState("");
+  
+  // Ref for auto-scroll
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages]);
   
   // Trade modal state
   const [tradeModalOpen, setTradeModalOpen] = useState(false);
@@ -965,6 +973,8 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                   <span className="text-sm">Analyzing...</span>
                 </div>
               )}
+              {/* Auto-scroll anchor */}
+              <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
           
