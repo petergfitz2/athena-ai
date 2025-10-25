@@ -143,13 +143,14 @@ export async function setupAuth(app: Express) {
   }
   
   // Also register for localhost (for development)
-  // Use the actual Replit domain for callback even when accessed as localhost
+  // Use the first Replit domain for callback even when accessed as localhost
+  const firstReplitDomain = process.env.REPLIT_DOMAINS!.split(",")[0];
   const localhostStrategy = new Strategy(
     {
       name: `replitauth:localhost`,
       config,
       scope: "openid email profile offline_access",
-      callbackURL: `https://${process.env.REPLIT_DOMAINS}/api/callback`,
+      callbackURL: `https://${firstReplitDomain}/api/callback`,
     },
     verify,
   );
