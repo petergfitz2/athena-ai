@@ -551,10 +551,7 @@ export default function CommandCenter() {
         </div>
         
         {/* Main Content Area */}
-        <div className={cn(
-          "w-full max-w-7xl mx-auto px-6 py-6 transition-all duration-300",
-          sidebarOpen ? "lg:mr-[420px]" : ""
-        )}>
+        <div className="w-full max-w-7xl mx-auto px-6 py-6 transition-all duration-300">
           
           {/* Daily Briefing - Compact placement */}
           {showBriefing && (
@@ -918,14 +915,14 @@ export default function CommandCenter() {
         <div className="flex flex-col h-full">
           {/* Chat Header */}
           <div className="p-4 border-b border-white/10">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 flex-1">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="flex-shrink-0">
-                  <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
+                  <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 </div>
-                <div className="min-w-0 flex-1">
+                <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-medium">Athena AI</h3>
-                  <p className="text-xs text-muted-foreground">Your Investment Advisor</p>
+                  <p className="text-xs text-muted-foreground truncate">Your Investment Advisor</p>
                 </div>
               </div>
               <Button
