@@ -114,6 +114,8 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
   
   // Ref for auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Ref for chat input to maintain focus
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
   
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -376,6 +378,10 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
       });
     } finally {
       setIsLoading(false);
+      // Keep focus on the input field for continuous conversation
+      setTimeout(() => {
+        chatInputRef.current?.focus();
+      }, 100);
     }
   };
 
@@ -995,6 +1001,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
             <div className="space-y-3">
               <div className="flex gap-3">
                 <Textarea
+                  ref={chatInputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
