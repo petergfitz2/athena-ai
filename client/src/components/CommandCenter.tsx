@@ -510,12 +510,12 @@ export default function CommandCenter() {
               <div className="flex items-center gap-4">
                 <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 <div>
-                  <h1 className="text-lg sm:text-xl font-medium text-foreground">
+                  <h1 className="text-xl sm:text-2xl font-light text-white">
                     {getGreeting()}
                   </h1>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-1">
                     <marketStatus.icon className="w-4 h-4" />
-                    <span className={cn("text-sm", marketStatus.color)}>
+                    <span className={cn("text-sm font-medium", marketStatus.color)}>
                       {marketStatus.text}
                     </span>
                   </div>
@@ -650,23 +650,23 @@ export default function CommandCenter() {
                 return (
                   <Card 
                     key={article.id} 
-                    className="p-3 bg-white/5 hover:bg-white/10 border-white/10 cursor-pointer transition-all duration-200 hover:scale-[1.02] rounded-[16px]"
+                    className="p-4 bg-white/5 hover:bg-white/10 border-white/10 cursor-pointer transition-all duration-200 hover:scale-[1.02] rounded-[20px]"
                     onClick={() => handleNewsClick(article)}
                     data-testid={`news-item-${article.id}`}
                   >
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-foreground line-clamp-2 hover:text-primary transition-colors">
+                      <p className="text-sm font-medium text-white line-clamp-2 hover:text-primary transition-colors">
                         {article.title}
                       </p>
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {article.source && (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-xs text-white/60 font-light">
                               {article.source}
                             </span>
                           )}
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-white/60 font-light">
                             {new Date(article.publishedAt).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit',
