@@ -949,14 +949,6 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
-      {/* Backdrop overlay for chat - luxury dimming effect */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[199] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
         "fixed right-0 top-0 h-full w-full sm:w-[320px] md:w-[340px] lg:w-[360px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
