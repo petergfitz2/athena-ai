@@ -946,7 +946,6 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xl font-light text-white">Athena AI</h3>
-                  <p className="text-sm text-white/70 truncate">Institutional-Grade AI Investment Advisor</p>
                 </div>
               </div>
               <Button
