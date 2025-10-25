@@ -12,6 +12,7 @@ import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { processVoiceInput } from "./voice";
 import { ConversationAnalyzer } from "./conversationAnalyzer";
 import { getMarketIndices, getQuote, getBatchQuotes, getNews, getHistoricalData } from "./services/marketService";
+import MarketStreamService from "./services/marketStream";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -1882,6 +1883,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced portfolio analytics endpoints
+  app.get("/api/analytics/performance-metrics", isAuthenticated, async (req, res) => {
+    try {
+      const { portfolioAnalytics } = await import("./services/portfolioAnalytics");
+      const userId = (req.user as any).id;
+      const metrics = await portfolioAnalytics.getPerformanceMetrics(userId);
+      res.json(metrics);
+    } catch (error) {
+      console.error("Performance metrics error:", error);
+      res.status(500).json({ error: "Failed to calculate performance metrics" });
+    }
+  });
+
+  app.get("/api/analytics/correlation-matrix", isAuthenticated, async (req, res) => {
+    try {
+      const { portfolioAnalytics } = await import("./services/portfolioAnalytics");
+      const userId = (req.user as any).id;
+      const correlations = await portfolioAnalytics.getCorrelationMatrix(userId);
+      res.json(correlations);
+    } catch (error) {
+      console.error("Correlation matrix error:", error);
+      res.status(500).json({ error: "Failed to calculate correlation matrix" });
+    }
+  });
+
+  app.get("/api/analytics/risk-metrics", isAuthenticated, async (req, res) => {
+    try {
+      const { portfolioAnalytics } = await import("./services/portfolioAnalytics");
+      const userId = (req.user as any).id;
+      const riskMetrics = await portfolioAnalytics.getRiskMetrics(userId);
+      res.json(riskMetrics);
+    } catch (error) {
+      console.error("Risk metrics error:", error);
+      res.status(500).json({ error: "Failed to calculate risk metrics" });
+    }
+  });
+
   app.get("/api/analytics/stress-test", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
@@ -1940,7 +1978,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
   
   // Initialize market streaming service
-  const MarketStreamService = require('./services/marketStream').default;
   const marketStream = new MarketStreamService(wss);
 
   // Cleanup on server shutdown
