@@ -552,34 +552,36 @@ export default function CommandCenter() {
           </div>
         </div>
         
-        {/* Main Content Area */}
-        <div className="w-full max-w-7xl mx-auto px-6 py-6 transition-all duration-300">
+        {/* Main Content Area - Luxury Grid Layout */}
+        <div className="w-full px-8 py-8 transition-all duration-300">
           
-          {/* Daily Briefing - Compact placement */}
+          {/* Daily Briefing - Floating Above Content */}
           {showBriefing && (
-            <div className="mb-6">
+            <div className="mb-8">
               <DailyBriefing onDismiss={() => setShowBriefing(false)} />
             </div>
           )}
           
-          {/* Hero Section - Portfolio & Market Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Portfolio Snapshot - Primary Focus */}
-            <div className="lg:col-span-1">
-              <PortfolioSnapshot 
-                portfolioSummary={portfolioSummary} 
-                topMovers={topMovers} 
-              />
+          {/* Master Grid - Clean 3-Column Layout with Proper Hierarchy */}
+          <div className="max-w-[1600px] mx-auto">
+            {/* Primary Section - Portfolio & Market Data */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+              {/* Portfolio Snapshot - Primary Focus */}
+              <div className="xl:col-span-1">
+                <PortfolioSnapshot 
+                  portfolioSummary={portfolioSummary} 
+                  topMovers={topMovers} 
+                />
+              </div>
+              
+              {/* Market Overview - Equal Importance */}
+              <div className="xl:col-span-1">
+                <MarketOverview onTrade={handleOpenTradeModal} />
+              </div>
             </div>
             
-            {/* Market Overview - Secondary */}
-            <div className="lg:col-span-1">
-              <MarketOverview onTrade={handleOpenTradeModal} />
-            </div>
-          </div>
-          
-          {/* Secondary Grid - Supporting Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Secondary Section - Action Items & Insights */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* AI Insights */}
             <AIInsights />
 
@@ -719,8 +721,8 @@ export default function CommandCenter() {
             </Card>
           </div>
           
-          {/* Tertiary Section - Full-width Cards */}
-          <div className="space-y-6 mt-6">
+            {/* Tertiary Section - Full-width Cards */}
+            <div className="space-y-8">
             {/* Active Positions */}
             <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-3 sm:pb-4">
@@ -905,6 +907,7 @@ export default function CommandCenter() {
               )}
             </CardContent>
             </Card>
+          </div>
           </div>
         </div>
       </div>
