@@ -522,28 +522,30 @@ export default function CommandCenter() {
                 </div>
               </div>
             
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {!user && <DemoModeBanner inline />}
-                <Button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  variant={isRecording ? "destructive" : "default"}
-                  size="default"
-                  className="rounded-full min-h-[44px] px-4"
-                  data-testid="button-voice-command"
-                >
-                  {isRecording ? <Square className="w-4 h-4 sm:mr-2" /> : <Mic className="w-4 h-4 sm:mr-2" />}
-                  <span className="hidden sm:inline font-semibold">{isRecording ? "Recording..." : "Voice"}</span>
-                </Button>
+                {/* Unified Conversation Interface */}
                 <Button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
-                  variant="outline"
+                  variant={sidebarOpen ? "default" : "outline"}
                   size="default"
-                  className="rounded-full min-h-[44px] px-4 bg-black/60 backdrop-blur-xl border-white/10"
-                  data-testid="button-toggle-chat"
+                  className={cn(
+                    "rounded-full min-h-[48px] px-5 backdrop-blur-xl transition-all duration-200",
+                    sidebarOpen 
+                      ? "bg-primary shadow-lg shadow-primary/25 border-primary hover:bg-primary/90" 
+                      : "bg-white/10 border-white/20 hover:bg-white/15 hover:border-white/30"
+                  )}
+                  data-testid="button-athena-chat"
                 >
-                  <MessageCircle className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline font-semibold">Chat</span>
-                  {sidebarOpen && <X className="w-4 h-4 ml-1" />}
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="ml-2 font-semibold">
+                    {sidebarOpen ? "Close" : "Talk to Athena"}
+                  </span>
+                  {!sidebarOpen && (
+                    <Badge variant="secondary" className="ml-2 px-1.5 py-0.5 text-[10px] bg-primary/20 text-primary border-primary/30">
+                      AI
+                    </Badge>
+                  )}
                 </Button>
               </div>
             </div>
