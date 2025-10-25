@@ -127,47 +127,33 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
   if (dismissed) return null;
 
   return (
-    <div className={cn(
-      "fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300",
-      "p-6 sm:p-8"
-    )}>
-      <Card className={cn(
-        "w-full max-w-2xl max-h-[75vh] bg-gradient-to-br border-white/20 shadow-2xl rounded-[28px] overflow-hidden flex flex-col",
-        "animate-in slide-in-from-bottom duration-500",
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+      <div className={cn(
+        "bg-gradient-to-br rounded-[28px] p-4",
         timeData.theme
       )}>
         {/* Header with Avatar */}
-        <CardHeader className="relative pb-3 border-b border-white/10 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <AthenaTraderAvatar size="small" showStatus={false} showName={false} />
-              <div>
-                <CardTitle className="text-lg font-light flex items-center gap-2">
-                  <TimeIcon className="w-4 h-4 text-primary" />
-                  {timeData.greeting} Briefing
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
-                </p>
-              </div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <AthenaTraderAvatar size="small" showStatus={false} showName={false} />
+            <div>
+              <h3 className="text-lg font-light flex items-center gap-2">
+                <TimeIcon className="w-4 h-4 text-primary" />
+                {timeData.greeting} Briefing
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </p>
             </div>
-            <Button
-              onClick={handleDismiss}
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-white/10"
-              data-testid="button-dismiss-briefing"
-            >
-              <X className="w-5 h-5" />
-            </Button>
           </div>
-        </CardHeader>
+        </div>
+      </div>
 
-        <CardContent className="p-4 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+      <div className="space-y-4 px-2">
           {/* Quick Summary */}
           <div className="bg-primary/10 rounded-[20px] p-3 border border-primary/20">
             <p className="text-sm font-light leading-relaxed">
@@ -325,49 +311,48 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
               </div>
             </div>
           )}
-        </CardContent>
+      </div>
 
-        {/* Footer Actions */}
-        <div className="p-3 border-t border-white/10 flex items-center justify-between flex-shrink-0">
+      {/* Footer Actions */}
+      <div className="p-3 border-t border-white/10 flex items-center justify-between">
+        <Button
+          onClick={() => setExpanded(!expanded)}
+          variant="ghost"
+          size="sm"
+          className="rounded-full text-xs"
+          data-testid="button-toggle-briefing"
+        >
+          {expanded ? "Show Less" : "Show More"}
+          <ChevronRight className={cn(
+            "w-3 h-3 ml-1 transition-transform",
+            expanded && "rotate-90"
+          )} />
+        </Button>
+        <div className="flex gap-2">
           <Button
-            onClick={() => setExpanded(!expanded)}
-            variant="ghost"
+            onClick={() => {
+              // Would open full dashboard with briefing details
+              handleDismiss();
+            }}
+            variant="outline"
             size="sm"
             className="rounded-full text-xs"
-            data-testid="button-toggle-briefing"
+            data-testid="button-view-later"
           >
-            {expanded ? "Show Less" : "Show More"}
-            <ChevronRight className={cn(
-              "w-3 h-3 ml-1 transition-transform",
-              expanded && "rotate-90"
-            )} />
+            <Clock className="w-3 h-3 mr-1" />
+            Later
           </Button>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => {
-                // Would open full dashboard with briefing details
-                handleDismiss();
-              }}
-              variant="outline"
-              size="sm"
-              className="rounded-full text-xs"
-              data-testid="button-view-later"
-            >
-              <Clock className="w-3 h-3 mr-1" />
-              Later
-            </Button>
-            <Button
-              onClick={handleDismiss}
-              size="sm"
-              className="rounded-full text-xs"
-              data-testid="button-start-trading"
-            >
-              <Sparkles className="w-3 h-3 mr-1" />
-              Start Trading
-            </Button>
-          </div>
+          <Button
+            onClick={handleDismiss}
+            size="sm"
+            className="rounded-full text-xs"
+            data-testid="button-start-trading"
+          >
+            <Sparkles className="w-3 h-3 mr-1" />
+            Start Trading
+          </Button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
   TrendingUp, TrendingDown, Plus, ArrowUpRight, ShoppingCart, 
   Sparkles, Wallet, BookOpen, MessageCircle, Newspaper, 
   HelpCircle, Target, DollarSign, Activity, Briefcase, 
-  ChevronRight, Eye, Zap, ArrowRight 
+  ChevronRight, Eye, Zap, ArrowRight, FileText 
 } from "lucide-react";
 import type { PortfolioSummary, Holding, MarketQuote, NewsArticle } from "@shared/schema";
 import { apiJson, queryClient } from "@/lib/queryClient";
@@ -24,6 +24,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import DailyBriefing from "@/components/DailyBriefing";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 function SimplifiedDashboardContent() {
   const { user } = useAuth();
@@ -31,6 +38,19 @@ function SimplifiedDashboardContent() {
   const [, setLocation] = useLocation();
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [selectedNewsArticle, setSelectedNewsArticle] = useState<NewsArticle | null>(null);
+  const [showDailyBriefing, setShowDailyBriefing] = useState(false);
+  
+  // Check if we should show the daily briefing on initial load
+  useEffect(() => {
+    const lastShown = localStorage.getItem('athena_briefing_last_shown');
+    const today = new Date().toDateString();
+    
+    // Show daily briefing if it hasn't been shown today
+    if (lastShown !== today) {
+      setShowDailyBriefing(true);
+      localStorage.setItem('athena_briefing_last_shown', today);
+    }
+  }, []);
 
   const { data: summary, isLoading: summaryLoading } = useQuery<PortfolioSummary>({
     queryKey: ['/api/portfolio/summary'],
@@ -86,13 +106,24 @@ function SimplifiedDashboardContent() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         
         {/* Simplified Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-extralight mb-2">
-            Welcome back, {user?.fullName || user?.username}
-          </h1>
-          <p className="text-muted-foreground font-light">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extralight mb-2">
+              Welcome back, {user?.fullName || user?.username}
+            </h1>
+            <p className="text-muted-foreground font-light">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowDailyBriefing(true)}
+            className="bg-gradient-to-r from-primary/80 to-purple-600/80 hover:from-primary hover:to-purple-600 text-white rounded-[28px] shadow-xl shadow-primary/20"
+            size="lg"
+            data-testid="button-daily-briefing"
+          >
+            <FileText className="w-5 h-5 mr-2" />
+            Daily Briefing
+          </Button>
         </div>
 
         {/* Start Here Section - Only show for new/empty portfolios */}
@@ -495,6 +526,16 @@ function SimplifiedDashboardContent() {
           onClose={() => setSelectedNewsArticle(null)}
         />
       )}
+      
+      {/* Daily Briefing Modal */}
+      <Dialog open={showDailyBriefing} onOpenChange={setShowDailyBriefing}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black/95 border-white/10 rounded-[28px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-light text-white">Your Daily Investment Briefing</DialogTitle>
+          </DialogHeader>
+          <DailyBriefing onDismiss={() => setShowDailyBriefing(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
