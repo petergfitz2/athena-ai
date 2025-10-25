@@ -588,8 +588,8 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         
         {/* Main Content Area - Luxury Grid Layout */}
         <div className={cn(
-          "w-full px-8 py-8 transition-all duration-300",
-          sidebarOpen ? "sm:mr-[400px] md:mr-[450px] lg:mr-[480px]" : "" // Account for chat sidebar width
+          "w-full px-8 py-8 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          sidebarOpen ? "sm:mr-[360px] md:mr-[380px] lg:mr-[400px]" : "" // Account for chat sidebar width
         )}>
           
           {/* Daily Briefing - Floating Above Content */}
@@ -949,12 +949,25 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
+      {/* Backdrop overlay for chat - luxury dimming effect */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[199] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[400px] md:w-[450px] lg:w-[480px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform transition-all duration-500 z-[200] shadow-2xl shadow-black/20",
-        sidebarOpen ? "translate-x-0" : "translate-x-full"
+        "fixed right-0 top-0 h-full w-full sm:w-[360px] md:w-[380px] lg:w-[400px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
+        sidebarOpen 
+          ? "translate-x-0 opacity-100 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]" 
+          : "translate-x-full opacity-95 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
       )}>
-        <div className="flex flex-col h-full">
+        <div className={cn(
+          "flex flex-col h-full transition-all duration-700",
+          sidebarOpen ? "scale-100" : "scale-[0.98]"
+        )}>
           {/* Refined Chat Header - Minimalist Luxury */}
           <div className="p-8 border-b border-white/10 bg-gradient-to-r from-white/[0.02] to-white/[0.04] backdrop-blur-md">
             <div className="flex items-center justify-between gap-4">
