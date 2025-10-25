@@ -15,12 +15,10 @@ export default function OnboardingDrawer() {
   useEffect(() => {
     // Check if user has seen onboarding
     const seen = localStorage.getItem("hasSeenOnboarding");
-    if (!seen) {
-      setIsOpen(true);
-      setHasSeenOnboarding(false);
-    } else {
+    if (seen) {
       setHasSeenOnboarding(true);
     }
+    // Start closed instead of auto-opening
   }, []);
 
   const handleDismiss = () => {
@@ -29,19 +27,18 @@ export default function OnboardingDrawer() {
     setHasSeenOnboarding(true);
   };
 
-  // Don't show the drawer if user has seen onboarding and it's closed
-  if (hasSeenOnboarding && !isOpen) {
+  // Always show the help button in bottom-right corner when drawer is closed
+  if (!isOpen) {
     return (
-      <div className="fixed top-20 right-4 z-40">
+      <div className="fixed bottom-6 right-6 z-40">
         <Button
-          variant="outline"
-          size="sm"
+          variant="default"
+          size="default"
           onClick={() => setIsOpen(true)}
-          className="rounded-full bg-black/60 backdrop-blur-xl border-white/10 hover:bg-white/10"
+          className="rounded-full min-h-[56px] min-w-[56px] p-0 shadow-lg bg-primary hover:bg-primary/90"
           data-testid="button-show-help"
         >
-          <BookOpen className="w-4 h-4 mr-2" />
-          Help & Guides
+          <BookOpen className="w-6 h-6" />
         </Button>
       </div>
     );
