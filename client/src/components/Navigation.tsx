@@ -67,13 +67,13 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
     }
   };
 
-  // Core navigation items - always visible with text
+  // Simplified navigation items - text only
   const navLinks = [
-    { href: "/command-center", label: "Dashboard", icon: LayoutDashboard, shortcut: "⌘D" },
-    { href: "/portfolio", label: "Portfolio", icon: Briefcase, shortcut: "⌘P" },
-    { href: "/watchlist", label: "Watchlist", icon: ListChecks, shortcut: "⌘W" },
-    { href: "/trades", label: "Trades", icon: TrendingUp, shortcut: "⌘T" },
-    { href: "/analytics", label: "Analytics", icon: Activity, shortcut: "⌘A" },
+    { href: "/command-center", label: "Dashboard", shortcut: "⌘D" },
+    { href: "/portfolio", label: "Portfolio", shortcut: "⌘P" },
+    { href: "/watchlist", label: "Watchlist", shortcut: "⌘W" },
+    { href: "/trades", label: "Trades", shortcut: "⌘T" },
+    { href: "/profile", label: "Profile", shortcut: "⌘U" },
   ];
 
   const modes = [
@@ -140,9 +140,9 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             e.preventDefault();
             setLocation('/trades');
             break;
-          case 'a':
+          case 'u':
             e.preventDefault();
-            setLocation('/analytics');
+            setLocation('/profile');
             break;
           case '1':
             e.preventDefault();
@@ -302,25 +302,33 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
               />
             </motion.div>
 
-            {/* Navigation Links - Hidden on Mobile */}
-            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+            {/* Navigation Links - Text only with underline animation */}
+            <div className="hidden md:flex items-center gap-8 flex-shrink-0">
               {navLinks.map((link) => {
-                const Icon = link.icon;
                 const active = isActive(link.href);
                 return (
                   <Tooltip key={link.href}>
                     <TooltipTrigger asChild>
                       <Link 
                         href={link.href}
-                        className={`flex items-center gap-2 min-h-[44px] h-11 px-4 rounded-full text-sm transition-all relative flex-shrink-0 ${
-                          active
-                            ? "bg-primary/20 text-primary font-bold"
-                            : "text-white font-semibold hover:text-white hover:bg-white/10"
-                        }`}
+                        className="relative group py-2 transition-colors"
                         data-testid={`link-${link.label.toLowerCase()}`}
                       >
-                        <Icon className="w-5 h-5" />
-                        <span className="font-semibold">{link.label}</span>
+                        <span className={`text-sm font-medium transition-colors ${
+                          active
+                            ? "text-primary"
+                            : "text-white/80 hover:text-white"
+                        }`}>
+                          {link.label}
+                        </span>
+                        {/* Underline animation */}
+                        <span 
+                          className={`absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300 ${
+                            active 
+                              ? "w-full" 
+                              : "w-0 group-hover:w-full"
+                          }`}
+                        />
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent className="text-xs">
@@ -556,9 +564,8 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 
                 <div className="border-t border-white/10 my-2"></div>
                 
-                {/* Navigation Links */}
+                {/* Navigation Links - Text only */}
                 {navLinks.map((link) => {
-                  const Icon = link.icon;
                   const active = isActive(link.href);
                   return (
                     <Link 
@@ -572,7 +579,6 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       }`}
                       data-testid={`mobile-link-${link.label.toLowerCase()}`}
                     >
-                      <Icon className="w-5 h-5" />
                       <span className="flex-1">{link.label}</span>
                       {active && (
                         <div className="w-1 h-6 bg-primary rounded-full" />
