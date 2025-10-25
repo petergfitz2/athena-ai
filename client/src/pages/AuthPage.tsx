@@ -129,13 +129,18 @@ export default function AuthPage() {
             {/* Main CTA Button */}
             <Button
               onClick={handleLogin}
-              className="w-full rounded-[28px] h-14 text-base font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 shadow-xl shadow-primary/20 mb-6"
+              className="w-full rounded-[28px] h-14 text-base font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 shadow-xl shadow-primary/20 mb-4"
               size="lg"
               data-testid="button-get-started"
             >
               <LogIn className="w-5 h-5 mr-2" />
               Get Started
             </Button>
+            
+            {/* Note about preview limitations */}
+            <p className="text-xs text-center text-white/60 mb-6">
+              If button doesn't work, open this page in a new tab
+            </p>
 
             {/* Auth Provider Info */}
             <div className="space-y-4">
