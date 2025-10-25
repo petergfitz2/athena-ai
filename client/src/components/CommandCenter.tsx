@@ -936,40 +936,34 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
-      {/* Floating CTA - Professional Chat Launcher (visible when chat is closed) */}
+      {/* Floating CTA - Refined & Elegant (visible when chat is closed) */}
       {!sidebarOpen && (
-        <div className="fixed bottom-8 right-8 z-[190]">
+        <div className="fixed bottom-6 right-6 z-[190]">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="relative group transition-all duration-300 hover:scale-105 active:scale-100"
+            className="group relative transition-all duration-300 hover:scale-105 active:scale-95"
             data-testid="button-athena-fab"
-            aria-label="Open AI Investment Assistant"
+            aria-label="Chat with Athena AI"
           >
-            {/* Background glow effect */}
-            <div className="absolute -inset-4 rounded-full bg-primary/40 blur-2xl opacity-75 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Subtle glow */}
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-primary/30 to-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Main pill-shaped CTA button */}
-            <div className="relative flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-primary to-primary/80 rounded-full shadow-2xl shadow-primary/50 border border-primary/50 group-hover:from-primary group-hover:to-primary/70 transition-all duration-300">
-              {/* Avatar with pulse */}
+            {/* Compact pill design */}
+            <div className="relative flex items-center gap-2.5 px-4 py-2.5 bg-black border border-primary/40 rounded-full shadow-lg backdrop-blur-xl group-hover:border-primary/60 group-hover:bg-primary/10 transition-all duration-300">
+              {/* Avatar - smaller, refined */}
               <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-white/20 animate-ping" />
-                <div className="relative w-12 h-12 rounded-full border-2 border-white/30 overflow-hidden">
+                <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-primary/30 group-hover:ring-primary/50 transition-all duration-300">
                   <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
                 </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-black" />
               </div>
               
-              {/* CTA Text */}
-              <div className="flex items-center gap-2">
-                <span className="text-white font-medium text-base">Ask Athena</span>
-                <MessageCircle className="w-5 h-5 text-white/90" />
+              {/* Text with icon */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-white text-sm font-medium">Chat</span>
+                <MessageCircle className="w-4 h-4 text-primary/80" />
               </div>
-              
-              {/* Animated chevron */}
-              <ChevronRight className="w-4 h-4 text-white/80 animate-pulse" />
             </div>
-            
-            {/* Notification badge (for new features or messages) */}
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border-2 border-black" />
           </button>
         </div>
       )}
