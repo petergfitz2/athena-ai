@@ -18,8 +18,23 @@ export default function AuthPage() {
   }, [user, setLocation]);
 
   // Handle Replit Auth login - supports Google, GitHub, Apple, and email
-  const handleLogin = () => {
-    window.location.href = "/api/login";
+  const handleLogin = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Login button clicked!");
+    
+    // Try to open in a new tab first (works better in Replit preview)
+    const loginUrl = window.location.origin + "/api/login";
+    console.log("Attempting to open:", loginUrl);
+    
+    const newWindow = window.open(loginUrl, '_blank');
+    
+    // If popup blocked, fallback to redirect
+    if (!newWindow) {
+      console.log("Popup blocked, using redirect instead");
+      window.location.href = "/api/login";
+    } else {
+      console.log("Opened login in new tab");
+    }
   };
 
   return (
@@ -129,19 +144,28 @@ export default function AuthPage() {
             {/* Main CTA Button */}
             <Button
               onClick={handleLogin}
-              className="w-full rounded-[28px] h-14 text-base font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 shadow-xl shadow-primary/20 mb-4"
+              className="w-full rounded-[28px] h-14 text-base font-medium bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 shadow-xl shadow-primary/20 mb-4 cursor-pointer relative z-50 pointer-events-auto"
               size="lg"
               data-testid="button-get-started"
+              type="button"
             >
               <LogIn className="w-5 h-5 mr-2" />
               Get Started
             </Button>
             
-            {/* Note about preview limitations */}
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-[14px] p-3 mb-6">
-              <p className="text-xs text-center text-yellow-200">
-                ⚠️ If using Replit preview: Right-click "Get Started" → "Open Link in New Tab"
+            {/* Alternative login method */}
+            <div className="text-center mb-6">
+              <p className="text-xs text-muted-foreground mb-2">
+                Button not working?
               </p>
+              <a 
+                href="/api/login" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline"
+              >
+                Click here to login directly
+              </a>
             </div>
 
             {/* Auth Provider Info */}
