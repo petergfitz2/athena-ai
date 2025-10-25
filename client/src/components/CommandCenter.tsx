@@ -615,7 +615,7 @@ export default function CommandCenter() {
           <MarketOverview onTrade={handleOpenTradeModal} />
 
           {/* AI Insights */}
-          <Card className="bg-gradient-to-br from-primary/20 to-purple-600/20 border-white/10 rounded-[20px]">
+          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-3 sm:pb-4">
               <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                 <span className="font-medium">AI Insights</span>
