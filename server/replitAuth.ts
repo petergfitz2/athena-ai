@@ -100,12 +100,13 @@ export async function setupAuth(app: Express) {
   }
   
   // Also register for localhost (for development)
+  // Use the actual Replit domain for callback even when accessed as localhost
   const localhostStrategy = new Strategy(
     {
       name: `replitauth:localhost`,
       config,
       scope: "openid email profile offline_access",
-      callbackURL: `http://localhost:5000/api/callback`,
+      callbackURL: `https://${process.env.REPLIT_DOMAINS}/api/callback`,
     },
     verify,
   );
@@ -115,26 +116,36 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    // Always use Replit domain for callback to avoid OAuth redirect mismatch
+    const useReplitDomain = process.env.REPLIT_DOMAINS;
+    const callbackURL = useReplitDomain 
+      ? `https://${process.env.REPLIT_DOMAINS}/api/callback`
+      : `http://localhost:5000/api/callback`;
+    
     // Use the correct strategy based on environment
     const strategyName = req.hostname === 'localhost' 
       ? 'replitauth:localhost' 
       : `replitauth:${req.hostname}`;
     
-    console.log('Login attempt with strategy:', strategyName, 'hostname:', req.hostname);
+    console.log('Login attempt with strategy:', strategyName, 'hostname:', req.hostname, 'callbackURL:', callbackURL);
     
     passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
+      callbackURL: callbackURL,  // Explicitly set the callback URL
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    // Use the correct strategy based on environment
-    const strategyName = req.hostname === 'localhost' 
+    // Check if request is coming from Replit domain
+    const isReplitDomain = req.hostname.includes('replit.dev') || req.hostname.includes('replit.app');
+    
+    // Use the correct strategy based on the actual hostname
+    const strategyName = (req.hostname === 'localhost' || req.hostname === '0.0.0.0')
       ? 'replitauth:localhost' 
       : `replitauth:${req.hostname}`;
     
-    console.log('Callback attempt with strategy:', strategyName, 'hostname:', req.hostname);
+    console.log('Callback attempt with strategy:', strategyName, 'hostname:', req.hostname, 'isReplitDomain:', isReplitDomain);
     
     passport.authenticate(strategyName, {
       successReturnToOrRedirect: "/dashboard",
