@@ -557,17 +557,20 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
             
               <div className="flex items-center gap-3">
                 {!user && <DemoModeBanner inline />}
-                {/* Unified Conversation Interface */}
+                {/* Unified Conversation Interface with Avatar */}
                 <Button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                   className={cn(
-                    "rounded-[20px] px-4 py-2 transition-all duration-300 flex items-center gap-2",
+                    "rounded-[20px] px-3 py-1.5 transition-all duration-300 flex items-center gap-2",
                     sidebarOpen 
                       ? "bg-white/10 text-white border border-white/20 hover:bg-white/15" 
                       : "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20"
                   )}
                   data-testid="button-athena-chat"
                 >
+                  <div className="w-7 h-7 flex-shrink-0">
+                    <AthenaTraderAvatar size="mini" showStatus={true} showName={false} />
+                  </div>
                   <MessageCircle className="w-4 h-4" />
                   <span className="text-sm font-medium">Talk to Athena</span>
                 </Button>
@@ -939,14 +942,16 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
-      {/* Floating Action Button - Talk to Athena (visible when chat is closed) */}
+      {/* Floating Action Button with Avatar - Talk to Athena (visible when chat is closed) */}
       {!sidebarOpen && (
         <Button
           onClick={() => setSidebarOpen(true)}
-          className="fixed bottom-8 right-8 z-[190] rounded-full p-4 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/30 transition-all duration-300 hover:scale-105"
+          className="fixed bottom-8 right-8 z-[190] rounded-full p-3 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/30 transition-all duration-300 hover:scale-105"
           data-testid="button-athena-fab"
         >
-          <MessageCircle className="w-6 h-6" />
+          <div className="w-8 h-8">
+            <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
+          </div>
           <span className="sr-only">Talk to Athena</span>
         </Button>
       )}
