@@ -33,48 +33,56 @@ export default function LeftChatPanel() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Smart auto-scroll - scrolls to TOP of new messages for natural reading
+  // Smart auto-scroll - ALWAYS scrolls to TOP of new AI messages for natural reading
   const prevMessageCount = useRef(messages.length);
-  const lastMessageRef = useRef<HTMLDivElement>(null);
+  const hasScrolledToLatestAI = useRef(false);
   
   useEffect(() => {
     if (scrollAreaRef.current && messages.length > 0) {
       const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollElement) {
-        // Check if this is a NEW message appearing
-        const isNewMessage = messages.length > prevMessageCount.current;
-        
-        if (isNewMessage) {
-          // NEW MESSAGE - scroll to show its TOP/START for natural reading
+      if (!scrollElement) return;
+      
+      const lastMessage = messages[messages.length - 1];
+      const isNewMessage = messages.length > prevMessageCount.current;
+      const isAIMessage = lastMessage?.sender === 'ai';
+      
+      // NEW AI MESSAGE - always scroll to show its TOP
+      if (isNewMessage && isAIMessage) {
+        hasScrolledToLatestAI.current = false; // Reset flag for new AI message
+      }
+      
+      // If this is an AI message and we haven't scrolled to its top yet
+      if (isAIMessage && !hasScrolledToLatestAI.current && lastMessage?.content) {
+        // Find the message element
+        setTimeout(() => {
           const messageElements = scrollElement.querySelectorAll('[data-message-id]');
-          const lastMessage = messageElements[messageElements.length - 1] as HTMLElement;
+          const lastMessageElement = messageElements[messageElements.length - 1] as HTMLElement;
           
-          if (lastMessage) {
-            // Check if user is near bottom (within 100px) - only then auto-scroll
+          if (lastMessageElement) {
+            // Check if user is near bottom (within 100px)
             const isNearBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight < 100;
             
             if (isNearBottom) {
-              // Scroll to show the TOP of the new message so user can read from beginning
-              lastMessage.scrollIntoView({ 
+              // Scroll to TOP of the AI message so user can read from beginning
+              lastMessageElement.scrollIntoView({ 
                 behavior: 'smooth', 
-                block: 'start'  // CRITICAL: 'start' shows TOP of message
+                block: 'start'  // Shows TOP of message, not bottom
               });
+              hasScrolledToLatestAI.current = true; // Mark that we've scrolled to this AI message
             }
-            // If user has scrolled up to read, don't interrupt them
           }
-        } else {
-          // STREAMING UPDATE - only follow if user is at the very bottom
-          const isAtBottom = Math.abs(scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight) < 5;
-          
-          if (isAtBottom) {
-            // User is actively following the stream
-            scrollElement.scrollTop = scrollElement.scrollHeight;
-          }
-          // Otherwise keep their reading position stable
-        }
-        
-        prevMessageCount.current = messages.length;
+        }, 50); // Small delay to ensure DOM is updated
       }
+      
+      // For USER messages, just scroll to bottom if near bottom
+      if (isNewMessage && !isAIMessage) {
+        const isNearBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight < 100;
+        if (isNearBottom) {
+          scrollElement.scrollTop = scrollElement.scrollHeight;
+        }
+      }
+      
+      prevMessageCount.current = messages.length;
     }
   }, [messages]);
 
