@@ -93,7 +93,7 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
   return (
     <div
       className={cn(
-        "flex w-full animate-slide-in gap-3 lg:gap-4",
+        "flex w-full animate-slide-in gap-2",
         isUser ? "justify-end" : "justify-start"
       )}
     >
@@ -109,7 +109,7 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
         
         <div
           className={cn(
-            "rounded-[20px] px-4 py-3 border transition-all duration-300",
+            "rounded-[20px] px-3 py-2 border transition-all duration-300",
             isUser
               ? "bg-primary/20 border-primary/30"
               : "bg-white/[0.05] backdrop-blur-md border-white/10"

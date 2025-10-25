@@ -579,7 +579,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         {/* Main Content Area - Luxury Grid Layout */}
         <div className={cn(
           "w-full px-8 py-8 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          sidebarOpen ? "sm:mr-[300px] md:mr-[320px] lg:mr-[340px]" : "" // Account for chat sidebar width
+          sidebarOpen ? "sm:mr-[280px] md:mr-[300px] lg:mr-[320px]" : "" // Account for chat sidebar width
         )}>
           
           {/* Daily Briefing - Floating Above Content */}
@@ -953,7 +953,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
       
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[300px] md:w-[320px] lg:w-[340px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
+        "fixed right-0 top-0 h-full w-full sm:w-[280px] md:w-[300px] lg:w-[320px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
         sidebarOpen 
           ? "translate-x-0 opacity-100 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]" 
           : "translate-x-full opacity-95 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
@@ -963,7 +963,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           sidebarOpen ? "scale-100" : "scale-[0.98]"
         )}>
           {/* Refined Chat Header - Minimalist Luxury */}
-          <div className="px-3 py-4 border-b border-white/10 bg-gradient-to-r from-white/[0.02] to-white/[0.04] backdrop-blur-md">
+          <div className="px-2 py-3 border-b border-white/10 bg-gradient-to-r from-white/[0.02] to-white/[0.04] backdrop-blur-md">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4 min-w-0">
                 <div className="flex-shrink-0">
@@ -987,8 +987,8 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           </div>
           
           {/* Messages */}
-          <ScrollArea className="flex-1 px-2 py-3">
-            <div className="space-y-4">
+          <ScrollArea className="flex-1 px-1.5 py-2">
+            <div className="space-y-3">
               {messages.map((message) => (
                 <ChatMessage key={message.id} {...message} />
               ))}
@@ -1004,9 +1004,9 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           </ScrollArea>
           
           {/* Enhanced Chat Input - AI-First Design */}
-          <div className="px-2 py-3 border-t border-white/20 bg-gradient-to-t from-black/50 to-transparent">
-            <div className="space-y-2">
-              <div className="flex gap-1">
+          <div className="px-1.5 py-2 border-t border-white/20 bg-gradient-to-t from-black/50 to-transparent">
+            <div className="space-y-1.5">
+              <div className="flex gap-0.5">
                 <Textarea
                   ref={chatInputRef}
                   value={input}
