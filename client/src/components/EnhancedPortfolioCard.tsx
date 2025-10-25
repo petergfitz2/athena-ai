@@ -56,11 +56,11 @@ export function EnhancedPortfolioCard({
   if (isLoading) {
     return (
       <Card className={cn(
-        "h-full min-h-[480px] bg-[#0F0F12] border border-white/10 rounded-[20px] animate-pulse",
+        "h-full bg-[#0F0F12] border border-white/10 rounded-[20px] animate-pulse",
         className
       )}>
         <CardContent className="p-6">
-          <div className="h-full" />
+          <div className="h-[400px]" />
         </CardContent>
       </Card>
     );
@@ -101,9 +101,9 @@ export function EnhancedPortfolioCard({
   return (
     <Card 
       className={cn(
-        "h-full min-h-[480px] bg-[#0F0F12] border border-white/10 rounded-[20px]",
+        "h-full bg-[#0F0F12] border border-white/10 rounded-[20px]",
         "transition-all duration-300 ease-in-out cursor-pointer",
-        "hover:scale-[1.02] hover:shadow-[0_20px_50px_rgba(123,77,255,0.2)]",
+        "hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(123,77,255,0.2)]",
         "flex flex-col",
         className
       )}

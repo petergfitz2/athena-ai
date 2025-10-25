@@ -168,9 +168,10 @@ function PortfolioPageContent() {
               <h2 className="text-4xl font-extralight text-white">Your Holdings</h2>
             </div>
             <div 
-              className="grid gap-6 transition-all duration-300 ease-in-out"
+              className="grid gap-8 transition-all duration-300 ease-in-out"
               style={{
-                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                gridAutoRows: '1fr'
               }}
             >
               {holdings.map((holding) => {
