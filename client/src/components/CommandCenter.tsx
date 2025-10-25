@@ -483,7 +483,7 @@ export default function CommandCenter() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black overflow-x-hidden">
         {/* Navigation Bar */}
         <Navigation />
         <NavigationBreadcrumbs />
@@ -499,7 +499,7 @@ export default function CommandCenter() {
         
         {/* Header with Avatar and Greeting */}
         <div className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-white/10">
-          <div className="max-w-[1600px] mx-auto px-6 py-4">
+          <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
@@ -551,8 +551,8 @@ export default function CommandCenter() {
 
         {/* Main Grid Layout */}
         <div className={cn(
-        "max-w-[1600px] mx-auto p-4 sm:p-6 transition-all duration-300",
-        sidebarOpen ? "sm:mr-[400px] md:mr-[450px]" : ""
+        "w-full max-w-screen-2xl mx-auto p-4 sm:p-6 transition-all duration-300",
+        sidebarOpen ? "lg:mr-[400px] xl:mr-[450px]" : ""
       )}>
         {/* Chat Button - Opens AI advisor conversation */}
         {!sidebarOpen && (
@@ -576,7 +576,7 @@ export default function CommandCenter() {
 
         <div className={cn(
           "grid gap-4 sm:gap-6",
-          expandedView ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 md:grid-cols-2"
+          expandedView ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 lg:grid-cols-2"
         )}>
           {/* Portfolio Snapshot */}
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
@@ -1016,7 +1016,7 @@ export default function CommandCenter() {
       
       {/* Athena Chat Sidebar */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[400px] md:w-[450px] bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 z-50",
+        "fixed right-0 top-0 h-full w-full sm:w-[380px] lg:w-[420px] xl:w-[450px] bg-black/95 backdrop-blur-xl border-l border-white/10 transform transition-transform duration-300 z-50",
         sidebarOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="flex flex-col h-full">
