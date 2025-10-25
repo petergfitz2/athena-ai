@@ -218,8 +218,8 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 width: searchExpanded 
                   ? typeof window !== 'undefined' && window.innerWidth < 768 
                     ? "calc(100vw - 160px)" // Mobile: account for padding and buttons
-                    : "461px" // Desktop: 20% larger (384px * 1.2)
-                  : "144px" // 20% larger collapsed (120px * 1.2)
+                    : "280px" // Desktop: more reasonable width
+                  : "144px" // Collapsed width
               }}
               transition={{
                 duration: 0.25,
@@ -250,14 +250,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       setSearchExpanded(false);
                     }
                   }}
-                  placeholder={searchExpanded ? "Search tickers, companies, or ask anything..." : "Search..."}
-                  className={`w-full h-11 min-h-[44px] pl-10 pr-10 rounded-[20px] transition-all duration-250 text-sm md:text-base ${
+                  placeholder={searchExpanded ? "Search tickers or companies..." : "Search..."}
+                  className={`w-full h-11 min-h-[44px] pl-10 pr-10 rounded-[20px] transition-all duration-250 text-white text-sm md:text-base ${
                     searchExpanded 
-                      ? "border-white/30 bg-white/10 ring-2 ring-primary/50 placeholder:opacity-100" 
-                      : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-80"
-                  } placeholder:text-muted-foreground placeholder:text-xs placeholder:transition-opacity placeholder:duration-300 ${
+                      ? "border-white/30 bg-white/10 ring-2 ring-primary/50 placeholder:opacity-70" 
+                      : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-60"
+                  } placeholder:text-white/50 placeholder:text-xs placeholder:transition-opacity placeholder:duration-300 ${
                     !searchExpanded ? "placeholder:truncate" : ""
-                  } focus:ring-2 focus:ring-primary focus:border-primary`}
+                  } focus:ring-2 focus:ring-primary focus:border-primary focus:text-white`}
                   data-testid="input-ticker-search"
                   onClick={() => {
                     if (!searchExpanded) {
