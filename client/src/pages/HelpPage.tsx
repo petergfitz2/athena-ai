@@ -134,7 +134,7 @@ function HelpContent() {
             {helpResources.map((resource, idx) => {
               const Icon = resource.icon;
               return (
-                <GlassCard key={idx} className="p-8 hover-elevate active-elevate-2 transition-all">
+                <GlassCard key={idx} className="p-8 hover:bg-white/[0.08] active:bg-white/[0.10] transition-all">
                   <Link href={resource.link}>
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -192,7 +192,7 @@ function HelpContent() {
           <h2 className="text-3xl font-light text-foreground mb-6">Popular Articles</h2>
           <div className="space-y-4">
             <Link href="/tutorials">
-              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover-elevate active-elevate-2 transition-all">
+              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover:bg-white/[0.08] active:bg-white/[0.10] transition-all">
                 <h3 className="text-lg font-light text-foreground mb-1">
                   How to Execute Your First Trade
                 </h3>
@@ -202,7 +202,7 @@ function HelpContent() {
               </div>
             </Link>
             <Link href="/tutorials">
-              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover-elevate active-elevate-2 transition-all">
+              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover:bg-white/[0.08] active:bg-white/[0.10] transition-all">
                 <h3 className="text-lg font-light text-foreground mb-1">
                   Understanding the Three Interface Modes
                 </h3>
@@ -212,7 +212,7 @@ function HelpContent() {
               </div>
             </Link>
             <Link href="/tutorials">
-              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover-elevate active-elevate-2 transition-all">
+              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover:bg-white/[0.08] active:bg-white/[0.10] transition-all">
                 <h3 className="text-lg font-light text-foreground mb-1">
                   Using AI Trade Suggestions
                 </h3>
@@ -222,7 +222,7 @@ function HelpContent() {
               </div>
             </Link>
             <Link href="/faq">
-              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover-elevate active-elevate-2 transition-all">
+              <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 hover:bg-white/[0.08] active:bg-white/[0.10] transition-all">
                 <h3 className="text-lg font-light text-foreground mb-1">
                   Account Security Best Practices
                 </h3>

@@ -936,19 +936,40 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
-      {/* Floating Avatar - Talk to Athena (visible when chat is closed) */}
+      {/* Floating Avatar - Elegant Design (visible when chat is closed) */}
       {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="fixed bottom-8 right-8 z-[190] rounded-full transition-all duration-300 hover:scale-110 shadow-2xl shadow-black/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
-          data-testid="button-athena-fab"
-          title="Talk to Athena"
-        >
-          <div className="w-14 h-14">
-            <AthenaTraderAvatar size="mini" showStatus={true} showName={false} />
-          </div>
-          <span className="sr-only">Talk to Athena</span>
-        </button>
+        <div className="fixed bottom-8 right-8 z-[190]">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="relative group transition-all duration-500"
+            data-testid="button-athena-fab"
+            title="Talk to Athena"
+          >
+            {/* Glow effect background */}
+            <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl group-hover:bg-primary/40 transition-all duration-500" />
+            
+            {/* Avatar container with luxury border */}
+            <div className="relative rounded-full p-1 bg-gradient-to-br from-primary/50 to-primary/20 group-hover:from-primary/60 group-hover:to-primary/30 transition-all duration-300">
+              <div className="rounded-full bg-black/90 p-0.5">
+                <div className="w-14 h-14">
+                  <AthenaTraderAvatar size="mini" showStatus={true} showName={false} />
+                </div>
+              </div>
+            </div>
+            
+            {/* Pulse animation for attention */}
+            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+            
+            {/* Hover label */}
+            <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-black/95 backdrop-blur-xl text-white text-sm px-3 py-1.5 rounded-full border border-white/10 whitespace-nowrap">
+                Talk to Athena
+              </div>
+            </div>
+            
+            <span className="sr-only">Talk to Athena</span>
+          </button>
+        </div>
       )}
       
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
