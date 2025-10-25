@@ -1,0 +1,817 @@
+┌─────────────────────────────────┐
+│  👤 PERSONAL    🏆 LEAGUES      │ ← Tabs
+├─────────────────────────────────┤
+│                                 │
+│  [Amanda's avatar - large]      │
+│                                 │
+│  "Your portfolio is up $340     │
+│   today. NVDA drove most gains."│
+│                                 │
+│  [Your message input]           │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**User mental model:** "This is my private advisor"
+
+---
+
+### **2. SOCIAL SPACE (Leagues/Communities)**
+
+**What it is:**
+- Group chats with friends or public communities
+- Compete, share ideas, see leaderboards
+- Still have access to Amanda's intelligence (but in group context)
+
+**Visual design:**
+```
+┌─────────────────────────────────┐
+│  👤 PERSONAL    🏆 LEAGUES      │ ← Tabs
+├─────────────────────────────────┤
+│                                 │
+│  📊 MY LEAGUES                  │
+│  • College Friends (5 people)   │
+│  • Tech Investors (12 people)   │
+│                                 │
+│  🌍 PUBLIC COMMUNITIES          │
+│  • Day Traders (2.4K members)   │
+│  • Dividend Investors (890)     │
+│  • NVDA Gang (1.1K members)     │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**When you tap a league:**
+```
+┌─────────────────────────────────┐
+│  ← Back    COLLEGE FRIENDS  ⚙️  │
+├─────────────────────────────────┤
+│  📊 LEADERBOARD    💬 CHAT      │ ← Sub-tabs
+├─────────────────────────────────┤
+│                                 │
+│  🥇 Mike        +12.4%  $8,240  │
+│  🥈 You         +8.1%   $5,890  │
+│  🥉 Sarah       +6.2%   $4,120  │
+│  4️⃣  Tom        +3.8%   $2,450  │
+│  5️⃣  Lisa       -1.2%   $980    │
+│                                 │
+│  [View Details]                 │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**Switch to CHAT tab:**
+```
+┌─────────────────────────────────┐
+│  ← Back    COLLEGE FRIENDS  ⚙️  │
+├─────────────────────────────────┤
+│  📊 LEADERBOARD    💬 CHAT      │
+├─────────────────────────────────┤
+│                                 │
+│ Mike: Just bought NVDA dip 🚀   │
+│ 10:34 AM                        │
+│                                 │
+│ You: Risky, valuations high     │
+│ 10:35 AM                        │
+│                                 │
+│ Sarah: @You look at momentum    │
+│ [Shows NVDA chart card]         │
+│ 10:36 AM                        │
+│                                 │
+│ [Ask Amanda] [Type message...]  │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**Key: [Ask Amanda] button in group chat**
+- Tap it → Amanda appears briefly
+- "Amanda, should I buy NVDA here?"
+- Amanda responds IN THE GROUP CHAT (everyone can see her analysis)
+- Or you can DM Amanda privately, then share her response to group
+
+---
+
+### **3. AMANDA IN GROUP CONTEXT**
+
+**How it works:**
+
+**Scenario 1: Direct question in group**
+```
+You: "@Amanda what's your take on NVDA here?"
+
+Amanda: [Appears as message in group chat]
+"NVDA momentum score: 0.82 (strong)
+Valuation: 2.1 std devs above mean
+Risk: High volatility regime
+My take: Wait for pullback to $250"
+
+Sarah: "Thanks! That's helpful"
+Mike: "Nah I'm buying now 🚀"
+```
+
+**Scenario 2: Share private Amanda insight**
+```
+[You had private convo with Amanda]
+
+In group chat:
+You: [Shares screenshot]
+"Amanda found tax-loss harvesting 
+opportunity worth $2.4K"
+
+Mike: "Whoa, how'd she find that?"
+You: "She monitors portfolio 24/7"
+Mike: "I need to sign up..."
+```
+
+**Scenario 3: Amanda can comment on group activity (optional feature)**
+```
+[Mike makes huge risky trade]
+
+Amanda: [Notification to group]
+"🚨 Mike just allocated 40% portfolio 
+to one stock. Historically, this 
+concentration level leads to..."
+
+Mike: "Yo Amanda, I know what 
+I'm doing 😂"
+```
+
+---
+
+## SPECIFIC SOCIAL FEATURES
+
+### **A. LEAGUES (Private Competitive Groups)**
+
+**What they are:**
+- 2-50 person groups competing on portfolio performance
+- Can be friends, family, coworkers, or strangers who opt-in
+
+**How to create:**
+1. Tap "Create League"
+2. Name it: "College Friends", "Work Trading Group"
+3. Set rules:
+   - Time period (1 week, 1 month, 1 year, ongoing)
+   - Starting $ amount (everyone starts at $10K virtual OR use real portfolios)
+   - Asset restrictions (stocks only? Options allowed?)
+4. Invite via link or username
+
+**League features:**
+- **Real-time leaderboard** (updates after each trade)
+- **Performance metrics:**
+  - Total return %
+  - Sharpe ratio
+  - Win rate (% of winning trades)
+  - Biggest winner/loser
+- **Achievements:**
+  - "🔥 Hot Streak" (5 winning trades in a row)
+  - "💎 Diamond Hands" (Held through -10% drawdown)
+  - "🎯 Sniper" (Bought within 2% of bottom)
+- **Group chat** (trash talk, share DDs, celebrate wins)
+- **Trade feed:** See when members buy/sell (optional transparency setting)
+
+**Gamification:**
+```
+┌─────────────────────────────────┐
+│  COLLEGE FRIENDS LEAGUE         │
+│  Week 3 of 12                   │
+├─────────────────────────────────┤
+│                                 │
+│  🥇 Mike        +12.4%          │
+│     └─ 🔥 5-trade hot streak    │
+│                                 │
+│  🥈 You         +8.1%           │
+│     └─ 💎 Survived volatility   │
+│                                 │
+│  🥉 Sarah       +6.2%           │
+│                                 │
+│  Recent Activity:               │
+│  • Mike bought TSLA (+$400)     │
+│  • You sold AAPL (+$127)        │
+│  • Sarah bought NVDA            │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**Why this drives signups:**
+- Mike sends invite link to group text
+- Friends see: "Mike is up 12%! Join league to compete"
+- FOMO kicks in → friends sign up
+- Now Mike gets referral credit + friends are engaged
+
+---
+
+### **B. PUBLIC COMMUNITIES (Reddit-style)**
+
+**What they are:**
+- Large public groups organized by interest/strategy
+- Anyone can join, post, comment
+- Moderated by community
+
+**Examples:**
+- "Day Traders" (2.4K members)
+- "Dividend Investors" (890 members)  
+- "NVDA Gang" (1.1K members - stock-specific)
+- "Swing Trading Strategies"
+- "Options Degenerates" (wallstreetbets vibes)
+- "Women Investors"
+- "Beginner's Corner"
+
+**Community features:**
+- **Discussion threads** (like Reddit posts)
+- **Trade ideas** with attached analysis
+- **Ask Amanda** (anyone can summon her for group context)
+- **Top contributors** (reputation/karma system)
+- **Hot takes** (upvote/downvote)
+
+**Example post:**
+```
+┌─────────────────────────────────┐
+│  r/DayTraders                   │
+├─────────────────────────────────┤
+│                                 │
+│  Posted by @TechTrader420       │
+│  2 hours ago                    │
+│                                 │
+│  "NVDA breaking out of triangle │
+│   pattern. Target: $520"        │
+│                                 │
+│  [Shows technical chart]        │
+│                                 │
+│  ⬆️ 47  💬 12  🔗 Share         │
+│                                 │
+│  Comments:                      │
+│  • "I'm in, bought calls"       │
+│  • "@Amanda confirm this?"      │
+│  • Amanda: "Momentum score 0.84"│
+│                                 │
+└─────────────────────────────────┘
+```
+
+**Why this drives retention:**
+- Users come back daily to check community hot takes
+- Learn from others' successes/failures
+- Build reputation as top contributor
+- Feel part of something bigger than solo investing
+
+---
+
+### **C. SHARING & SCREENSHOTS**
+
+**Make it stupidly easy to share:**
+
+**1. Quick Share Button**
+After any trade:
+```
+┌─────────────────────────────────┐
+│  ✅ Trade Executed              │
+│                                 │
+│  Bought 10 NVDA @ $487.32       │
+│  Total: $4,873.20               │
+│                                 │
+│  [Done]  [Share to League 📤]   │
+└─────────────────────────────────┘
+```
+
+Tap "Share" → Choose league → Auto-generates:
+```
+"Just bought 10 NVDA @ $487 🚀
+Momentum score: 0.84
+Let's see if this prints 💰"
+```
+
+**2. Portfolio Screenshot Generator**
+```
+[Portfolio view]
+
+[Screenshot button] →
+
+Auto-generates beautiful card:
+┌─────────────────────────────────┐
+│  MY PORTFOLIO                   │
+│  +$2,341 today (+8.1%)          │
+│                                 │
+│  Top Performer: NVDA +12.4%     │
+│  Total Value: $28,940           │
+│                                 │
+│  [Athena watermark]             │
+└─────────────────────────────────┘
+```
+
+Tap → Share to league, Twitter, Instagram Stories
+
+**3. Amanda Insight Sharing**
+```
+[Amanda tells you something smart]
+
+[Share button] on her message →
+
+Creates shareable card:
+┌─────────────────────────────────┐
+│  💡 AMANDA'S INSIGHT            │
+│                                 │
+│  "Your tech holdings have       │
+│   0.87 correlation—you're       │
+│   dangerously concentrated."    │
+│                                 │
+│  Risk Score: ⚠️ High            │
+│                                 │
+│  [Athena watermark]             │
+└─────────────────────────────────┘
+```
+
+Share to league → friends see Amanda's intelligence → sign up
+
+---
+
+### **D. COMPETITIVE ACHIEVEMENTS**
+
+**System-wide achievements (visible on profile):**
+
+**Trading Milestones:**
+- 🎯 "First Trade" (everyone gets this)
+- 💯 "Century" (100 total trades)
+- 💰 "Profit Streak" (10 winning trades in a row)
+- 📈 "10% Gain" (Portfolio up 10% all-time)
+- 🚀 "Moonshot" (Single stock +50%)
+
+**Risk Management:**
+- 💎 "Diamond Hands" (Held through -20% drawdown)
+- 🎲 "Calculated Risk" (Used Amanda's risk analysis before risky trade)
+- 🧠 "Smart Diversification" (Low correlation score maintained)
+
+**Social:**
+- 👥 "Squad Builder" (Invited 5 friends who signed up)
+- 🏆 "League Champion" (Won a league)
+- 🔥 "Hot Streak" (Top 3 in league for 4 weeks straight)
+- 💬 "Helpful" (10+ upvotes on community posts)
+
+**Amanda Engagement:**
+- 🗣️ "Conversationalist" (100 messages with Amanda)
+- 📚 "Student" (Completed 5 educational modules)
+- 🎓 "Graduate" (Completed all beginner lessons)
+
+**Display on profile:**
+```
+┌─────────────────────────────────┐
+│  @YourUsername                  │
+│  Member since Jan 2025          │
+│                                 │
+│  Portfolio: +18.2% (all-time)   │
+│  League Rank: 🥈 2nd            │
+│                                 │
+│  🏆 ACHIEVEMENTS (12/50)        │
+│  💰🎯📈💎🧠👥🔥🗣️📚           │
+│                                 │
+│  [View All Achievements]        │
+└─────────────────────────────────┘
+```
+
+**Why this works:**
+- People love collecting achievements (see: Xbox Gamerscore, LinkedIn skill endorsements)
+- Visible on profile → social status
+- Creates goals beyond just "make money"
+- Encourages specific behaviors (diversify, engage with Amanda, invite friends)
+
+---
+
+### **E. TRADE FEED (Optional Transparency)**
+
+**Inspired by Strava (fitness tracking social network)**
+
+**How it works:**
+- Users can opt to make their trades visible to friends/league
+- Real-time feed shows: "Mike bought 10 NVDA @ $487"
+- Can comment, react, ask questions
+
+**Privacy settings:**
+- **Private:** Only you see your trades
+- **Friends:** Only people in your leagues see
+- **Public:** Anyone can see
+- **Selective:** Choose which trades to share
+
+**Example feed:**
+```
+┌─────────────────────────────────┐
+│  TRADE FEED                     │
+├─────────────────────────────────┤
+│                                 │
+│  Mike bought 10 NVDA @ $487     │
+│  2 min ago                      │
+│  💬 3  👍 5                      │
+│                                 │
+│  Sarah sold 20 AAPL @ $178      │
+│  12 min ago                     │
+│  💬 1  😮 2                      │
+│                                 │
+│  You bought 5 MSFT @ $420       │
+│  1 hour ago                     │
+│  💬 7  🔥 12                     │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**Why this is powerful:**
+- Social proof: "5 people in my network bought NVDA today"
+- FOMO: "Everyone's winning except me"
+- Learning: See what successful traders are doing
+- Accountability: Less likely to make dumb trades if friends can see
+
+**Anti-pattern to avoid:** Don't make this feel like surveillance or pressure. Opt-in only.
+
+---
+
+## GROWTH MECHANICS
+
+### **1. VIRAL INVITE FLOW**
+
+**When user signs up:**
+```
+Step 1: "Welcome to Athena!"
+Step 2: "Fund your account"
+Step 3: ⭐ "Invite friends to compete"
+
+"Investing is more fun with friends.
+ Create your first league:"
+
+[Create League] [Skip for now]
+```
+
+If they create league:
+```
+"COLLEGE FRIENDS" created!
+
+Invite members:
+[Copy invite link]
+[Share via text]
+[Share via social]
+
+"Each friend who joins gets you both
+ $10 in bonus credit"
+```
+
+**Incentive structure:**
+- Referrer gets: $10 credit per signup
+- Referee gets: $10 credit on signup
+- Both get: Bonus achievement badge
+
+**Expected conversion:**
+- 60% of users create at least one league
+- Average 4 invites sent per league creator
+- 30% invite-to-signup conversion
+- **Viral coefficient: ~0.7** (not quite exponential, but strong organic growth)
+
+To push over 1.0:
+- Increase referral bonus to $25
+- Add "league champion gets $100" for leagues of 10+
+- Add seasonal tournaments with cash prizes
+
+---
+
+### **2. CONTENT SHARING**
+
+**Make every win shareable:**
+
+After big gain:
+```
+┌─────────────────────────────────┐
+│  🎉 BIG WIN!                    │
+│                                 │
+│  NVDA +$847 today (+18.2%)      │
+│                                 │
+│  Your best trade this month!    │
+│                                 │
+│  [Share on Twitter]             │
+│  [Share to Instagram Story]     │
+│  [Share to league]              │
+│                                 │
+└─────────────────────────────────┘
+```
+
+Auto-generates beautiful card with Athena branding:
+```
+┌─────────────────────────────────┐
+│                                 │
+│  🚀 +$847 on NVDA today         │
+│                                 │
+│  Powered by Athena AI           │
+│  [athena.ai/join]               │
+│                                 │
+└─────────────────────────────────┘
+```
+
+**Psychology:** People LOVE sharing wins. If card includes Athena branding + signup link → free marketing.
+
+**Expected impact:**
+- 15-20% of big wins get shared
+- ~3% clickthrough rate on shared content
+- 10-15% signup conversion
+- **Adds 5-10% to organic growth**
+
+---
+
+### **3. TOURNAMENTS & EVENTS**
+
+**Seasonal competitions (like Fortnite seasons):**
+
+**"ATHENA Q1 CHAMPIONSHIP"**
+- $10K prize pool
+- 3-month competition
+- Open to all users (free entry)
+- Leaderboard based on risk-adjusted returns
+
+**Weekly challenges:**
+- "Beat the S&P this week" (everyone who does gets badge)
+- "Find the best value play" (lowest P/E stock that goes up)
+- "Tax harvesting week" (most $ saved via tax-loss harvesting)
+
+**Why this works:**
+- Creates recurring engagement spikes
+- "I need to check my rank" → daily logins
+- Shareable moments: "I'm #47 out of 10K in the championship!"
+- Attracts competitive users
+
+---
+
+## CONCERNS & MITIGATION
+
+### **⚠️ Regulatory Risk: Gamification of Investing**
+
+**The problem:**
+- SEC/FINRA have cracked down on "gamification" (see: Robinhood confetti controversy)
+- They worry it encourages reckless trading
+
+**Our mitigation:**
+1. **Competition is on risk-adjusted returns, not pure returns**
+   - Leaderboard shows Sharpe ratio, not just % gain
+   - Penalizes excessive risk-taking
+   - Rewards smart, diversified strategies
+
+2. **Amanda provides guardrails**
+   - "You're about to make a very risky trade. Sure?"
+   - "Your correlation just spiked to 0.9. Want to diversify first?"
+   - Educational prompts BEFORE risky actions
+
+3. **Transparency with regulators**
+   - Proactively share approach with SEC
+   - Position as "educational + competitive" not "gambling"
+   - Compare to sports leagues (fantasy football isn't gambling)
+
+4. **No loot boxes, no random rewards**
+   - Everything is based on actual performance
+   - No slot machine mechanics
+   - No "spin to win" bullshit
+
+5. **Opt-in, not default**
+   - Users choose to join leagues
+   - Can use platform without social features
+   - Personal space (Amanda) is primary interface
+
+**Messaging:**
+"We're making investing social and educational, not turning it into a game. Competition drives learning, and our AI ensures users don't take reckless risks."
+
+---
+
+### **⚠️ Social Pressure to Trade**
+
+**The problem:**
+- Users might feel pressured to trade just to keep up in leagues
+- Overtrading is bad for returns
+
+**Mitigation:**
+1. **Leaderboards reward Sharpe ratio, not trade volume**
+   - Fewer, better trades beat frequent mediocre trades
+   - "Quality over quantity" messaging
+
+2. **Amanda discourages overtrading**
+   - "You've made 15 trades this week. Studies show frequent trading reduces returns. Want to slow down?"
+
+3. **"Buy and hold" leagues**
+   - Competition for best long-term strategy
+   - Minimum hold period (30 days, 90 days, 1 year)
+   - Rewards patience
+
+4. **Penalties for excessive risk**
+   - Leaderboard shows risk-adjusted returns
+   - Taking 10x risk for 2x return doesn't win leagues
+
+---
+
+### **⚠️ Privacy / Bragging Creates Bad Behavior**
+
+**The problem:**
+- Users might share misleading info (cherry-pick wins, hide losses)
+- "Influencer trading" can lead followers astray
+
+**Mitigation:**
+1. **Verified performance**
+   - Shared screenshots are authenticated (can't fake)
+   - Shows all-time performance, not just cherry-picked trades
+
+2. **Community moderation**
+   - Report button for misleading info
+   - Top contributors have reputation scores
+   - Bad actors get flagged/banned
+
+3. **Amanda fact-checks in communities**
+   - User posts: "NVDA going to $1000!"
+   - Amanda can comment: "Historical analysis suggests this valuation would require..."
+   - Keeps discussion grounded
+
+---
+
+## REPLIT PROMPTS FOR IMPLEMENTATION
+
+I'll create these as separate, focused prompts you can give Replit one at a time:
+
+---
+
+### **PROMPT 1: Add "Leagues" Tab to Main Navigation**
+```
+Add a new "Leagues" tab to the main navigation alongside "Personal" (Amanda chat).
+
+Navigation structure:
+- Two tabs at top of screen: "👤 PERSONAL" and "🏆 LEAGUES"
+- Default view is Personal tab (existing Amanda chat)
+- Tapping Leagues tab shows:
+
+LEAGUES VIEW (initially empty state):
+
+Section 1: "MY LEAGUES" 
+- Empty state message: "You're not in any leagues yet"
+- Button: "Create Your First League"
+
+Section 2: "PUBLIC COMMUNITIES"
+- List 4-5 placeholder communities:
+  • Day Traders (2.4K members)
+  • Dividend Investors (890 members)
+  • NVDA Gang (1.1K members)
+  • Options Trading (3.1K members)
+- Each community is tappable (goes to community view - to be built later)
+
+Bottom of screen:
+- Fixed button: "+ Create League"
+
+Style:
+- Use existing dark theme
+- Purple accent color for active tab
+- Community cards should have subtle hover/tap states
+```
+
+---
+
+### **PROMPT 2: Create League Flow**
+```
+Build the "Create League" flow that appears when user taps "+ Create League" button.
+
+SCREEN 1: League Setup
+- Header: "Create Your League"
+- Input field: "League Name" (placeholder: "College Friends")
+- Dropdown: "Competition Type"
+  • Real Portfolios (compare actual $ performance)
+  • Virtual $10K (everyone starts with $10K virtual money)
+- Dropdown: "Duration"
+  • 1 Week
+  • 1 Month
+  • 3 Months
+  • 1 Year
+  • Ongoing
+- Toggle: "Allow options trading" (default: off)
+- Button: "Next"
+
+SCREEN 2: Invite Members
+- Header: "[League Name]" created!
+- Subheader: "Invite your friends to compete"
+- Display shareable link: "athena.ai/league/abc123xyz"
+- Buttons:
+  • "Copy Link"
+  • "Share via Text"
+  • "Share via Email"
+- Text: "Each friend who joins gets you both $10 credit"
+- Input field: "Or invite by username"
+- Button: "Done" (returns to Leagues tab, now showing your new league)
+
+After league created, it appears in "MY LEAGUES" section with:
+- League name
+- Member count (starts at 1 - just you)
+- Current rank (1st of 1)
+- "Invite Members" button
+```
+
+---
+
+### **PROMPT 3: League Detail View (Leaderboard)**
+```
+Create the league detail screen that appears when user taps on a league from their list.
+
+Layout:
+- Header: "[League Name]" with back button and settings gear icon
+- Two sub-tabs: "📊 LEADERBOARD" and "💬 CHAT" (default to Leaderboard)
+
+LEADERBOARD TAB:
+
+Show ranked list of members:
+- Each row displays:
+  • Rank emoji (🥇 🥈 🥉 or number)
+  • Profile picture (placeholder avatar)
+  • Username
+  • Portfolio performance (colored green if positive, red if negative)
+  • Total portfolio value
+  
+Example rows:
+🥇 Mike        +12.4%  $11,240
+🥈 You         +8.1%   $10,810  
+🥉 Sarah       +6.2%   $10,620
+4️⃣  Tom        +3.8%   $10,380
+5️⃣  Lisa       -1.2%   $9,880
+
+Below leaderboard:
+- "Competition ends in 23 days"
+- Button: "View Detailed Stats"
+
+Style:
+- Use card design for leaderboard
+- Highlight current user's row with subtle purple border
+- Animate rank changes (if updating in real-time)
+```
+
+---
+
+### **PROMPT 4: League Chat Tab**
+```
+Build the CHAT tab within league detail view (same screen as leaderboard, different tab).
+
+Layout:
+- Header shows league name, back button, settings
+- Sub-tab "💬 CHAT" (active)
+- Message feed showing chat history
+- Input area at bottom
+
+Message types to support:
+
+1. Text messages
+- Shows username, timestamp, message content
+- User's own messages aligned right (purple background)
+- Other users' messages aligned left (dark gray background)
+
+2. Trade shares
+- Special card format showing:
+  • "[Username] just traded"
+  • "Bought 10 NVDA @ $487.32"
+  • Timestamp
+  • React buttons (👍 🔥 💰)
+
+3. Amanda responses (when someone asks @Amanda)
+- Shows Amanda's avatar
+- Her response in a distinct card style
+- "Amanda responded to [Username]'s question"
+
+Bottom input area:
+- Text input field: "Type message..."
+- Button: "Ask Amanda" (opens modal to ask Amanda a question that posts her response in chat)
+- Send button
+
+Features:
+- Auto-scroll to latest message
+- Typing indicators ("Mike is typing...")
+- Unread message count badge on Chat tab when viewing Leaderboard
+```
+
+---
+
+### **PROMPT 5: "Ask Amanda in Group" Feature**
+```
+Add functionality for users to ask Amanda questions within a league chat.
+
+When user taps "Ask Amanda" button in league chat:
+
+MODAL APPEARS:
+- Title: "Ask Amanda"
+- Subtitle: "Her response will be visible to everyone in [League Name]"
+- Text input: "What's your question?"
+- Buttons: "Cancel" | "Ask Amanda"
+
+After user submits:
+- Modal closes
+- Their question appears in chat as: "@Amanda [question]"
+- Loading indicator: "Amanda is thinking..."
+- After 2-3 seconds, Amanda's response appears as special message card:
+
+AMANDA'S RESPONSE CARD:
+┌─────────────────────────────────┐
+│ [Amanda avatar]  AMANDA         │
+│ In response to @[Username]      │
+│                                 │
+│ [Her answer text]               │
+│                                 │
+│ [Optional: data visualization   │
+│  like a mini chart or stats]    │
+│                                 │
+│ 👍 3  💬 Reply                  │
+└─────────────────────────────────┘
+
+Other members can:
+- React with emoji
+- Reply in thread
+- Ask follow-up questions
+
+Note: For MVP, you can simulate Amanda's response with pre-written answers based on question keywords. Full AI integration comes later.
