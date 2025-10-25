@@ -3,13 +3,19 @@ import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { apiJson } from "@/lib/queryClient";
+import DailyBriefing from "@/components/DailyBriefing";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useVoice } from "@/hooks/useVoice";
 import Navigation from "@/components/Navigation";
 import NavigationBreadcrumbs from "@/components/NavigationBreadcrumbs";
 import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
-import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
 import OnboardingDrawer from "@/components/OnboardingDrawer";
 import DemoModeBanner from "@/components/DemoModeBanner";
@@ -55,7 +61,8 @@ import {
   Square,
   Trophy,
   Users,
-  Search
+  Search,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -94,6 +101,7 @@ export default function CommandCenter() {
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(true); // AI chat open by default for AI-native experience
   const [showBriefing, setShowBriefing] = useState(false); // Skip briefing when chat is primary
+  const [showDailyBriefing, setShowDailyBriefing] = useState(false); // For the manual Daily Briefing button
   const [messages, setMessages] = useState<Message[]>([{
     id: "welcome",
     role: "assistant",
@@ -559,6 +567,16 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
               </div>
             
               <div className="flex items-center gap-3">
+                {/* Daily Briefing Button */}
+                <Button
+                  onClick={() => setShowDailyBriefing(true)}
+                  className="bg-gradient-to-r from-primary/80 to-purple-600/80 hover:from-primary hover:to-purple-600 text-white rounded-[28px] shadow-xl shadow-primary/20"
+                  size="sm"
+                  data-testid="button-daily-briefing"
+                >
+                  <FileText className="w-4 h-4 mr-1" />
+                  Daily Briefing
+                </Button>
                 {!user && <DemoModeBanner inline />}
                 {/* Avatar Display (not clickable) */}
                 <div className="relative rounded-full">
@@ -1132,6 +1150,16 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           setSelectedNewsArticle(null);
         }}
       />
+      
+      {/* Daily Briefing Modal */}
+      <Dialog open={showDailyBriefing} onOpenChange={setShowDailyBriefing}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black/95 border-white/10 rounded-[28px]">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-light text-white">Your Daily Investment Briefing</DialogTitle>
+          </DialogHeader>
+          <DailyBriefing onDismiss={() => setShowDailyBriefing(false)} />
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 }
