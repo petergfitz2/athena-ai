@@ -155,7 +155,7 @@ export default function LeftChatPanel() {
             <AthenaTraderAvatar 
               isActive={true}
               showStatus={true}
-              size="sm"
+              size="small"
             />
             <div className="flex-1">
               <h3 className="text-base sm:text-lg font-light">
