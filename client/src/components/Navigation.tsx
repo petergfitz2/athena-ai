@@ -201,7 +201,7 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
           {/* Left Side - Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center h-12 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
-              <span className="text-xl lg:text-2xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
+              <span className="text-2xl lg:text-3xl font-bold tracking-tight text-white whitespace-nowrap leading-none">
                 Athena AI
               </span>
             </Link>
@@ -312,15 +312,15 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                     <TooltipTrigger asChild>
                       <Link 
                         href={link.href}
-                        className={`flex items-center gap-1.5 min-h-[44px] h-11 px-3 rounded-full text-xs transition-all relative flex-shrink-0 ${
+                        className={`flex items-center gap-2 min-h-[44px] h-11 px-4 rounded-full text-sm transition-all relative flex-shrink-0 ${
                           active
                             ? "bg-primary/20 text-primary font-bold"
-                            : "text-white font-medium hover:text-white hover:bg-white/10"
+                            : "text-white font-semibold hover:text-white hover:bg-white/10"
                         }`}
                         data-testid={`link-${link.label.toLowerCase()}`}
                       >
-                        <Icon className="w-4 h-4" />
-                        <span className="font-medium">{link.label}</span>
+                        <Icon className="w-5 h-5" />
+                        <span className="font-semibold">{link.label}</span>
                       </Link>
                     </TooltipTrigger>
                     <TooltipContent className="text-xs">
@@ -335,18 +335,33 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
 
           {/* Right Side - Mode Switcher and User Menu - ALWAYS VISIBLE */}
           <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-            {/* Mode Switcher - Larger icons */}
+            {/* Mode Switcher - Enhanced Design */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20"
+                  className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-purple-600/20 border border-white/20 hover:from-primary/30 hover:to-purple-600/30 hover:border-white/30 transition-all"
                   data-testid="button-mode-switcher"
                 >
-                  {currentMode === "athena" && <MessageCircle className="w-5 h-5 text-white" />}
-                  {currentMode === "hybrid" && <Layout className="w-5 h-5 text-white" />}
-                  {currentMode === "terminal" && <Grid3x3 className="w-5 h-5 text-white" />}
+                  <div className="relative">
+                    {currentMode === "athena" && (
+                      <div className="flex flex-col items-center">
+                        <MessageCircle className="w-6 h-6 text-white" />
+                      </div>
+                    )}
+                    {currentMode === "hybrid" && (
+                      <div className="relative">
+                        <Layout className="w-6 h-6 text-white" />
+                      </div>
+                    )}
+                    {currentMode === "terminal" && (
+                      <div className="relative">
+                        <Grid3x3 className="w-6 h-6 text-white" />
+                      </div>
+                    )}
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full animate-pulse" />
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -399,11 +414,11 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 p-0"
+                  className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 p-0"
                   data-testid="button-user-menu"
                 >
-                  <Avatar className="w-9 h-9">
-                    <AvatarFallback className="bg-primary/30 text-white text-sm font-bold">
+                  <Avatar className="w-11 h-11">
+                    <AvatarFallback className="bg-primary/30 text-white text-base font-bold">
                       {getUserInitials()}
                     </AvatarFallback>
                   </Avatar>
@@ -564,10 +579,10 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       key={link.href} 
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-4 rounded-[20px] text-base font-light transition-all min-h-[56px] ${
+                      className={`flex items-center gap-3 px-4 py-4 rounded-[20px] text-lg font-medium transition-all min-h-[56px] ${
                         active
-                          ? "bg-primary/20 text-primary font-normal"
-                          : "text-muted-foreground hover-elevate active-elevate-2"
+                          ? "bg-primary/20 text-primary font-semibold"
+                          : "text-white hover-elevate active-elevate-2"
                       }`}
                       data-testid={`mobile-link-${link.label.toLowerCase()}`}
                     >
