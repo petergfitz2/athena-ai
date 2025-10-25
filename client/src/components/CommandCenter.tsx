@@ -495,8 +495,8 @@ export default function CommandCenter() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-black overflow-x-hidden">
-        {/* Navigation Bar */}
+      <div className="min-h-screen bg-black">
+        {/* Navigation Bar - Sticky */}
         <Navigation />
         <NavigationBreadcrumbs />
         

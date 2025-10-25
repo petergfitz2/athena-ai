@@ -189,11 +189,12 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
 
   return (
     <nav
-      className={`sticky top-0 z-50 border-b ${
+      className={`sticky top-0 z-[100] border-b ${
         variant === "transparent"
           ? "bg-black/80 backdrop-blur-xl border-white/5"
           : "bg-black border-white/10"
       }`}
+      style={{ position: 'sticky' }}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
