@@ -143,41 +143,27 @@ export default function RightChatPanel() {
   }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ 
-          x: window.innerWidth < 768 ? 0 : 420, 
-          y: window.innerWidth < 768 ? "100%" : 0,
-          opacity: 0 
-        }}
-        animate={{ 
-          x: 0, 
-          y: 0,
-          opacity: 1 
-        }}
-        exit={{ 
-          x: window.innerWidth < 768 ? 0 : 420, 
-          y: window.innerWidth < 768 ? "100%" : 0,
-          opacity: 0 
-        }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="fixed md:right-0 md:top-[64px] md:bottom-0 
-                   left-0 right-0 bottom-0 
-                   md:w-[420px] w-full
-                   md:max-h-[calc(100vh-64px)] max-h-[85vh]
-                   z-40 bg-black/95 backdrop-blur-xl 
-                   md:border-l border-t md:border-t-0 border-white/10 
-                   flex flex-col
-                   md:shadow-[-10px_0_40px_rgba(0,0,0,0.25)]
-                   shadow-2xl
-                   md:rounded-none rounded-t-[28px]"
-        data-testid="right-chat-panel"
-      >
+    <div
+      className={cn(
+        "fixed md:right-0 md:top-[64px] md:bottom-0",
+        "left-0 right-0 bottom-0",
+        "md:w-[420px] w-full",
+        "md:max-h-[calc(100vh-64px)] max-h-[85vh]",
+        "z-40 bg-black/95 backdrop-blur-xl",
+        "md:border-l border-t md:border-t-0 border-white/10",
+        "flex flex-col",
+        "md:rounded-none rounded-t-[28px]",
+        "transition-transform duration-300 ease-in-out",
+        isPanelOpen 
+          ? "md:translate-x-0 translate-y-0 md:shadow-[-10px_0_40px_rgba(0,0,0,0.25)] shadow-2xl" 
+          : "md:translate-x-[420px] translate-y-full"
+      )}
+      data-testid="right-chat-panel"
+    >
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-white/10">
           <div className="flex items-center gap-2 sm:gap-3">
             <AthenaTraderAvatar 
-              isActive={true}
               showStatus={true}
               size="small"
             />
@@ -301,7 +287,6 @@ export default function RightChatPanel() {
             Press Enter to send • Shift+Enter for new line
           </p>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
   );
 }
