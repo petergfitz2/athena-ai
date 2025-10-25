@@ -138,9 +138,11 @@ export default function AuthPage() {
             </Button>
             
             {/* Note about preview limitations */}
-            <p className="text-xs text-center text-white/60 mb-6">
-              If button doesn't work, open this page in a new tab
-            </p>
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-[14px] p-3 mb-6">
+              <p className="text-xs text-center text-yellow-200">
+                ⚠️ If using Replit preview: Right-click "Get Started" → "Open Link in New Tab"
+              </p>
+            </div>
 
             {/* Auth Provider Info */}
             <div className="space-y-4">
@@ -152,8 +154,11 @@ export default function AuthPage() {
               
               {/* Supported Providers - Informational Only */}
               <div className="bg-white/5 rounded-[20px] p-6 border border-white/10">
-                <p className="text-sm text-center text-white/90 mb-4">
-                  Clicking "Get Started" will let you sign in with:
+                <p className="text-sm text-center text-white/90 mb-2">
+                  Available sign-in options:
+                </p>
+                <p className="text-xs text-center text-white/60 mb-4">
+                  (You'll choose after clicking "Get Started" above)
                 </p>
                 <div className="flex justify-center gap-6">
                   <div className="flex flex-col items-center gap-2 group">
