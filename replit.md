@@ -3,13 +3,28 @@
 ## Overview
 Athena AI Investing is a luxury AI-powered investment platform designed to be a personal investment advisor through a professional female trader avatar. The platform aims to make institutional-grade investing tools accessible, combining sophisticated analytics, social trading, gamification, and AI-driven insights for all user levels. It delivers an intuitive, adaptive interface that learns from user behavior, providing features like personalized AI daily briefings, deep portfolio analytics, and an investment simulator.
 
-### Recent UX Improvements (Oct 25, 2025)
+### Recent Improvements (Oct 25, 2025)
+
+#### Authentication Fixes
+- **Fixed Session Persistence**: Resolved critical bug where session cookies were always secure (HTTPS-only), blocking local development
+- **Auto-create Sessions Table**: Enabled automatic creation of sessions table if missing
+- **OAuth Support**: Full integration with Google, GitHub, Apple, and Email sign-in via Replit Auth
+
+#### UX Enhancements
 - **AI-Native Experience**: Chat sidebar now opens by default, making conversational trading the primary interface
 - **Enhanced Chat Interface**: Expanded to 600px width with luxury gradients and improved visibility
 - **Consolidated Controls**: Single "Talk to Athena" button replaces confusing dual Voice/Chat buttons
 - **Improved Accessibility**: Better text contrast (white primary, white/60 secondary) throughout
 - **Luxury Spacing**: All cards use 28px rounded corners with 8px gaps between sections
 - **Consistent Glassmorphism**: Gradient backgrounds (from-white/5 to-white/[0.02]) with backdrop-blur-2xl
+- **Clear Auth Instructions**: Added warning about Replit preview limitations with right-click solution
+
+#### Testing & Verification
+- **Market Data API**: Verified working with Yahoo Finance integration
+- **Portfolio Features**: Confirmed $125,850 demo portfolio with realistic holdings
+- **Trading System**: Tested order types and trade execution flow
+- **UI Modes**: Validated Amanda, Hybrid, and Terminal mode switching
+- **Comprehensive Documentation**: Created detailed USER_GUIDE.md for end users
 
 ## User Preferences
 - I prefer simple language.
