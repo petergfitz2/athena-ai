@@ -211,14 +211,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             {/* Expandable Search Bar - Responsive */}
             <motion.div 
               ref={searchRef} 
-              className="relative flex-shrink-0"
+              className="relative flex-shrink-0 ml-16"
               initial={false}
               animate={{
                 width: searchExpanded 
                   ? typeof window !== 'undefined' && window.innerWidth < 768 
                     ? "calc(100vw - 160px)" // Mobile: account for padding and buttons
-                    : "320px" // Desktop: 320px expanded
-                  : "44px" // Collapsed: minimum touch target size
+                    : "352px" // Desktop: increased from 320px to 352px (1/3" wider)
+                  : "100px" // Increased from 44px to prevent overlap
               }}
               transition={{
                 duration: 0.25,
