@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import custom animations */
+@import "./styles/animations.css";
+
 /* Custom Scrollbar Styles */
 @layer utilities {
   .custom-scrollbar {
