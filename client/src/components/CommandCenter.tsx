@@ -561,7 +561,10 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
         
         {/* Main Content Area - Luxury Grid Layout */}
-        <div className="w-full px-8 py-8 transition-all duration-300">
+        <div className={cn(
+          "w-full px-8 py-8 transition-all duration-300",
+          sidebarOpen ? "lg:mr-[550px] xl:mr-[600px]" : "" // Account for chat sidebar width
+        )}>
           
           {/* Daily Briefing - Floating Above Content */}
           {showBriefing && (
@@ -922,7 +925,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
       
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[480px] lg:w-[550px] xl:w-[600px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-2xl border-l border-white/20 transform transition-all duration-500 z-50 shadow-2xl shadow-primary/10",
+        "fixed right-0 top-0 h-full w-full sm:w-[480px] lg:w-[550px] xl:w-[600px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-2xl border-l border-white/20 transform transition-all duration-500 z-[200] shadow-2xl shadow-primary/10", // Higher z-index to stay above content
         sidebarOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="flex flex-col h-full">
