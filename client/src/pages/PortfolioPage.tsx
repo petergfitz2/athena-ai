@@ -164,10 +164,15 @@ function PortfolioPageContent() {
           </div>
         ) : (
           <div>
-            <div className="sticky top-0 z-10 bg-black/95 backdrop-blur-sm pb-4 -mt-4 pt-4 mb-4">
-              <h2 className="text-4xl font-extralight text-foreground">Your Holdings</h2>
+            <div className="sticky top-0 z-10 bg-[#0F0F12]/95 backdrop-blur-sm pb-6 -mt-4 pt-4 mb-8">
+              <h2 className="text-4xl font-extralight text-white">Your Holdings</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div 
+              className="grid gap-6 transition-all duration-300 ease-in-out"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))'
+              }}
+            >
               {holdings.map((holding) => {
                 const quantity = parseFloat(holding.quantity);
                 const avgCost = parseFloat(holding.averageCost);
