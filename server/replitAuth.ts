@@ -115,16 +115,30 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Use the correct strategy based on environment
+    const strategyName = req.hostname === 'localhost' 
+      ? 'replitauth:localhost' 
+      : `replitauth:${req.hostname}`;
+    
+    console.log('Login attempt with strategy:', strategyName, 'hostname:', req.hostname);
+    
+    passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+    // Use the correct strategy based on environment
+    const strategyName = req.hostname === 'localhost' 
+      ? 'replitauth:localhost' 
+      : `replitauth:${req.hostname}`;
+    
+    console.log('Callback attempt with strategy:', strategyName, 'hostname:', req.hostname);
+    
+    passport.authenticate(strategyName, {
+      successReturnToOrRedirect: "/dashboard",
+      failureRedirect: "/",
     })(req, res, next);
   });
 
