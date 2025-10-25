@@ -12,6 +12,8 @@ import DailyBriefing from "@/components/DailyBriefing";
 import ChatMessage from "@/components/ChatMessage";
 import OnboardingDrawer from "@/components/OnboardingDrawer";
 import DemoModeBanner from "@/components/DemoModeBanner";
+import PortfolioSnapshot from "@/components/PortfolioSnapshot";
+import AIInsights from "@/components/AIInsights";
 import ExecuteTradeModal from "@/components/ExecuteTradeModal";
 import NewsDetailModal from "@/components/NewsDetailModal";
 import MarketOverview from "@/components/MarketOverview";
@@ -571,105 +573,16 @@ export default function CommandCenter() {
           expandedView ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 lg:grid-cols-2"
         )}>
           {/* Portfolio Snapshot */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-3 sm:pb-4">
-              <CardTitle className="flex items-center justify-between text-base sm:text-lg">
-                <span className="font-medium">Portfolio Snapshot</span>
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 sm:space-y-4">
-              <div>
-                <p className="text-2xl sm:text-3xl font-medium text-foreground">
-                  <AnimatedCounter 
-                    value={portfolioSummary?.totalValue || 0} 
-                    formatValue={formatCurrency}
-                    duration={1500}
-                  />
-                </p>
-                <div className="flex items-center gap-2 mt-2">
-                  {(portfolioSummary?.dayGainPercent || 0) >= 0 ? (
-                    <TrendingUp className="w-4 h-4 text-success" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4 text-destructive" />
-                  )}
-                  <span className={cn(
-                    "text-sm",
-                    (portfolioSummary?.dayGainPercent || 0) >= 0 ? "text-success" : "text-destructive"
-                  )}>
-                    {(portfolioSummary?.dayGainPercent || 0) >= 0 ? "+" : ""}
-                    {portfolioSummary?.dayGainPercent?.toFixed(2) || "0"}% Today
-                  </span>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">Top Movers</p>
-                {topMovers.map((mover) => (
-                  <div key={mover.symbol} className="flex justify-between items-center">
-                    <TickerLink symbol={mover.symbol} />
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">${mover.value.toFixed(0)}</span>
-                      <Badge 
-                        variant={mover.change >= 0 ? "default" : "destructive"}
-                        className="text-xs"
-                      >
-                        {mover.change >= 0 ? "+" : ""}{mover.change.toFixed(1)}%
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <PortfolioSnapshot 
+            portfolioSummary={portfolioSummary} 
+            topMovers={topMovers} 
+          />
 
           {/* Market Indices - Live Data */}
           <MarketOverview onTrade={handleOpenTradeModal} />
 
           {/* AI Insights */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
-            <CardHeader className="pb-3 sm:pb-4">
-              <CardTitle className="flex items-center justify-between text-base sm:text-lg">
-                <span className="font-medium">AI Insights</span>
-                <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <Star className="w-4 h-4 text-yellow-500 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium">Strong Buy Signal</p>
-                    <p className="text-xs text-muted-foreground">NVDA showing bullish momentum</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Sparkles className="w-4 h-4 text-primary mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium">Portfolio Optimization</p>
-                    <p className="text-xs text-muted-foreground">Consider rebalancing tech sector</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Shield className="w-4 h-4 text-success mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium">Risk Alert</p>
-                    <p className="text-xs text-muted-foreground">Volatility expected in energy sector</p>
-                  </div>
-                </div>
-              </div>
-              
-              <Button 
-                className="w-full rounded-full min-h-[44px]"
-                variant="default"
-                size="default"
-                data-testid="button-view-recommendations"
-              >
-                View All Recommendations
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            </CardContent>
-          </Card>
+          <AIInsights />
 
           {/* Quick Actions */}
           <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
