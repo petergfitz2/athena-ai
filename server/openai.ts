@@ -14,10 +14,45 @@ interface ConversationContext {
   contextMode?: string | null;
 }
 
+import * as athena from "./athenaConversations";
+
 export async function generateAIResponse(
   userMessage: string,
   context: ConversationContext
 ): Promise<string> {
+  // First, check if this matches one of Athena's core conversation flows
+  const intent = athena.detectConversationIntent(userMessage);
+  
+  // Handle specific conversation flows with Athena's optimized responses
+  if (intent === "stock_research") {
+    // Extract ticker from message
+    const tickers = ["NVDA", "AAPL", "TSLA", "MSFT", "GOOGL"];
+    let ticker = "";
+    for (const symbol of tickers) {
+      if (userMessage.toUpperCase().includes(symbol)) {
+        ticker = symbol;
+        break;
+      }
+    }
+    if (ticker) {
+      return athena.generateStockResponse(ticker);
+    }
+  }
+  
+  if (intent === "portfolio_analysis") {
+    return athena.generatePortfolioResponse(context.holdings);
+  }
+  
+  if (intent === "market_overview") {
+    return athena.generateMarketResponse();
+  }
+  
+  if (intent === "trade_execution") {
+    const tradeResponse = athena.generateTradeResponse(userMessage, 1);
+    return tradeResponse.response;
+  }
+  
+  // For general queries, fall back to OpenAI with Athena's personality
   // Fetch user's active avatar
   const activeAvatar = await storage.getActiveAvatar(context.userId);
   
