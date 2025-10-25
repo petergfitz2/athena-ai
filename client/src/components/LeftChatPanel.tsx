@@ -209,7 +209,9 @@ export default function LeftChatPanel() {
                   <ChatMessage 
                     content={message.content} 
                     role={message.sender === "user" ? "user" : "assistant"}
-                    timestamp={message.timestamp}
+                    timestamp={message.timestamp instanceof Date 
+                      ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : message.timestamp}
                   />
                 </div>
               </motion.div>
