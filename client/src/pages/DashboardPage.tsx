@@ -25,6 +25,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import DailyBriefing from "@/components/DailyBriefing";
+import { MarketSentiment } from "@/components/MarketSentiment";
 import {
   Dialog,
   DialogContent,
@@ -474,6 +475,11 @@ function SimplifiedDashboardContent() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* AI Market Sentiment & Trade Suggestions */}
+        <div className="mt-8">
+          <MarketSentiment />
         </div>
 
         {/* Progressive Disclosure - Show after some activity */}
