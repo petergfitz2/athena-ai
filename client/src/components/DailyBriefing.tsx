@@ -69,10 +69,12 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
   };
 
   const portfolioImpact = {
+    totalValue: 125850.00,
+    dayChange: 2875.50,
     expectedReturn: 2.3,
     riskLevel: "moderate",
-    topGainer: { symbol: "NVDA", gain: 5.2 },
-    topLoser: { symbol: "TSLA", loss: -2.1 },
+    topGainer: { symbol: "NVDA", gain: 5.2, impact: 1245.00 },
+    topLoser: { symbol: "TSLA", loss: -2.1, impact: -421.00 },
   };
 
   const recommendations = [
@@ -105,24 +107,19 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
     "3 of your holdings report earnings this week",
   ];
 
-  // Generate dynamic summary based on market conditions
-  const getMarketSummary = () => {
-    const marketsUp = [marketSummary.sp500, marketSummary.nasdaq, marketSummary.dow].filter(m => m.change > 0).length;
-    const marketTrend = marketsUp >= 2 ? "positive momentum" : marketsUp === 1 ? "mixed signals" : "bearish pressure";
-    const marketTrendClass = marketsUp >= 2 ? "text-success" : marketsUp === 1 ? "text-warning" : "text-destructive";
-    
-    const topSector = marketSummary.nasdaq.change > marketSummary.dow.change ? "tech" : "industrials";
-    const returnClass = portfolioImpact.expectedReturn >= 0 ? "text-primary" : "text-destructive";
-    
-    return {
-      trend: marketTrend,
-      trendClass: marketTrendClass,
-      sector: topSector,
-      returnClass: returnClass
-    };
-  };
+  const upcomingEvents = [
+    { type: "fed", text: "Fed meeting at 2 PM" },
+    { type: "earnings", text: "3 earnings reports this week" }
+  ];
 
-  const summary = getMarketSummary();
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Math.abs(value));
+  };
 
   if (dismissed) return null;
 
@@ -171,10 +168,15 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
           {/* Quick Summary */}
           <div className="bg-primary/10 rounded-[20px] p-3 border border-primary/20">
             <p className="text-sm font-light leading-relaxed">
-              Markets are showing <span className={cn("font-medium", summary.trendClass)}>{summary.trend}</span> with {summary.sector} leading. 
-              Your portfolio is positioned for a <span className={cn("font-medium", summary.returnClass)}>
-                {portfolioImpact.expectedReturn >= 0 ? "+" : ""}{portfolioImpact.expectedReturn}%
-              </span> expected return today with {portfolioImpact.riskLevel} risk exposure.
+              Your portfolio is worth <span className="font-medium text-foreground">{formatCurrency(portfolioImpact.totalValue)}</span>, 
+              {portfolioImpact.dayChange >= 0 ? (
+                <>up <span className="font-medium text-success">+{formatCurrency(portfolioImpact.dayChange)}</span></>
+              ) : (
+                <>down <span className="font-medium text-destructive">-{formatCurrency(portfolioImpact.dayChange)}</span></>
+              )} today 
+              driven by <span className="font-medium">{portfolioImpact.topGainer.symbol}</span> (+{formatCurrency(portfolioImpact.topGainer.impact)}). 
+              Watch for the <span className="font-medium text-warning">Fed meeting at 2 PM</span> and 
+              <span className="font-medium"> 3 earnings reports</span> this week.
             </p>
           </div>
 
