@@ -1,13 +1,20 @@
+import React, { useMemo, useEffect, useState } from "react";
 import { useMarketStream } from "@/hooks/useMarketStream";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 
-export function MarketIndicesTicker() {
-  const { marketIndices, status, lastUpdate } = useMarketStream({
-    channels: ["market-indices"]
-  });
-
+// Memoized ticker item component to prevent unnecessary re-renders
+const TickerItem = React.memo(({ 
+  name, 
+  price, 
+  changePercent,
+  showDivider 
+}: { 
+  name: string; 
+  price: number; 
+  changePercent: number;
+  showDivider?: boolean;
+}) => {
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
@@ -32,82 +39,140 @@ export function MarketIndicesTicker() {
     return "text-zinc-400";
   };
 
-  if (!status.connected && !status.reconnecting) {
+  return (
+    <div className="flex items-center">
+      {showDivider && (
+        <div className="h-4 border-l border-gray-700/50 mr-6" />
+      )}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-white/90 text-sm font-medium">
+            {name}
+          </span>
+          <span className="text-white/90 font-mono text-sm">
+            {formatNumber(price)}
+          </span>
+        </div>
+        <div className={cn(
+          "flex items-center gap-1",
+          getTrendColor(changePercent)
+        )}>
+          {getTrendIcon(changePercent)}
+          <span className="font-mono text-xs font-medium">
+            {formatPercent(changePercent)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+TickerItem.displayName = 'TickerItem';
+
+// Loading skeleton component
+const TickerSkeleton = React.memo(() => (
+  <div className="flex items-center justify-evenly w-full">
+    {["DOW", "S&P 500", "NASDAQ", "VIX"].map((name, index) => (
+      <div key={name} className="flex items-center">
+        {index > 0 && (
+          <div className="h-4 border-l border-gray-700/50 mr-6" />
+        )}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-white/50 text-sm font-medium">{name}</span>
+            <div className="w-20 h-4 bg-white/10 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+));
+
+TickerSkeleton.displayName = 'TickerSkeleton';
+
+export const MarketIndicesTicker = React.memo(() => {
+  const { marketIndices, status, lastUpdate } = useMarketStream({
+    channels: ["market-indices"]
+  });
+
+  // Local state to control rendering and prevent flicker
+  const [displayIndices, setDisplayIndices] = useState(marketIndices);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Update display indices with a controlled interval to prevent flicker
+  useEffect(() => {
+    if (marketIndices.length > 0) {
+      setIsInitialized(true);
+      
+      // Only update if there's actual new data
+      const hasChanges = JSON.stringify(marketIndices) !== JSON.stringify(displayIndices);
+      if (hasChanges) {
+        setDisplayIndices(marketIndices);
+      }
+    }
+  }, [marketIndices, displayIndices]);
+
+  // Memoize the ticker content to prevent unnecessary re-renders
+  const tickerContent = useMemo(() => {
+    if (!isInitialized || displayIndices.length === 0) {
+      return <TickerSkeleton />;
+    }
+
+    return (
+      <div className="flex items-center justify-evenly w-full">
+        {displayIndices.map((index, i) => (
+          <TickerItem
+            key={`${index.symbol}-${index.price}`} // Use stable key
+            name={index.name}
+            price={index.price}
+            changePercent={index.changePercent}
+            showDivider={i > 0}
+          />
+        ))}
+      </div>
+    );
+  }, [displayIndices, isInitialized]);
+
+  // Don't render anything if not connected
+  if (!status.connected && !status.reconnecting && !isInitialized) {
     return null;
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-2xl border-b border-white/5">
+    <div className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-zinc-900 to-zinc-800 backdrop-blur-2xl border-b border-white/10">
       <div className="relative">
-        {/* Connection status indicator */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2">
-          <div className={cn(
-            "flex items-center gap-2 text-xs",
-            status.connected ? "text-emerald-400/60" : "text-amber-400/60"
-          )}>
-            <div className={cn(
-              "w-1.5 h-1.5 rounded-full animate-pulse",
-              status.connected ? "bg-emerald-400" : "bg-amber-400"
-            )} />
-            <span className="font-mono">
-              {status.connected ? "LIVE" : "CONNECTING"}
-            </span>
-          </div>
-        </div>
+        {/* Main ticker content */}
+        <div className="px-6 py-2">
+          <div className="max-w-screen-2xl mx-auto">
+            <div className="flex items-center justify-between">
+              {/* Ticker items */}
+              <div className="flex-1">
+                {tickerContent}
+              </div>
 
-        {/* Market indices ticker */}
-        <div className="overflow-hidden">
-          <div className="flex items-center gap-8 px-6 py-3 animate-scroll">
-            <AnimatePresence mode="wait">
-              {marketIndices.length > 0 ? (
-                marketIndices.map((index, i) => (
-                  <motion.div
-                    key={index.symbol}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-center gap-3 shrink-0"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-white/60 text-sm font-light">
-                        {index.name}
-                      </span>
-                      <span className="text-white font-mono text-sm">
-                        {formatNumber(index.price)}
-                      </span>
-                    </div>
-                    <div className={cn(
-                      "flex items-center gap-1",
-                      getTrendColor(index.changePercent)
-                    )}>
-                      {getTrendIcon(index.changePercent)}
-                      <span className="font-mono text-xs">
-                        {formatPercent(index.changePercent)}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="flex items-center gap-8">
-                  {["DOW", "S&P 500", "NASDAQ", "VIX"].map((name) => (
-                    <div key={name} className="flex items-center gap-3 shrink-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-white/40 text-sm">{name}</span>
-                        <div className="w-16 h-4 bg-white/5 rounded animate-pulse" />
-                      </div>
-                    </div>
-                  ))}
+              {/* Connection status indicator */}
+              <div className="ml-6 flex-shrink-0">
+                <div className={cn(
+                  "flex items-center gap-2 text-xs",
+                  status.connected ? "text-emerald-400/70" : "text-amber-400/70"
+                )}>
+                  <div className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    status.connected ? "bg-emerald-400 animate-pulse" : "bg-amber-400 animate-pulse"
+                  )} />
+                  <span className="font-mono text-white/70">
+                    {status.connected ? "LIVE" : status.reconnecting ? "RECONNECTING" : "OFFLINE"}
+                  </span>
                 </div>
-              )}
-            </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Last update timestamp */}
+        {/* Last update timestamp - subtle and unobtrusive */}
         {lastUpdate && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2">
-            <span className="text-[10px] text-white/20 font-mono">
+          <div className="absolute left-6 bottom-0 pb-0.5">
+            <span className="text-[10px] text-white/30 font-mono">
               {new Date(lastUpdate).toLocaleTimeString()}
             </span>
           </div>
@@ -115,4 +180,9 @@ export function MarketIndicesTicker() {
       </div>
     </div>
   );
-}
+});
+
+MarketIndicesTicker.displayName = 'MarketIndicesTicker';
+
+// Export as default for backward compatibility
+export default MarketIndicesTicker;
