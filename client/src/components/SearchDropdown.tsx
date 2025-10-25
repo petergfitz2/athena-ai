@@ -33,7 +33,7 @@ interface SearchDropdownProps {
   onResultClick?: (symbol: string) => void;
 }
 
-// Mock search results for demo
+// Mock search results for demo - expanded list for better search
 const mockSearchResults: SearchResult[] = [
   { 
     symbol: "AAPL", 
@@ -85,6 +85,106 @@ const mockSearchResults: SearchResult[] = [
     marketCap: 1.2e12,
     type: "stock" 
   },
+  { 
+    symbol: "F", 
+    name: "Ford Motor Company", 
+    price: 10.84, 
+    change: -0.12, 
+    changePercent: -1.09, 
+    volume: 52341234,
+    marketCap: 43.2e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "GM", 
+    name: "General Motors Company", 
+    price: 38.92, 
+    change: 0.45, 
+    changePercent: 1.17, 
+    volume: 12345678,
+    marketCap: 44.8e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "AMZN", 
+    name: "Amazon.com Inc.", 
+    price: 147.34, 
+    change: 1.89, 
+    changePercent: 1.30, 
+    volume: 34567890,
+    marketCap: 1.5e12,
+    type: "stock" 
+  },
+  { 
+    symbol: "META", 
+    name: "Meta Platforms Inc.", 
+    price: 322.45, 
+    change: -3.21, 
+    changePercent: -0.99, 
+    volume: 21345678,
+    marketCap: 820e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "JPM", 
+    name: "JPMorgan Chase & Co.", 
+    price: 155.67, 
+    change: 0.89, 
+    changePercent: 0.57, 
+    volume: 9876543,
+    marketCap: 450e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "BAC", 
+    name: "Bank of America Corporation", 
+    price: 32.45, 
+    change: -0.23, 
+    changePercent: -0.70, 
+    volume: 43215678,
+    marketCap: 260e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "WMT", 
+    name: "Walmart Inc.", 
+    price: 162.89, 
+    change: 1.12, 
+    changePercent: 0.69, 
+    volume: 7654321,
+    marketCap: 440e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "DIS", 
+    name: "The Walt Disney Company", 
+    price: 92.34, 
+    change: -1.45, 
+    changePercent: -1.54, 
+    volume: 11234567,
+    marketCap: 168e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "NFLX", 
+    name: "Netflix Inc.", 
+    price: 437.89, 
+    change: 5.67, 
+    changePercent: 1.31, 
+    volume: 4567890,
+    marketCap: 195e9,
+    type: "stock" 
+  },
+  { 
+    symbol: "AMD", 
+    name: "Advanced Micro Devices Inc.", 
+    price: 138.45, 
+    change: 3.21, 
+    changePercent: 2.37, 
+    volume: 54321098,
+    marketCap: 224e9,
+    type: "stock" 
+  },
 ];
 
 export default function SearchDropdown({ 
@@ -121,11 +221,45 @@ export default function SearchDropdown({
       return;
     }
 
-    // Filter stocks by symbol or name
-    const filtered = mockSearchResults.filter(result => 
-      result.symbol.toLowerCase().includes(query) ||
-      result.name.toLowerCase().includes(query)
-    ).slice(0, 6);
+    // Filter stocks by symbol or name - smart matching
+    const filtered = mockSearchResults.filter(result => {
+      const symbolMatch = result.symbol.toLowerCase().includes(query);
+      const nameMatch = result.name.toLowerCase().includes(query);
+      
+      // Also match individual words in company names
+      const nameWords = result.name.toLowerCase().split(' ');
+      const queryWords = query.split(' ').filter(w => w.length > 0);
+      
+      // Check if any query word matches any name word
+      const wordMatch = queryWords.some(queryWord => 
+        nameWords.some(nameWord => nameWord.startsWith(queryWord))
+      );
+      
+      return symbolMatch || nameMatch || wordMatch;
+    })
+    .sort((a, b) => {
+      // Prioritize exact symbol matches
+      const aSymbolExact = a.symbol.toLowerCase() === query;
+      const bSymbolExact = b.symbol.toLowerCase() === query;
+      if (aSymbolExact && !bSymbolExact) return -1;
+      if (!aSymbolExact && bSymbolExact) return 1;
+      
+      // Then prioritize symbol starts with
+      const aSymbolStarts = a.symbol.toLowerCase().startsWith(query);
+      const bSymbolStarts = b.symbol.toLowerCase().startsWith(query);
+      if (aSymbolStarts && !bSymbolStarts) return -1;
+      if (!aSymbolStarts && bSymbolStarts) return 1;
+      
+      // Then prioritize name starts with
+      const aNameStarts = a.name.toLowerCase().startsWith(query);
+      const bNameStarts = b.name.toLowerCase().startsWith(query);
+      if (aNameStarts && !bNameStarts) return -1;
+      if (!aNameStarts && bNameStarts) return 1;
+      
+      // Finally sort by market cap (larger companies first)
+      return (b.marketCap || 0) - (a.marketCap || 0);
+    })
+    .slice(0, 6);
 
     setFilteredResults(filtered);
   }, [searchQuery]);
