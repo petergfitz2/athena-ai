@@ -1,7 +1,18 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, decimal, pgEnum, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, decimal, pgEnum, integer, boolean, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
 
 // Avatar definitions
 export const avatars = pgTable("avatars", {
@@ -35,15 +46,19 @@ export const userAvatars = pgTable("user_avatars", {
   isActive: boolean("is_active").default(false).notNull(),
 });
 
-// Users table
+// Users table - updated for Replit Auth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  password: text("password"), // Made optional for Google auth users
+  email: text("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: text("profile_image_url"),
+  
+  // Legacy fields from original schema - kept for compatibility
+  username: text("username").unique(),
+  password: text("password"), // Optional for OAuth users
   fullName: text("full_name"),
   accountBalance: decimal("account_balance", { precision: 18, scale: 2 }).notNull().default('0'),
-  profileImageUrl: text("profile_image_url"),
   phoneNumber: text("phone_number"),
   preferredMode: text("preferred_mode").default('amanda'),
   emailNotifications: boolean("email_notifications").notNull().default(true),
@@ -51,6 +66,7 @@ export const users = pgTable("users", {
   activeAvatarId: varchar("active_avatar_id").references(() => avatars.id),
   googleId: text("google_id").unique(), // For Google OAuth
   authProvider: text("auth_provider").default('local'), // 'local' or 'google'
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import GlassCard from "@/components/GlassCard";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Brain, TrendingUp, Shield, Trophy, Star, LogIn, Sparkles, Users } from "lucide-react";
 import { SiGoogle, SiGithub, SiApple } from "react-icons/si";
