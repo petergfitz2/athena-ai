@@ -50,10 +50,7 @@ interface ChatProviderProps {
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isPanelOpen, setIsPanelOpen] = useState(() => {
-    const saved = localStorage.getItem("chatPanelOpen");
-    return saved ? JSON.parse(saved) : false;
-  });
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("chatPanelCollapsed");
     return saved ? JSON.parse(saved) : false;

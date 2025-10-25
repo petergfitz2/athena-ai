@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from "@/lib/auth";
 import { ModeProvider, useMode } from "@/contexts/ModeContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { StockDetailModalProvider } from "@/contexts/StockDetailModalContext";
-import LeftChatPanel from "@/components/LeftChatPanel";
+import RightChatPanel from "@/components/RightChatPanel";
 import FloatingChatBubble from "@/components/FloatingChatBubble";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AuthPage from "@/pages/AuthPage";

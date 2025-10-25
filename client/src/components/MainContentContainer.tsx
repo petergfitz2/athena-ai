@@ -21,8 +21,8 @@ export default function MainContentContainer({ children, className }: MainConten
     >
       <div
         className={cn(
-          "transition-[margin] duration-[0.3s] ease-in-out",
-          shouldShift ? "md:ml-[420px]" : "",
+          "transition-all duration-300 ease-in-out",
+          shouldShift ? "md:mr-[420px]" : "",
           "min-h-screen"
         )}
       >

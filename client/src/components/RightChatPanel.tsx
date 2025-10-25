@@ -16,7 +16,7 @@ import AthenaTraderAvatar from "@/components/AthenaTraderAvatar";
 import ChatMessage from "@/components/ChatMessage";
 import { cn } from "@/lib/utils";
 
-export default function LeftChatPanel() {
+export default function RightChatPanel() {
   const {
     messages,
     isPanelOpen,
@@ -121,21 +121,21 @@ export default function LeftChatPanel() {
     return null;
   }
 
-  // Handle collapsed state with a minimal vertical bar
+  // Handle collapsed state with a minimal vertical bar on the right
   if (isCollapsed) {
     return (
       <AnimatePresence>
         <motion.div
-          initial={{ x: -100, opacity: 0 }}
+          initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -100, opacity: 0 }}
+          exit={{ x: 100, opacity: 0 }}
           transition={{ type: "spring", damping: 25 }}
-          className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-1 z-40 bg-gradient-to-b from-primary/30 to-primary/10 
+          className="fixed right-0 top-[64px] h-[calc(100vh-64px)] w-1 z-40 bg-gradient-to-b from-primary/30 to-primary/10 
                      hover:w-2 cursor-pointer transition-all duration-200"
           onClick={handleExpand}
           data-testid="button-expand-chat-bar"
         >
-          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-20 
+          <div className="absolute top-1/2 -translate-y-1/2 right-0 w-full h-20 
                           bg-gradient-to-b from-transparent via-primary to-transparent opacity-60 animate-pulse" />
         </motion.div>
       </AnimatePresence>
@@ -146,7 +146,7 @@ export default function LeftChatPanel() {
     <AnimatePresence>
       <motion.div
         initial={{ 
-          x: window.innerWidth < 768 ? 0 : -400, 
+          x: window.innerWidth < 768 ? 0 : 420, 
           y: window.innerWidth < 768 ? "100%" : 0,
           opacity: 0 
         }}
@@ -156,22 +156,22 @@ export default function LeftChatPanel() {
           opacity: 1 
         }}
         exit={{ 
-          x: window.innerWidth < 768 ? 0 : -400, 
+          x: window.innerWidth < 768 ? 0 : 420, 
           y: window.innerWidth < 768 ? "100%" : 0,
           opacity: 0 
         }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="fixed md:left-0 md:top-[64px] md:bottom-0 
+        className="fixed md:right-0 md:top-[64px] md:bottom-0 
                    left-0 right-0 bottom-0 
                    md:w-[420px] w-full
                    md:max-h-[calc(100vh-64px)] max-h-[85vh]
                    z-40 bg-black/95 backdrop-blur-xl 
-                   md:border-r border-t md:border-t-0 border-white/10 
+                   md:border-l border-t md:border-t-0 border-white/10 
                    flex flex-col
-                   md:shadow-[10px_0_40px_rgba(0,0,0,0.25)]
+                   md:shadow-[-10px_0_40px_rgba(0,0,0,0.25)]
                    shadow-2xl
                    md:rounded-none rounded-t-[28px]"
-        data-testid="left-chat-panel"
+        data-testid="right-chat-panel"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-white/10">
