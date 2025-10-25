@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { apiJson } from "@/lib/queryClient";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -1010,10 +1011,41 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                 />
               ))}
               {isLoading && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <AthenaTraderAvatar size="mini" isTyping={true} showStatus={false} showName={false} />
-                  <span className="text-sm">Analyzing...</span>
-                </div>
+                <motion.div 
+                  className="flex items-center gap-3 px-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="bg-white/[0.05] backdrop-blur-md border border-white/10 rounded-[20px] px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <motion.div 
+                        className="flex gap-1"
+                        initial={{ opacity: 0.6 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                      >
+                        <motion.span 
+                          className="w-2 h-2 bg-primary rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                        />
+                        <motion.span 
+                          className="w-2 h-2 bg-primary rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+                        />
+                        <motion.span 
+                          className="w-2 h-2 bg-primary rounded-full"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
+                        />
+                      </motion.div>
+                      <span className="text-sm text-white/60 font-light">Athena is thinking...</span>
+                    </div>
+                  </div>
+                </motion.div>
               )}
               {/* Auto-scroll anchor */}
               <div ref={messagesEndRef} />

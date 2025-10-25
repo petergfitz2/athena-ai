@@ -95,9 +95,17 @@ export default function ChatMessage({ content, role, timestamp, quickReplies, on
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        type: "spring", 
+        damping: 20, 
+        stiffness: 150,
+        duration: 0.4 
+      }}
       className={cn(
-        "flex w-full animate-slide-in gap-2",
+        "flex w-full gap-2",
         isUser ? "justify-end" : "justify-start"
       )}
     >
@@ -147,6 +155,6 @@ export default function ChatMessage({ content, role, timestamp, quickReplies, on
         )}
       </div>
       
-    </div>
+    </motion.div>
   );
 }
