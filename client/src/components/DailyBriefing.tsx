@@ -126,10 +126,10 @@ export default function DailyBriefing({ onDismiss }: DailyBriefingProps) {
   return (
     <div className={cn(
       "fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300",
-      "p-4 sm:p-6"
+      "p-6 sm:p-8"
     )}>
       <Card className={cn(
-        "w-full max-w-2xl max-h-[85vh] bg-gradient-to-br border-white/20 shadow-2xl rounded-[28px] overflow-hidden flex flex-col",
+        "w-full max-w-2xl max-h-[75vh] bg-gradient-to-br border-white/20 shadow-2xl rounded-[28px] overflow-hidden flex flex-col",
         "animate-in slide-in-from-bottom duration-500",
         timeData.theme
       )}>
