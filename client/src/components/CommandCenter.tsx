@@ -489,82 +489,70 @@ export default function CommandCenter() {
         {/* Consolidated Onboarding Drawer */}
         <OnboardingDrawer />
         
-        {/* Header with Avatar and Greeting */}
-        <div className="sticky top-20 z-30 bg-black/80 backdrop-blur-xl border-b border-white/10">
-          <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-4">
+        {/* Compact Header Bar */}
+        <div className="border-b border-white/10">
+          <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
-                <div>
-                  <h1 className="text-2xl font-medium text-foreground">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-base sm:text-lg font-medium text-foreground">
                     {getGreeting()}
                   </h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <marketStatus.icon className="w-4 h-4" />
-                    <span className={cn("text-base font-medium", marketStatus.color)}>
+                  <div className="flex items-center gap-1.5">
+                    <marketStatus.icon className="w-3.5 h-3.5" />
+                    <span className={cn("text-sm font-medium", marketStatus.color)}>
                       {marketStatus.text}
                     </span>
                   </div>
                 </div>
               </div>
             
-            <div className="flex items-center gap-3">
-              <DemoModeBanner inline />
-              <Button
-                onClick={isRecording ? stopRecording : startRecording}
-                variant={isRecording ? "destructive" : "default"}
-                size="sm"
-                className="rounded-full font-medium"
-                data-testid="button-voice-command"
-              >
-                {isRecording ? <Square className="w-4 h-4 mr-2" /> : <Mic className="w-4 h-4 mr-2" />}
-                <span className="font-semibold">{isRecording ? "Recording..." : "Voice Command"}</span>
-              </Button>
-              <Button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                variant="ghost"
-                size="sm"
-                className="rounded-full font-medium"
-                data-testid="button-toggle-chat"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                <span className="font-semibold">Chat</span>
-                {sidebarOpen && <X className="w-4 h-4 ml-2" />}
-              </Button>
-            </div>
+              <div className="flex items-center gap-2">
+                {!user && <DemoModeBanner inline />}
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  variant={isRecording ? "destructive" : "default"}
+                  size="default"
+                  className="rounded-full min-h-[44px] px-4"
+                  data-testid="button-voice-command"
+                >
+                  {isRecording ? <Square className="w-4 h-4 sm:mr-2" /> : <Mic className="w-4 h-4 sm:mr-2" />}
+                  <span className="hidden sm:inline font-semibold">{isRecording ? "Recording..." : "Voice"}</span>
+                </Button>
+                <Button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  variant="outline"
+                  size="default"
+                  className="rounded-full min-h-[44px] px-4 bg-black/60 backdrop-blur-xl border-white/10"
+                  data-testid="button-toggle-chat"
+                >
+                  <MessageCircle className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline font-semibold">Chat</span>
+                  {sidebarOpen && <X className="w-4 h-4 ml-1" />}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Daily Briefing */}
-        {showBriefing && (
-          <DailyBriefing onDismiss={() => setShowBriefing(false)} />
-        )}
-
-        {/* Main Grid Layout */}
+        {/* Main Content Area */}
         <div className={cn(
-        "w-full max-w-screen-2xl mx-auto p-4 sm:p-6 transition-all duration-300",
-        sidebarOpen ? "lg:mr-[400px] xl:mr-[450px]" : ""
-      )}>
-        {/* Chat Button - Opens AI advisor conversation */}
-        {!sidebarOpen && (
-          <div className="mb-6">
-            <Button
-              onClick={() => setSidebarOpen(true)}
-              size="lg"
-              className="rounded-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-              data-testid="button-open-chat"
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Chat with your AI advisor
-            </Button>
+          "w-full max-w-screen-2xl mx-auto p-4 sm:p-6 transition-all duration-300",
+          sidebarOpen ? "lg:mr-[400px] xl:mr-[450px]" : ""
+        )}>
+          
+          {/* Daily Briefing - Compact placement */}
+          {showBriefing && (
+            <div className="mb-4">
+              <DailyBriefing onDismiss={() => setShowBriefing(false)} />
+            </div>
+          )}
+          
+          {/* Investment Dashboard Header */}
+          <div className="mb-4">
+            <h2 className="text-xl sm:text-2xl font-medium text-foreground">Investment Dashboard</h2>
           </div>
-        )}
-
-        {/* Investment Dashboard - ACTUAL CONTENT */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-normal text-foreground mb-4">Investment Dashboard</h2>
-        </div>
 
         <div className={cn(
           "grid gap-4 sm:gap-6",
