@@ -11,6 +11,7 @@ import { StockDetailModalProvider } from "@/contexts/StockDetailModalContext";
 import RightChatPanel from "@/components/RightChatPanel";
 import FloatingChatBubble from "@/components/FloatingChatBubble";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { MarketIndicesTicker } from "@/components/MarketIndicesTicker";
 import AuthPage from "@/pages/AuthPage";
 import PasswordResetPage from "@/pages/PasswordResetPage";
 import CommandCenter from "@/components/CommandCenter";
@@ -196,6 +197,21 @@ function Router() {
   );
 }
 
+function AppWithAuth() {
+  const { user } = useAuth();
+  
+  return (
+    <>
+      {user && <MarketIndicesTicker />}
+      <div className={user ? "pt-12" : ""}>
+        <Router />
+      </div>
+      <RightChatPanel />
+      <FloatingChatBubble />
+    </>
+  );
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -207,9 +223,7 @@ function App() {
                 <TooltipProvider>
                   <div className="dark">
                     <Toaster />
-                    <Router />
-                    <RightChatPanel />
-                    <FloatingChatBubble />
+                    <AppWithAuth />
                   </div>
                 </TooltipProvider>
               </StockDetailModalProvider>

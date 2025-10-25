@@ -1938,18 +1938,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // WebSocket server for real-time updates
   const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
+  
+  // Initialize market streaming service
+  const MarketStreamService = require('./services/marketStream').default;
+  const marketStream = new MarketStreamService(wss);
 
-  wss.on("connection", (ws) => {
-    console.log("WebSocket client connected");
-
-    ws.on("message", (message) => {
-      console.log("Received:", message.toString());
-      // Handle WebSocket messages here
-    });
-
-    ws.on("close", () => {
-      console.log("WebSocket client disconnected");
-    });
+  // Cleanup on server shutdown
+  process.on('SIGINT', () => {
+    marketStream.cleanup();
+    process.exit();
   });
 
   return httpServer;
