@@ -586,7 +586,7 @@ export default function CommandCenter() {
             <AIInsights />
 
             {/* Quick Actions */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300">
+            <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[28px] hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:border-white/20">
             <CardHeader className="pb-4 sm:pb-6">
               <CardTitle className="font-light text-lg sm:text-xl">Quick Actions</CardTitle>
             </CardHeader>
@@ -620,7 +620,7 @@ export default function CommandCenter() {
           </Card>
 
             {/* Market Pulse - News Feed */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300">
+            <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[28px] hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:border-white/20">
             <CardHeader className="pb-4 sm:pb-6">
               <CardTitle className="flex items-center justify-between">
                 <span className="font-light text-lg sm:text-xl">Market Pulse</span>
@@ -724,7 +724,7 @@ export default function CommandCenter() {
             {/* Tertiary Section - Full-width Cards */}
             <div className="space-y-8">
             {/* Active Positions */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+            <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[28px] hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:border-white/20">
             <CardHeader className="p-6 pb-4">
               <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                 <span className="font-light">Active Positions</span>
@@ -827,7 +827,7 @@ export default function CommandCenter() {
             </Card>
 
             {/* Watchlist */}
-            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[28px] hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+            <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-[28px] hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:border-white/20">
             <CardHeader className="p-6 pb-4">
               <CardTitle className="flex items-center justify-between">
                 <span className="font-light text-lg sm:text-xl">Watchlist</span>
