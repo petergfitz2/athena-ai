@@ -648,9 +648,9 @@ export default function CommandCenter() {
               </div>
               
               <Button 
-                className="w-full rounded-full"
+                className="w-full rounded-full min-h-[44px]"
                 variant="default"
-                size="sm"
+                size="default"
                 data-testid="button-view-recommendations"
               >
                 View All Recommendations
