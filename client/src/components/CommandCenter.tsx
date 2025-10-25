@@ -63,6 +63,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  quickReplies?: string[];
 }
 
 interface Holding {
@@ -357,16 +358,17 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
     setIsLoading(true);
 
     try {
-      const data = await apiJson<{ response: string }>("POST", "/api/chat", {
+      const data = await apiJson<{ response: string; quickReplies?: string[] }>("POST", "/api/chat", {
         message: text,
         conversationId,
       });
 
-      const assistantMessage: Message = {
+      const assistantMessage: Message & { quickReplies?: string[] } = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
         content: data.response,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        quickReplies: data.quickReplies,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -998,7 +1000,14 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           <ScrollArea className="flex-1 px-1.5 py-2">
             <div className="space-y-3">
               {messages.map((message) => (
-                <ChatMessage key={message.id} {...message} />
+                <ChatMessage 
+                  key={message.id} 
+                  {...message}
+                  onQuickReply={(reply) => {
+                    setInput(reply);
+                    handleSendMessage(reply);
+                  }}
+                />
               ))}
               {isLoading && (
                 <div className="flex items-center gap-2 text-muted-foreground">

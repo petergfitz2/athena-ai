@@ -9,6 +9,8 @@ interface ChatMessageProps {
   content: string;
   role: "user" | "assistant";
   timestamp?: string;
+  quickReplies?: string[];
+  onQuickReply?: (reply: string) => void;
 }
 
 // Common stock tickers to increase confidence in detection
@@ -25,7 +27,9 @@ const commonTickers = [
   'SPY', 'QQQ', 'IWM', 'DIA', 'VTI', 'VOO', 'EFA', 'EEM', 'GLD', 'SLV', 'USO', 'TLT'
 ];
 
-export default function ChatMessage({ content, role, timestamp }: ChatMessageProps) {
+import { Button } from "@/components/ui/button";
+
+export default function ChatMessage({ content, role, timestamp, quickReplies, onQuickReply }: ChatMessageProps) {
   const isUser = role === "user";
   
   // Fetch active avatar for AI messages
@@ -123,6 +127,24 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
             <p className="text-xs text-muted-foreground mt-2 font-light">{timestamp}</p>
           )}
         </div>
+        
+        {/* Quick Reply Buttons */}
+        {!isUser && quickReplies && quickReplies.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2 ml-2">
+            {quickReplies.map((reply, idx) => (
+              <Button
+                key={idx}
+                onClick={() => onQuickReply?.(reply)}
+                variant="outline"
+                size="sm"
+                className="rounded-full text-xs border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 transition-all"
+                data-testid={`button-quick-reply-${idx}`}
+              >
+                {reply}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
       
     </div>

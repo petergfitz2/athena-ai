@@ -781,9 +781,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           conversation.messages.push(aiMessage);
         }
 
+        // Detect intent and get quick replies
+        const intent = await import("./athenaConversations").then(m => m.detectConversationIntent(message));
+        const quickReplies = await import("./athenaConversations").then(m => m.generateQuickReplies(intent));
+        
         // Return simplified response for demo mode with mock analysis
         return res.json({ 
           response: aiResponse,
+          quickReplies,
           analysis: {
             hurriedScore: 30,
             analyticalScore: 50,
@@ -864,7 +869,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
 
-      res.json({ response: aiResponse });
+      // Detect intent and get quick replies
+      const intent = await import("./athenaConversations").then(m => m.detectConversationIntent(message));
+      const quickReplies = await import("./athenaConversations").then(m => m.generateQuickReplies(intent));
+      
+      res.json({ response: aiResponse, quickReplies });
     } catch (error) {
       console.error("Chat error:", error);
       res.status(500).json({ error: "Failed to generate response" });
