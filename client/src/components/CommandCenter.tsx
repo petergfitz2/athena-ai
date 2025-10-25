@@ -589,7 +589,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         {/* Main Content Area - Luxury Grid Layout */}
         <div className={cn(
           "w-full px-8 py-8 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          sidebarOpen ? "sm:mr-[360px] md:mr-[380px] lg:mr-[400px]" : "" // Account for chat sidebar width
+          sidebarOpen ? "sm:mr-[320px] md:mr-[340px] lg:mr-[360px]" : "" // Account for chat sidebar width
         )}>
           
           {/* Daily Briefing - Floating Above Content */}
@@ -959,7 +959,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
       
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
-        "fixed right-0 top-0 h-full w-full sm:w-[360px] md:w-[380px] lg:w-[400px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
+        "fixed right-0 top-0 h-full w-full sm:w-[320px] md:w-[340px] lg:w-[360px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
         sidebarOpen 
           ? "translate-x-0 opacity-100 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]" 
           : "translate-x-full opacity-95 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
@@ -969,14 +969,14 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           sidebarOpen ? "scale-100" : "scale-[0.98]"
         )}>
           {/* Refined Chat Header - Minimalist Luxury */}
-          <div className="p-8 border-b border-white/10 bg-gradient-to-r from-white/[0.02] to-white/[0.04] backdrop-blur-md">
+          <div className="p-5 border-b border-white/10 bg-gradient-to-r from-white/[0.02] to-white/[0.04] backdrop-blur-md">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-4 min-w-0">
                 <div className="flex-shrink-0">
                   <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-xl font-light text-white">Athena AI</h3>
+                  <h3 className="text-lg font-light text-white">Athena AI</h3>
                 </div>
               </div>
               <Button
@@ -987,7 +987,7 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                 data-testid="button-close-sidebar"
                 title="Close chat (Esc)"
               >
-                <X className="w-5 h-5 text-white/60 hover:text-white" />
+                <X className="w-4 h-4 text-white/60 hover:text-white" />
               </Button>
             </div>
           </div>
@@ -1010,9 +1010,9 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
           </ScrollArea>
           
           {/* Enhanced Chat Input - AI-First Design */}
-          <div className="p-6 border-t border-white/20 bg-gradient-to-t from-black/50 to-transparent">
-            <div className="space-y-3">
-              <div className="flex gap-3">
+          <div className="p-4 border-t border-white/20 bg-gradient-to-t from-black/50 to-transparent">
+            <div className="space-y-2">
+              <div className="flex gap-2">
                 <Textarea
                   ref={chatInputRef}
                   value={input}
@@ -1023,8 +1023,8 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Ask me anything: 'Analyze TSLA' • 'Buy 100 shares of AAPL' • 'What's moving the market today?'"
-                  className="flex-1 min-h-[80px] max-h-[150px] resize-none rounded-[24px] bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/50 text-base px-5 py-4 focus:border-primary/50 focus:ring-2 focus:ring-primary/30 transition-all"
+                  placeholder="Ask about stocks, trades, or markets..."
+                  className="flex-1 min-h-[60px] max-h-[100px] resize-none rounded-[20px] bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/50 text-sm px-4 py-3 focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
                   disabled={isLoading}
                   data-testid="textarea-chat-message"
                   autoFocus

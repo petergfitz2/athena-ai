@@ -99,28 +99,28 @@ export default function ChatMessage({ content, role, timestamp }: ChatMessagePro
     >
       {/* No avatar in messages - only in header for cleaner design */}
       
-      <div className="flex flex-col max-w-[85%] md:max-w-[75%]">
+      <div className="flex flex-col max-w-[85%] md:max-w-[80%]">
         {/* Subtle name label for AI messages */}
         {!isUser && (
-          <p className="text-xs font-light text-white/40 mb-1.5 ml-3">
+          <p className="text-xs font-light text-white/30 mb-1 ml-2">
             Athena AI
           </p>
         )}
         
         <div
           className={cn(
-            "rounded-[28px] px-6 md:px-8 lg:px-10 py-6 md:py-7 lg:py-8 border transition-all duration-300",
+            "rounded-[20px] px-4 py-3 border transition-all duration-300",
             isUser
               ? "bg-primary/20 border-primary/30"
-              : "bg-white/[0.06] backdrop-blur-md border-white/10"
+              : "bg-white/[0.05] backdrop-blur-md border-white/10"
           )}
           data-testid={`message-${role}`}
         >
-          <div className="text-base md:text-lg leading-relaxed font-light whitespace-pre-wrap text-foreground">
+          <div className="text-sm leading-relaxed font-light whitespace-pre-wrap text-foreground">
             {renderContentWithClickableTickers(content)}
           </div>
           {timestamp && (
-            <p className="text-xs text-muted-foreground mt-3 lg:mt-4 font-light">{timestamp}</p>
+            <p className="text-xs text-muted-foreground mt-2 font-light">{timestamp}</p>
           )}
         </div>
       </div>
