@@ -57,13 +57,31 @@ function updateUserSession(
 async function upsertUser(
   claims: any,
 ) {
-  await storage.upsertUser({
-    id: claims["sub"],
+  console.log('[UPSERT_USER] Starting with claims:', {
+    sub: claims["sub"],
     email: claims["email"],
-    firstName: claims["first_name"],
-    lastName: claims["last_name"],
-    profileImageUrl: claims["profile_image_url"],
+    first_name: claims["first_name"],
+    last_name: claims["last_name"],
   });
+  
+  try {
+    const userData = {
+      id: claims["sub"],
+      email: claims["email"],
+      firstName: claims["first_name"],
+      lastName: claims["last_name"],
+      profileImageUrl: claims["profile_image_url"],
+    };
+    
+    console.log('[UPSERT_USER] Calling storage.upsertUser with data:', userData);
+    const result = await storage.upsertUser(userData);
+    console.log('[UPSERT_USER] Successfully saved user:', result.id);
+    return result;
+  } catch (error) {
+    console.error('[UPSERT_USER] Failed to save user:', error);
+    console.error('[UPSERT_USER] Error stack:', error instanceof Error ? error.stack : 'No stack');
+    throw error;
+  }
 }
 
 export async function setupAuth(app: Express) {
@@ -78,10 +96,35 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    console.log('[VERIFY] Function called with tokens');
+    
+    try {
+      const user = {};
+      
+      console.log('[VERIFY] Calling updateUserSession...');
+      updateUserSession(user, tokens);
+      console.log('[VERIFY] updateUserSession completed successfully');
+      
+      const claims = tokens.claims();
+      console.log('[VERIFY] User claims:', {
+        sub: claims["sub"],
+        email: claims["email"],
+        first_name: claims["first_name"],
+        last_name: claims["last_name"],
+      });
+      
+      console.log('[VERIFY] Calling upsertUser...');
+      await upsertUser(claims);
+      console.log('[VERIFY] upsertUser completed successfully');
+      
+      console.log('[VERIFY] Calling verified() with user');
+      verified(null, user);
+      console.log('[VERIFY] Authentication successful!');
+    } catch (error) {
+      console.error('[VERIFY] Error during verification:', error);
+      console.error('[VERIFY] Error details:', JSON.stringify(error, null, 2));
+      verified(error as Error, false);
+    }
   };
 
   // Register strategies for all REPLIT_DOMAINS
@@ -130,6 +173,10 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    console.log('[CALLBACK] Handler started');
+    console.log('[CALLBACK] Query params:', req.query);
+    console.log('[CALLBACK] Headers host:', req.headers.host);
+    
     // Check if request is coming from Replit domain
     const isReplitDomain = req.hostname.includes('replit.dev') || req.hostname.includes('replit.app');
     
@@ -138,12 +185,39 @@ export async function setupAuth(app: Express) {
       ? 'replitauth:localhost' 
       : `replitauth:${req.hostname}`;
     
-    console.log('Callback attempt with strategy:', strategyName, 'hostname:', req.hostname, 'isReplitDomain:', isReplitDomain);
+    console.log('[CALLBACK] Using strategy:', strategyName, 'hostname:', req.hostname, 'isReplitDomain:', isReplitDomain);
     
+    console.log('[CALLBACK] About to call passport.authenticate...');
     passport.authenticate(strategyName, {
       successReturnToOrRedirect: "/dashboard",
       failureRedirect: "/",
+    }, (err, user, info) => {
+      console.log('[CALLBACK] Authenticate callback - err:', err);
+      console.log('[CALLBACK] Authenticate callback - user:', user);
+      console.log('[CALLBACK] Authenticate callback - info:', info);
+      
+      if (err) {
+        console.error('[CALLBACK] Authentication error:', err);
+        return res.redirect('/');
+      }
+      
+      if (!user) {
+        console.log('[CALLBACK] No user returned, redirecting to /');
+        return res.redirect('/');
+      }
+      
+      console.log('[CALLBACK] User authenticated, logging in...');
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error('[CALLBACK] Login error:', loginErr);
+          return res.redirect('/');
+        }
+        console.log('[CALLBACK] Login successful, redirecting to /dashboard');
+        return res.redirect('/dashboard');
+      });
     })(req, res, next);
+    
+    console.log('[CALLBACK] Handler completed');
   });
 
   app.get("/api/logout", (req, res) => {
