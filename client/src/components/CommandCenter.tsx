@@ -505,17 +505,17 @@ export default function CommandCenter() {
         
         {/* Compact Header Bar */}
         <div className="border-b border-white/10">
-          <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 py-2">
+          <div className="w-full max-w-7xl mx-auto px-6 py-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <AthenaTraderAvatar size="small" showStatus={true} showName={false} />
-                <div className="flex items-center gap-2">
-                  <h1 className="text-base sm:text-lg font-medium text-foreground">
+                <div>
+                  <h1 className="text-lg sm:text-xl font-medium text-foreground">
                     {getGreeting()}
                   </h1>
-                  <div className="flex items-center gap-1.5">
-                    <marketStatus.icon className="w-3.5 h-3.5" />
-                    <span className={cn("text-sm font-medium", marketStatus.color)}>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <marketStatus.icon className="w-4 h-4" />
+                    <span className={cn("text-sm", marketStatus.color)}>
                       {marketStatus.text}
                     </span>
                   </div>
@@ -552,40 +552,40 @@ export default function CommandCenter() {
         
         {/* Main Content Area */}
         <div className={cn(
-          "w-full max-w-screen-2xl mx-auto p-4 sm:p-6 transition-all duration-300",
-          sidebarOpen ? "lg:mr-[400px] xl:mr-[450px]" : ""
+          "w-full max-w-7xl mx-auto px-6 py-6 transition-all duration-300",
+          sidebarOpen ? "lg:mr-[420px]" : ""
         )}>
           
           {/* Daily Briefing - Compact placement */}
           {showBriefing && (
-            <div className="mb-4">
+            <div className="mb-6">
               <DailyBriefing onDismiss={() => setShowBriefing(false)} />
             </div>
           )}
           
-          {/* Investment Dashboard Header */}
-          <div className="mb-4">
-            <h2 className="text-xl sm:text-2xl font-medium text-foreground">Investment Dashboard</h2>
+          {/* Hero Section - Portfolio & Market Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Portfolio Snapshot - Primary Focus */}
+            <div className="lg:col-span-1">
+              <PortfolioSnapshot 
+                portfolioSummary={portfolioSummary} 
+                topMovers={topMovers} 
+              />
+            </div>
+            
+            {/* Market Overview - Secondary */}
+            <div className="lg:col-span-1">
+              <MarketOverview onTrade={handleOpenTradeModal} />
+            </div>
           </div>
+          
+          {/* Secondary Grid - Supporting Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* AI Insights */}
+            <AIInsights />
 
-        <div className={cn(
-          "grid gap-4 sm:gap-6",
-          expandedView ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 lg:grid-cols-2"
-        )}>
-          {/* Portfolio Snapshot */}
-          <PortfolioSnapshot 
-            portfolioSummary={portfolioSummary} 
-            topMovers={topMovers} 
-          />
-
-          {/* Market Indices - Live Data */}
-          <MarketOverview onTrade={handleOpenTradeModal} />
-
-          {/* AI Insights */}
-          <AIInsights />
-
-          {/* Quick Actions */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
+            {/* Quick Actions */}
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-3 sm:pb-4">
               <CardTitle className="font-medium text-base sm:text-lg">Quick Actions</CardTitle>
             </CardHeader>
@@ -618,8 +618,8 @@ export default function CommandCenter() {
             </CardContent>
           </Card>
 
-          {/* Market Pulse - Fully Interactive */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-1">
+            {/* Market Pulse - News Feed */}
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
                 <span className="font-medium">Market Pulse</span>
@@ -717,10 +717,13 @@ export default function CommandCenter() {
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
-          </Card>
-
-          {/* Active Positions */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] col-span-1 sm:col-span-2 lg:col-span-2">
+            </Card>
+          </div>
+          
+          {/* Tertiary Section - Full-width Cards */}
+          <div className="space-y-6 mt-6">
+            {/* Active Positions */}
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-3 sm:pb-4">
               <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                 <span className="font-medium">Active Positions</span>
@@ -820,10 +823,10 @@ export default function CommandCenter() {
                 </Button>
               )}
             </CardContent>
-          </Card>
+            </Card>
 
-          {/* Watchlist */}
-          <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px] lg:col-span-1">
+            {/* Watchlist */}
+            <Card className="bg-card/50 backdrop-blur-xl border-white/10 rounded-[20px]">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center justify-between">
                 <span className="font-medium">Watchlist</span>
@@ -902,20 +905,8 @@ export default function CommandCenter() {
                 </Button>
               )}
             </CardContent>
-          </Card>
-        </div>
-        
-        {/* View Toggle */}
-        <div className="flex justify-center mt-6">
-          <Button
-            onClick={() => setExpandedView(!expandedView)}
-            variant="ghost"
-            size="sm"
-            className="rounded-full"
-            data-testid="button-toggle-view"
-          >
-            {expandedView ? "Compact View" : "Expanded View"}
-          </Button>
+            </Card>
+          </div>
         </div>
       </div>
       
@@ -1033,8 +1024,6 @@ export default function CommandCenter() {
           setSelectedNewsArticle(null);
         }}
       />
-      
-      </div>
     </TooltipProvider>
   );
 }
