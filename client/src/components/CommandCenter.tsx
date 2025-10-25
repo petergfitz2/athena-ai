@@ -940,6 +940,18 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
+      {/* Floating Action Button - Talk to Athena (visible when chat is closed) */}
+      {!sidebarOpen && (
+        <Button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed bottom-8 right-8 z-[190] rounded-full p-4 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/30 transition-all duration-300 hover:scale-105"
+          data-testid="button-athena-fab"
+        >
+          <MessageCircle className="w-6 h-6" />
+          <span className="sr-only">Talk to Athena</span>
+        </Button>
+      )}
+      
       {/* Athena AI Chat - Primary Interface for AI-Native Experience */}
       <div className={cn(
         "fixed right-0 top-0 h-full w-full sm:w-[320px] md:w-[340px] lg:w-[360px] bg-gradient-to-br from-black via-black/98 to-primary/5 backdrop-blur-xl border-l border-white/12 transform z-[200] shadow-2xl shadow-black/20",
