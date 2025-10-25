@@ -936,33 +936,28 @@ Your portfolio is up +0.76% today at $125,850. What would you like to explore?`,
         </div>
       </div>
       
-      {/* Floating CTA - Refined & Elegant (visible when chat is closed) */}
+      {/* Floating CTA - Ask Athena Anything (visible when chat is closed) */}
       {!sidebarOpen && (
         <div className="fixed bottom-6 right-6 z-[190]">
           <button
             onClick={() => setSidebarOpen(true)}
             className="group relative transition-all duration-300 hover:scale-105 active:scale-95"
             data-testid="button-athena-fab"
-            aria-label="Chat with Athena AI"
+            aria-label="Ask Athena anything"
           >
             {/* Subtle glow */}
             <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-primary/30 to-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Compact pill design */}
-            <div className="relative flex items-center gap-2.5 px-4 py-2.5 bg-black border border-primary/40 rounded-full shadow-lg backdrop-blur-xl group-hover:border-primary/60 group-hover:bg-primary/10 transition-all duration-300">
-              {/* Avatar - smaller, refined */}
-              <div className="relative">
-                <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-primary/30 group-hover:ring-primary/50 transition-all duration-300">
-                  <AthenaTraderAvatar size="mini" showStatus={false} showName={false} />
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-black" />
-              </div>
+            {/* Compact pill design without avatar */}
+            <div className="relative flex items-center gap-2 px-4 py-2.5 bg-black border border-primary/40 rounded-full shadow-lg backdrop-blur-xl group-hover:border-primary/60 group-hover:bg-primary/10 transition-all duration-300">
+              {/* Message icon */}
+              <MessageCircle className="w-4 h-4 text-primary" />
               
-              {/* Text with icon */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-white text-sm font-medium">Chat</span>
-                <MessageCircle className="w-4 h-4 text-primary/80" />
-              </div>
+              {/* Text */}
+              <span className="text-white text-sm font-medium">Ask Athena</span>
+              
+              {/* Pulse indicator */}
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             </div>
           </button>
         </div>
