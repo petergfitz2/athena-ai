@@ -118,11 +118,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     }
   }, [isPanelOpen, messages.length, getAvatarGreeting]);
 
-  // Save panel states to localStorage
-  useEffect(() => {
-    localStorage.setItem("chatPanelOpen", JSON.stringify(isPanelOpen));
-  }, [isPanelOpen]);
-
+  // Only save collapsed state to localStorage (not open state - should always start closed)
   useEffect(() => {
     localStorage.setItem("chatPanelCollapsed", JSON.stringify(isCollapsed));
   }, [isCollapsed]);
