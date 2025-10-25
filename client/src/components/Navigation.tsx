@@ -212,14 +212,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
             {/* Expandable Search Bar - Responsive */}
             <motion.div 
               ref={searchRef} 
-              className="relative flex-shrink-0 ml-16"
+              className="relative flex-shrink-0 ml-8"
               initial={false}
               animate={{
                 width: searchExpanded 
                   ? typeof window !== 'undefined' && window.innerWidth < 768 
                     ? "calc(100vw - 160px)" // Mobile: account for padding and buttons
-                    : "352px" // Desktop: increased from 320px to 352px (1/3" wider)
-                  : "100px" // Increased from 44px to prevent overlap
+                    : "384px" // Desktop: increased width
+                  : "120px" // Increased to accommodate placeholder text
               }}
               transition={{
                 duration: 0.25,
@@ -250,12 +250,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                       setSearchExpanded(false);
                     }
                   }}
-                  placeholder={searchExpanded ? "Search stocks..." : ""}
+                  placeholder={searchExpanded ? "Search tickers, companies, or ask anything..." : "Search..."}
                   className={`w-full h-11 min-h-[44px] pl-10 pr-10 rounded-[20px] transition-all duration-250 text-sm md:text-base ${
                     searchExpanded 
                       ? "border-white/30 bg-white/10 ring-2 ring-primary/50 placeholder:opacity-100" 
-                      : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-70"
-                  } placeholder:text-muted-foreground placeholder:transition-opacity placeholder:duration-300 focus:ring-2 focus:ring-primary focus:border-primary`}
+                      : "border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer placeholder:opacity-80"
+                  } placeholder:text-muted-foreground placeholder:text-xs placeholder:transition-opacity placeholder:duration-300 ${
+                    !searchExpanded ? "placeholder:truncate" : ""
+                  } focus:ring-2 focus:ring-primary focus:border-primary`}
                   data-testid="input-ticker-search"
                   onClick={() => {
                     if (!searchExpanded) {
