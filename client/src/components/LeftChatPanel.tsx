@@ -33,9 +33,9 @@ export default function LeftChatPanel() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Smart auto-scroll - ALWAYS scrolls to TOP of new AI messages for natural reading
+  // Smart auto-scroll - shows TOP of AI messages, bottom for user messages
   const prevMessageCount = useRef(messages.length);
-  const hasScrolledToLatestAI = useRef(false);
+  const lastScrolledMessageId = useRef<string>("");
   
   useEffect(() => {
     if (scrollAreaRef.current && messages.length > 0) {
@@ -44,41 +44,32 @@ export default function LeftChatPanel() {
       
       const lastMessage = messages[messages.length - 1];
       const isNewMessage = messages.length > prevMessageCount.current;
-      const isAIMessage = lastMessage?.sender === 'ai';
       
-      // NEW AI MESSAGE - always scroll to show its TOP
-      if (isNewMessage && isAIMessage) {
-        hasScrolledToLatestAI.current = false; // Reset flag for new AI message
-      }
-      
-      // If this is an AI message and we haven't scrolled to its top yet
-      if (isAIMessage && !hasScrolledToLatestAI.current && lastMessage?.content) {
-        // Find the message element
-        setTimeout(() => {
-          const messageElements = scrollElement.querySelectorAll('[data-message-id]');
-          const lastMessageElement = messageElements[messageElements.length - 1] as HTMLElement;
-          
-          if (lastMessageElement) {
-            // Check if user is near bottom (within 100px)
-            const isNearBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight < 100;
-            
-            if (isNearBottom) {
-              // Scroll to TOP of the AI message so user can read from beginning
-              lastMessageElement.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start'  // Shows TOP of message, not bottom
-              });
-              hasScrolledToLatestAI.current = true; // Mark that we've scrolled to this AI message
-            }
-          }
-        }, 50); // Small delay to ensure DOM is updated
-      }
-      
-      // For USER messages, just scroll to bottom if near bottom
-      if (isNewMessage && !isAIMessage) {
+      // Only scroll for truly new messages
+      if (isNewMessage && lastMessage) {
+        // Check if user is near bottom (within 100px)
         const isNearBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight < 100;
+        
         if (isNearBottom) {
-          scrollElement.scrollTop = scrollElement.scrollHeight;
+          // Small delay to ensure DOM is ready
+          setTimeout(() => {
+            const messageElements = scrollElement.querySelectorAll('[data-message-id]');
+            const lastMessageElement = messageElements[messageElements.length - 1] as HTMLElement;
+            
+            if (lastMessageElement) {
+              if (lastMessage.sender === 'ai') {
+                // FOR AI MESSAGES: Scroll to TOP of message for natural reading
+                const messageTop = lastMessageElement.offsetTop;
+                scrollElement.scrollTo({
+                  top: messageTop - 10, // Small offset from top
+                  behavior: 'smooth'
+                });
+              } else {
+                // FOR USER MESSAGES: Scroll to bottom to show full message
+                scrollElement.scrollTop = scrollElement.scrollHeight;
+              }
+            }
+          }, 100);
         }
       }
       
