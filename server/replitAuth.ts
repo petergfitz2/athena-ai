@@ -116,23 +116,16 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    // Always use Replit domain for callback to avoid OAuth redirect mismatch
-    const useReplitDomain = process.env.REPLIT_DOMAINS;
-    const callbackURL = useReplitDomain 
-      ? `https://${process.env.REPLIT_DOMAINS}/api/callback`
-      : `http://localhost:5000/api/callback`;
-    
     // Use the correct strategy based on environment
     const strategyName = req.hostname === 'localhost' 
       ? 'replitauth:localhost' 
       : `replitauth:${req.hostname}`;
     
-    console.log('Login attempt with strategy:', strategyName, 'hostname:', req.hostname, 'callbackURL:', callbackURL);
+    console.log('Login attempt with strategy:', strategyName, 'hostname:', req.hostname);
     
     passport.authenticate(strategyName, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
-      callbackURL: callbackURL,  // Explicitly set the callback URL
     })(req, res, next);
   });
 
