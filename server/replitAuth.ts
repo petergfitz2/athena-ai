@@ -91,6 +91,9 @@ export async function setupAuth(app: Express) {
   app.use(passport.session());
 
   const config = await getOidcConfig();
+  console.log('[OAUTH CONFIG] Issuer URL:', process.env.ISSUER_URL ?? "https://replit.com/oidc");
+  console.log('[OAUTH CONFIG] Client ID:', process.env.REPL_ID);
+  console.log('[OAUTH CONFIG] Domains:', process.env.REPLIT_DOMAINS);
 
   const verify: VerifyFunction = async (
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
@@ -130,12 +133,16 @@ export async function setupAuth(app: Express) {
   // Register strategies for all REPLIT_DOMAINS
   for (const domain of process.env
     .REPLIT_DOMAINS!.split(",")) {
+    const callbackUrl = `https://${domain}/api/callback`;
+    console.log(`[OAUTH STRATEGY] Registering strategy for domain: ${domain}`);
+    console.log(`[OAUTH STRATEGY] Callback URL: ${callbackUrl}`);
+    
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
         config,
         scope: "openid email profile offline_access",
-        callbackURL: `https://${domain}/api/callback`,
+        callbackURL: callbackUrl,
       },
       verify,
     );
@@ -165,7 +172,10 @@ export async function setupAuth(app: Express) {
       ? 'replitauth:localhost' 
       : `replitauth:${req.hostname}`;
     
-    console.log('Login attempt with strategy:', strategyName, 'hostname:', req.hostname);
+    console.log('[LOGIN] Starting OAuth flow');
+    console.log('[LOGIN] Strategy:', strategyName);
+    console.log('[LOGIN] Hostname:', req.hostname);
+    console.log('[LOGIN] Full URL:', req.protocol + '://' + req.get('host') + req.originalUrl);
     
     passport.authenticate(strategyName, {
       prompt: "login consent",
