@@ -1920,6 +1920,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Trade suggestions endpoints
+  app.get("/api/trade-suggestions", isAuthenticated, async (req, res) => {
+    try {
+      const { tradeSuggestions } = await import("./services/tradeSuggestions");
+      const userId = (req.user as any).id;
+      const suggestions = await tradeSuggestions.generateTradeSuggestions(userId);
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Trade suggestions error:", error);
+      res.status(500).json({ error: "Failed to generate trade suggestions" });
+    }
+  });
+
+  app.get("/api/portfolio/rebalancing", isAuthenticated, async (req, res) => {
+    try {
+      const { tradeSuggestions } = await import("./services/tradeSuggestions");
+      const userId = (req.user as any).id;
+      const plan = await tradeSuggestions.generateRebalancingPlan(userId);
+      res.json(plan);
+    } catch (error) {
+      console.error("Rebalancing plan error:", error);
+      res.status(500).json({ error: "Failed to generate rebalancing plan" });
+    }
+  });
+
+  app.get("/api/market-insights", isAuthenticated, async (req, res) => {
+    try {
+      const { tradeSuggestions } = await import("./services/tradeSuggestions");
+      const insights = await tradeSuggestions.generateMarketInsights();
+      res.json(insights);
+    } catch (error) {
+      console.error("Market insights error:", error);
+      res.status(500).json({ error: "Failed to generate market insights" });
+    }
+  });
+
   app.get("/api/analytics/stress-test", isAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any).id;
