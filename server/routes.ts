@@ -102,6 +102,11 @@ function getModeChangeReason(
   return `Your current mode works well for this conversation style.`;
 }
 
+// Helper function to extract user ID from various auth formats
+function getUserId(user: any): string | undefined {
+  return user?.id || user?.claims?.sub || user?.sub;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize preset avatars in database on server start
   storage.initializePresetAvatars(avatarPresets).then(() => {
@@ -574,7 +579,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const user = req.user as any;
-      const conversation = await storage.createConversation({ userId: user.id });
+      const userId = getUserId(user);
+      
+      if (!userId) {
+        console.error('[CONVERSATION] No user ID found in user object:', user);
+        return res.status(400).json({ error: "User ID not found" });
+      }
+      
+      const conversation = await storage.createConversation({ userId });
       res.json(conversation);
     } catch (error) {
       res.status(500).json({ error: "Failed to create conversation" });
