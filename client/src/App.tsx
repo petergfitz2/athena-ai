@@ -204,7 +204,7 @@ function AppWithAuth() {
   return (
     <>
       {user && <MarketIndicesTicker />}
-      <div className={user ? "pt-12" : ""}>
+      <div className={user ? "pt-[36px]" : ""}>
         <Router />
       </div>
       <RightChatPanel />

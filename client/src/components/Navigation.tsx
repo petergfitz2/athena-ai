@@ -189,15 +189,14 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
 
   return (
     <nav
-      className={`sticky top-0 z-[100] border-b ${
+      className={`sticky top-0 z-50 h-[56px] border-b ${
         variant === "transparent"
-          ? "bg-black/80 backdrop-blur-xl border-white/5"
-          : "bg-black border-white/10"
+          ? "bg-neutral-900/95 backdrop-blur-sm border-gray-800/60"
+          : "bg-neutral-900 border-gray-800/60"
       }`}
-      style={{ position: 'sticky' }}
     >
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      <div className="w-full h-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-full gap-4">
           {/* Left Side - Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link href="/" className="flex items-center h-12 hover-elevate active-elevate-2 px-3 rounded-lg transition-colors" data-testid="link-logo">
@@ -314,16 +313,16 @@ export default function Navigation({ variant = "default" }: NavigationProps) {
                         className="relative group py-2 transition-colors"
                         data-testid={`link-${link.label.toLowerCase()}`}
                       >
-                        <span className={`text-sm font-medium transition-colors ${
+                        <span className={`text-sm font-medium tracking-wide transition-colors ${
                           active
-                            ? "text-primary"
-                            : "text-white/80 hover:text-white"
+                            ? "text-purple-400"
+                            : "text-gray-200 hover:text-white"
                         }`}>
                           {link.label}
                         </span>
                         {/* Underline animation */}
                         <span 
-                          className={`absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300 ${
+                          className={`absolute bottom-0 left-0 h-[2px] bg-purple-500 transition-all duration-300 ${
                             active 
                               ? "w-full" 
                               : "w-0 group-hover:w-full"
