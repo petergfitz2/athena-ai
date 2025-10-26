@@ -46,10 +46,10 @@ const TickerItem = React.memo(({
       )}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-white/90 text-sm font-medium">
+          <span className="text-gray-200 text-sm font-medium">
             {name}
           </span>
-          <span className="text-white/90 font-mono text-sm tabular-nums">
+          <span className="text-gray-200 font-mono text-sm tabular-nums">
             {formatNumber(price)}
           </span>
         </div>
@@ -79,8 +79,8 @@ const TickerSkeleton = React.memo(() => (
         )}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-white/50 text-sm font-medium">{name}</span>
-            <div className="w-20 h-4 bg-white/10 rounded animate-pulse" />
+            <span className="text-gray-200/50 text-sm font-medium">{name}</span>
+            <div className="w-20 h-4 bg-zinc-800 rounded animate-pulse" />
           </div>
         </div>
       </div>
@@ -99,8 +99,9 @@ export const MarketIndicesTicker = React.memo(() => {
   const [displayIndices, setDisplayIndices] = useState(() => marketIndices);
   const [isInitialized, setIsInitialized] = useState(false);
   const lastDataRef = useRef<string>("");
+  const updateIntervalRef = useRef<NodeJS.Timeout>();
 
-  // Update display indices with a controlled interval to prevent flicker
+  // Update display indices with 15-second interval to prevent flicker
   useEffect(() => {
     if (marketIndices.length > 0) {
       // Only update if not initialized or if there's actual new data
@@ -110,16 +111,25 @@ export const MarketIndicesTicker = React.memo(() => {
         setIsInitialized(true);
         setDisplayIndices(marketIndices);
         lastDataRef.current = currentDataString;
-      } else if (currentDataString !== lastDataRef.current) {
-        // Use a small delay to batch updates and prevent flicker
-        const timeoutId = setTimeout(() => {
-          setDisplayIndices(marketIndices);
-          lastDataRef.current = currentDataString;
-        }, 100);
         
-        return () => clearTimeout(timeoutId);
+        // Set up 15-second interval for updates
+        updateIntervalRef.current = setInterval(() => {
+          if (lastDataRef.current !== JSON.stringify(marketIndices)) {
+            setDisplayIndices(marketIndices);
+            lastDataRef.current = JSON.stringify(marketIndices);
+          }
+        }, 15000);
+      } else if (currentDataString !== lastDataRef.current) {
+        // Cache the update for next interval
+        lastDataRef.current = currentDataString;
       }
     }
+    
+    return () => {
+      if (updateIntervalRef.current) {
+        clearInterval(updateIntervalRef.current);
+      }
+    };
   }, [marketIndices, isInitialized]); // Fixed dependency array
 
   // Memoize the ticker content to prevent unnecessary re-renders
@@ -149,32 +159,32 @@ export const MarketIndicesTicker = React.memo(() => {
   }
 
   return (
-    <div className="w-full bg-gradient-to-r from-zinc-900 to-zinc-800 backdrop-blur-2xl border-b border-white/10">
+    <div className="w-full bg-zinc-900 transition-none animate-none shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)]">
       <div className="relative">
         {/* Main ticker content */}
-        <div className="px-6 py-2">
+        <div className="px-4 py-2">
           <div className="max-w-screen-2xl mx-auto">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between divide-x divide-gray-700/50">
               {/* Ticker items */}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden pr-4">
                 {tickerContent}
               </div>
 
               {/* Connection status indicator */}
-              <div className="ml-6 flex-shrink-0">
+              <div className="pl-4 flex-shrink-0">
                 <div className={cn(
-                  "flex items-center gap-2 text-xs",
-                  status.connected ? "text-emerald-400/70" : "text-amber-400/70"
+                  "flex items-center gap-2 text-xs transition-none",
+                  status.connected ? "text-indigo-400" : "text-amber-400"
                 )}>
                   <div className={cn(
-                    "w-1.5 h-1.5 rounded-full",
+                    "w-1.5 h-1.5 rounded-full transition-none",
                     status.connected 
-                      ? "bg-emerald-400 animate-pulse" 
+                      ? "bg-indigo-400 animate-pulse" 
                       : status.reconnecting 
                       ? "bg-amber-400 animate-pulse" 
                       : "bg-gray-400"
                   )} />
-                  <span className="font-mono text-white/70 uppercase tracking-wider">
+                  <span className="font-mono text-gray-200 uppercase tracking-wider">
                     {status.connected ? "LIVE" : status.reconnecting ? "RECONNECTING" : "OFFLINE"}
                   </span>
                 </div>
@@ -185,8 +195,8 @@ export const MarketIndicesTicker = React.memo(() => {
 
         {/* Last update timestamp - subtle and unobtrusive */}
         {lastUpdate && status.connected && (
-          <div className="absolute left-6 bottom-0 pb-0.5">
-            <span className="text-[10px] text-white/30 font-mono">
+          <div className="absolute left-4 bottom-0 pb-0.5">
+            <span className="text-[10px] text-gray-200/30 font-mono transition-none">
               Last updated: {new Date(lastUpdate).toLocaleTimeString()}
             </span>
           </div>
