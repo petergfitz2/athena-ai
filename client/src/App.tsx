@@ -37,6 +37,7 @@ import LeaderboardPage from "@/pages/LeaderboardPage";
 import NewsAggregationPage from "@/pages/NewsAggregationPage";
 import NotFound from "@/pages/not-found";
 import AnimatedPage from "@/components/AnimatedPage";
+import { TradeNotification, useTradeNotifications } from "@/components/TradeNotification";
 
 // Command Center is now the default - no mode selection needed
 function CommandCenterWrapper() {
