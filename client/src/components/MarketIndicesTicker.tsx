@@ -40,16 +40,16 @@ const TickerItem = React.memo(({
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center px-4">
       {showDivider && (
-        <div className="h-4 border-l border-gray-700/50 mr-6" />
+        <div className="h-4 border-l border-gray-700/50" />
       )}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 pl-4">
         <div className="flex items-center gap-2">
-          <span className="text-gray-200 text-sm font-medium">
+          <span className="text-gray-200 text-sm font-medium tracking-wide">
             {name}
           </span>
-          <span className="text-gray-200 font-mono text-sm tabular-nums">
+          <span className="text-gray-300 font-mono text-sm tabular-nums">
             {formatNumber(price)}
           </span>
         </div>
@@ -73,13 +73,13 @@ TickerItem.displayName = 'TickerItem';
 const TickerSkeleton = React.memo(() => (
   <div className="flex items-center justify-evenly w-full">
     {["DOW", "S&P 500", "NASDAQ", "VIX"].map((name, index) => (
-      <div key={name} className="flex items-center">
+      <div key={name} className="flex items-center px-4">
         {index > 0 && (
-          <div className="h-4 border-l border-gray-700/50 mr-6" />
+          <div className="h-4 border-l border-gray-700/50" />
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pl-4">
           <div className="flex items-center gap-2">
-            <span className="text-gray-200/50 text-sm font-medium">{name}</span>
+            <span className="text-gray-200/50 text-sm font-medium tracking-wide">{name}</span>
             <div className="w-20 h-4 bg-zinc-800 rounded animate-pulse" />
           </div>
         </div>
@@ -159,48 +159,36 @@ export const MarketIndicesTicker = React.memo(() => {
   }
 
   return (
-    <div className="w-full bg-zinc-900 transition-none animate-none shadow-[inset_0_-1px_0_rgba(255,255,255,0.05)]">
-      <div className="relative">
-        {/* Main ticker content */}
-        <div className="px-4 py-2">
-          <div className="max-w-screen-2xl mx-auto">
-            <div className="flex items-center justify-between divide-x divide-gray-700/50">
-              {/* Ticker items */}
-              <div className="flex-1 overflow-hidden pr-4">
-                {tickerContent}
-              </div>
+    <div className="sticky top-0 z-40 w-full h-[36px] bg-neutral-900 border-b border-gray-800/60">
+      <div className="h-full flex items-center px-4">
+        <div className="max-w-screen-2xl mx-auto w-full">
+          <div className="flex items-center justify-between">
+            {/* Ticker items */}
+            <div className="flex-1 flex items-center justify-evenly overflow-hidden whitespace-nowrap">
+              {tickerContent}
+            </div>
 
-              {/* Connection status indicator */}
-              <div className="pl-4 flex-shrink-0">
+            {/* Connection status indicator */}
+            <div className="flex-shrink-0 pl-4 border-l border-gray-700/50">
+              <div className={cn(
+                "flex items-center gap-2 text-xs",
+                status.connected ? "text-indigo-400" : "text-amber-400"
+              )}>
                 <div className={cn(
-                  "flex items-center gap-2 text-xs transition-none",
-                  status.connected ? "text-indigo-400" : "text-amber-400"
-                )}>
-                  <div className={cn(
-                    "w-1.5 h-1.5 rounded-full transition-none",
-                    status.connected 
-                      ? "bg-indigo-400 animate-pulse" 
-                      : status.reconnecting 
-                      ? "bg-amber-400 animate-pulse" 
-                      : "bg-gray-400"
-                  )} />
-                  <span className="font-mono text-gray-200 uppercase tracking-wider">
-                    {status.connected ? "LIVE" : status.reconnecting ? "RECONNECTING" : "OFFLINE"}
-                  </span>
-                </div>
+                  "w-1.5 h-1.5 rounded-full",
+                  status.connected 
+                    ? "bg-indigo-400 animate-pulse" 
+                    : status.reconnecting 
+                    ? "bg-amber-400 animate-pulse" 
+                    : "bg-gray-400"
+                )} />
+                <span className="font-mono text-gray-200 uppercase tracking-wider">
+                  {status.connected ? "LIVE" : status.reconnecting ? "RECONNECTING" : "OFFLINE"}
+                </span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Last update timestamp - subtle and unobtrusive */}
-        {lastUpdate && status.connected && (
-          <div className="absolute left-4 bottom-0 pb-0.5">
-            <span className="text-[10px] text-gray-200/30 font-mono transition-none">
-              Last updated: {new Date(lastUpdate).toLocaleTimeString()}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
