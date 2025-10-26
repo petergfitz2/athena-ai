@@ -138,18 +138,30 @@ export function MarketSentiment() {
   return (
     <div className="space-y-6">
       {/* Market Sentiment Card */}
-      <Card className="rounded-[28px] bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl border-white/10">
-        <CardHeader>
+      <Card className="rounded-[28px] bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl border-white/10 relative overflow-hidden">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/10 animate-pulse" />
+        </div>
+        
+        <CardHeader className="relative z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-primary/10 backdrop-blur-xl">
+              <motion.div 
+                className="p-3 rounded-xl bg-primary/10 backdrop-blur-xl"
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
                 <Brain className="w-6 h-6 text-primary" />
-              </div>
+              </motion.div>
               <div>
                 <CardTitle className="text-2xl font-extralight">AI Market Analysis</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Powered by advanced pattern recognition
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <p className="text-sm text-muted-foreground">
+                    Live pattern recognition active
+                  </p>
+                </div>
               </div>
             </div>
             <Button
@@ -177,34 +189,82 @@ export function MarketSentiment() {
               className="space-y-6"
             >
               {/* Sentiment Overview */}
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/[0.02] border border-primary/10">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={cn("p-2 rounded-lg bg-white/5", getSentimentColor(insights.sentiment))}>
-                      {getSentimentIcon(insights.sentiment)}
+              <motion.div 
+                className="p-6 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/[0.02] border border-primary/10 relative overflow-hidden"
+                whileHover={{ scale: 1.01 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                {/* Animated background based on sentiment */}
+                <div className={cn(
+                  "absolute inset-0 opacity-10",
+                  insights.sentiment === "bullish" ? "bg-gradient-to-br from-green-500 to-transparent" :
+                  insights.sentiment === "bearish" ? "bg-gradient-to-br from-red-500 to-transparent" :
+                  "bg-gradient-to-br from-yellow-500 to-transparent"
+                )} />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <motion.div 
+                        className={cn("p-3 rounded-xl bg-white/10 backdrop-blur", getSentimentColor(insights.sentiment))}
+                        animate={{ 
+                          y: insights.sentiment === "bullish" ? [-2, 2, -2] : 
+                             insights.sentiment === "bearish" ? [2, -2, 2] : 
+                             [0, 0, 0] 
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        {getSentimentIcon(insights.sentiment)}
+                      </motion.div>
+                      <div>
+                        <h3 className="text-2xl font-extralight capitalize flex items-center gap-2">
+                          {insights.sentiment} Market
+                          {insights.confidence >= 80 && (
+                            <Badge variant="outline" className="text-xs bg-green-500/10 border-green-500/20">
+                              High Confidence
+                            </Badge>
+                          )}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          AI confidence: <span className="font-medium text-white">{insights.confidence.toFixed(0)}%</span>
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-light capitalize">{insights.sentiment} Market</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {insights.confidence.toFixed(0)}% confidence level
-                      </p>
-                    </div>
+                    <Badge variant="outline" className="no-default-hover-elevate bg-green-500/10 border-green-500/20">
+                      <Activity className="w-3 h-3 mr-1 text-green-500" />
+                      <span className="text-green-500">Live</span>
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="no-default-hover-elevate">
-                    <Activity className="w-3 h-3 mr-1" />
-                    Live Analysis
-                  </Badge>
-                </div>
 
-                {/* Confidence Bar */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Analysis Confidence</span>
-                    <span>{insights.confidence.toFixed(0)}%</span>
+                  {/* Enhanced Confidence Bar */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Analysis Strength</span>
+                      <motion.span 
+                        className="font-medium"
+                        key={insights.confidence}
+                        initial={{ scale: 1.2, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                      >
+                        {insights.confidence.toFixed(0)}%
+                      </motion.span>
+                    </div>
+                    <div className="relative h-3 rounded-full bg-white/5 overflow-hidden">
+                      <motion.div
+                        className={cn(
+                          "absolute inset-y-0 left-0 rounded-full",
+                          insights.sentiment === "bullish" ? "bg-gradient-to-r from-green-500 to-green-400" :
+                          insights.sentiment === "bearish" ? "bg-gradient-to-r from-red-500 to-red-400" :
+                          "bg-gradient-to-r from-yellow-500 to-yellow-400"
+                        )}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${insights.confidence}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                      />
+                    </div>
                   </div>
-                  <Progress value={insights.confidence} className="h-2" />
                 </div>
-              </div>
+              </motion.div>
 
               {/* Key Market Factors */}
               <div className="space-y-3">
