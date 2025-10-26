@@ -5,6 +5,19 @@ Athena AI Investing is a luxury AI-powered investment platform designed to be a 
 
 ### Recent Improvements (Oct 26, 2025)
 
+#### Demo Mode Implementation
+- **Complete Public Access**: Platform now fully accessible without authentication via demo mode
+- **Seamless Experience**: Demo users automatically get demo@athena.ai identity with sample portfolio
+- **All Features Available**: Trading, AI chat, portfolio analytics all work in demo mode
+- **Demo Portfolio**: Includes AAPL, MSFT, GOOGL, TSLA, NVDA, META, AMZN, JPM with realistic values ($125,850 total)
+- **In-Memory Conversations**: Demo conversations stored temporarily in memory for session persistence
+
+#### Authentication & Session Management
+- **Fixed Critical Bug**: Resolved session cookies always being secure (HTTPS-only), now works in development
+- **Auto-create Sessions Table**: Sessions table automatically created if missing
+- **isAuthenticatedOrDemo Middleware**: New middleware allows both authenticated and demo users
+- **Seamless Transition**: Users can explore in demo mode then sign up for full features
+
 #### Market Ticker Enhancements
 - **Enhanced Visibility**: Applied bright white text (90% opacity) with proper padding for better readability
 - **Eliminated Flicker**: Fixed infinite re-render bug using React.memo and stable state management
