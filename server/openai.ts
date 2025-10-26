@@ -56,12 +56,59 @@ export async function generateAIResponse(
   // Fetch user's active avatar
   const activeAvatar = await storage.getActiveAvatar(context.userId);
   
-  // Build portfolio context for the AI
-  const portfolioSummary = context.holdings.length > 0
-    ? context.holdings
-        .map((h) => `${h.symbol}: ${h.quantity} shares @ avg $${h.averageCost}`)
-        .join(", ")
-    : "No holdings yet";
+  // Build enhanced portfolio context for the AI
+  let portfolioSummary = "No holdings yet";
+  let portfolioMetrics = "";
+  
+  if (context.holdings.length > 0) {
+    // Calculate total value and P&L
+    let totalValue = 0;
+    let totalCost = 0;
+    let topPerformer = { symbol: "", gain: -Infinity };
+    let worstPerformer = { symbol: "", gain: Infinity };
+    
+    for (const holding of context.holdings) {
+      const currentValue = holding.quantity * (holding.currentPrice || holding.averageCost);
+      const cost = holding.quantity * holding.averageCost;
+      const gainPercent = ((currentValue - cost) / cost) * 100;
+      
+      totalValue += currentValue;
+      totalCost += cost;
+      
+      if (gainPercent > topPerformer.gain) {
+        topPerformer = { symbol: holding.symbol, gain: gainPercent };
+      }
+      if (gainPercent < worstPerformer.gain) {
+        worstPerformer = { symbol: holding.symbol, gain: gainPercent };
+      }
+    }
+    
+    const totalGain = totalValue - totalCost;
+    const totalGainPercent = ((totalGain / totalCost) * 100).toFixed(1);
+    
+    // Build holdings summary
+    portfolioSummary = context.holdings
+      .slice(0, 5) // Top 5 holdings for brevity
+      .map((h) => {
+        const currentValue = h.quantity * (h.currentPrice || h.averageCost);
+        const gain = ((currentValue - h.quantity * h.averageCost) / (h.quantity * h.averageCost) * 100).toFixed(1);
+        return `${h.symbol}: ${h.quantity} shares (${gain > 0 ? '+' : ''}${gain}%)`;
+      })
+      .join(", ");
+    
+    if (context.holdings.length > 5) {
+      portfolioSummary += ` +${context.holdings.length - 5} more`;
+    }
+    
+    // Build metrics summary
+    portfolioMetrics = `
+PORTFOLIO METRICS:
+• Total Value: $${totalValue.toLocaleString()}
+• Total P&L: ${totalGain >= 0 ? '+' : ''}$${totalGain.toLocaleString()} (${totalGain >= 0 ? '+' : ''}${totalGainPercent}%)
+• Holdings: ${context.holdings.length} positions
+• Top Performer: ${topPerformer.symbol} ${topPerformer.gain > 0 ? '+' : ''}${topPerformer.gain.toFixed(1)}%
+• Worst Performer: ${worstPerformer.symbol} ${worstPerformer.gain > 0 ? '+' : ''}${worstPerformer.gain.toFixed(1)}%`;
+  }
 
   // Build avatar personality context
   let avatarContext = "";
@@ -163,6 +210,7 @@ RESPONSE STRUCTURE:
   const systemPrompt = `${avatarContext || `You are ${avatarName}, an investment information assistant providing market data and analysis.`}
 
 USER PORTFOLIO: ${portfolioSummary}
+${portfolioMetrics}
 
 YOUR APPROACH:
 • Keep responses to 3-5 sentences MAX
