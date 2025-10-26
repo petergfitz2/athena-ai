@@ -149,7 +149,7 @@ export const MarketIndicesTicker = React.memo(() => {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-zinc-900 to-zinc-800 backdrop-blur-2xl border-b border-white/10 shadow-lg">
+    <div className="w-full bg-gradient-to-r from-zinc-900 to-zinc-800 backdrop-blur-2xl border-b border-white/10">
       <div className="relative">
         {/* Main ticker content */}
         <div className="px-6 py-2">
