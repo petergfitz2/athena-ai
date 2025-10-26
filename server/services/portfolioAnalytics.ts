@@ -340,8 +340,8 @@ export class PortfolioAnalyticsService {
     }
 
     // Calculate weighted portfolio metrics
-    const totalValue = holdings.reduce((sum, h) => sum + (h.quantity * h.averagePrice), 0);
-    const weights = holdings.map(h => (h.quantity * h.averagePrice) / totalValue);
+    const totalValue = holdings.reduce((sum, h) => sum + (parseFloat(h.quantity) * parseFloat(h.averageCost)), 0);
+    const weights = holdings.map(h => (parseFloat(h.quantity) * parseFloat(h.averageCost)) / totalValue);
     
     // Generate returns
     const portfolioReturns = this.generateMockReturns("PORTFOLIO", 252);
