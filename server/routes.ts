@@ -6,7 +6,7 @@ import { db } from "./db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { avatarPresets } from "./avatarPresets";
-import { isAuthenticated } from "./replitAuth";
+import { isAuthenticated, isAuthenticatedOrDemo } from "./replitAuth";
 import { insertUserSchema, insertHoldingSchema, insertTradeSchema, type PortfolioSummary } from "@shared/schema";
 import { generateAIResponse, generateTradeSuggestions } from "./openai";
 import { processVoiceInput } from "./voice";
@@ -168,12 +168,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get current user endpoint
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Get current user endpoint - works in demo mode
+  app.get('/api/auth/user', isAuthenticatedOrDemo, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const user = req.user;
+      if (user.isDemo) {
+        // Return demo user data
+        res.json({
+          id: 'demo-user',
+          email: 'demo@athena.ai',
+          firstName: 'Demo',
+          lastName: 'User',
+          profileImageUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+        });
+      } else {
+        const userId = user.claims.sub;
+        const userData = await storage.getUser(userId);
+        res.json(userData);
+      }
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -183,7 +195,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: Logout is handled by Replit Auth at /api/logout
   
   app.get("/api/auth/me", (req: any, res) => {
-    if (req.isAuthenticated() && req.user) {
+    // Always return a user for demo mode
+    if (!req.user) {
+      // Return demo user for unauthenticated requests
+      res.json({
+        id: 'demo-user',
+        email: 'demo@athena.ai',
+        firstName: 'Demo',
+        lastName: 'User',
+        profileImageUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+        isDemo: true,
+      });
+    } else if (req.isAuthenticated() && req.user) {
       const user = req.user;
       res.json({
         id: user.claims.sub,
@@ -935,9 +958,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/avatars/active", isAuthenticated, async (req, res) => {
+  app.get("/api/avatars/active", isAuthenticatedOrDemo, async (req, res) => {
     try {
       const user = req.user as any;
+      
+      // For demo users, always return Athena
+      if (user.isDemo) {
+        return res.json({
+          name: "Athena",
+          imageUrl: "/avatars/athena-default.png",
+          personalityProfile: {
+            catchphrase: "Your AI Investment Advisor",
+            traits: ["intelligent", "professional"],
+            tradingStyle: "balanced",
+            tone: "professional"
+          }
+        });
+      }
+      
       const activeAvatar = await storage.getActiveAvatar(user.id);
       
       if (!activeAvatar) {

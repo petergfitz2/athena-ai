@@ -50,8 +50,8 @@ interface ChatProviderProps {
 
 export function ChatProvider({ children }: ChatProviderProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  // CRITICAL: Panel must ALWAYS start closed - no exceptions
-  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(false);
+  // Panel starts open by default for AI-native experience
+  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(true);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("chatPanelCollapsed");
     return saved ? JSON.parse(saved) : false;
@@ -106,12 +106,12 @@ export function ChatProvider({ children }: ChatProviderProps) {
     return `Hi! I'm ${name}, your AI investment assistant. I can help you analyze stocks, suggest trades, and answer any questions about your portfolio. What would you like to know?`;
   }, [activeAvatar]);
 
-  // CRITICAL: Ensure panel starts closed on mount - double-check initialization
+  // Ensure panel starts open on mount for AI-native experience
   useEffect(() => {
-    console.log('[ChatPanel] Ensuring panel starts closed');
-    setIsPanelOpen(false);
-    // Remove any lingering localStorage that might open it
-    localStorage.removeItem("chatPanelOpen");
+    console.log('[ChatPanel] Initializing panel in open state');
+    setIsPanelOpen(true);
+    // Store the open state
+    localStorage.setItem("chatPanelOpen", "true");
   }, []);
 
   // Initialize welcome message when panel first opens

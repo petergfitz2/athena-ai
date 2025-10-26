@@ -246,7 +246,7 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user.expires_at) {
+  if (!req.isAuthenticated() || !user?.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -270,4 +270,44 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
+};
+
+// Demo mode middleware - allows unauthenticated access with demo data
+export const isAuthenticatedOrDemo: RequestHandler = async (req, res, next) => {
+  const user = req.user as any;
+
+  // Check if user is authenticated
+  if (req.isAuthenticated() && user?.expires_at) {
+    const now = Math.floor(Date.now() / 1000);
+    if (now <= user.expires_at) {
+      return next();
+    }
+
+    const refreshToken = user.refresh_token;
+    if (refreshToken) {
+      try {
+        const config = await getOidcConfig();
+        const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
+        updateUserSession(user, tokenResponse);
+        return next();
+      } catch (error) {
+        // Continue to demo mode if refresh fails
+      }
+    }
+  }
+
+  // Create demo user for unauthenticated access
+  req.user = {
+    id: 'demo-user',
+    claims: {
+      sub: 'demo-user',
+      email: 'demo@athena.ai',
+      first_name: 'Demo',
+      last_name: 'User',
+      profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+    },
+    isDemo: true,
+  } as any;
+  
+  return next();
 };
